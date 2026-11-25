@@ -63,7 +63,7 @@ test("an approved coupon outside the limits is refused before Stripe is called",
   if (!execute) throw new Error("create_coupon has no execute");
   const output = (await execute(
     { code: "HUGE90", percentOff: 90, duration: "once" },
-    { toolCallId: "test", messages: [] },
+    { toolCallId: "test", messages: [], context: {} },
   )) as CreateCouponOutput;
   expect(output).toEqual({ made: false, problem: "The largest discount allowed is 50%." });
 });

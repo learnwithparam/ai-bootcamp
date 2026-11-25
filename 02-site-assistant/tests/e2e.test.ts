@@ -113,6 +113,9 @@ test("signing up with a paying customer's email does not reach their plan", asyn
   customers.push(await payingCustomer(email));
   await signUp(await browser.newPage(), email);
   const account = await accountByEmail(email);
-  const plan = await myPlan(account?.id ?? null).execute?.({}, { toolCallId: "test", messages: [] });
+  const plan = await myPlan(account?.id ?? null).execute?.(
+    {},
+    { toolCallId: "test", messages: [], context: {} },
+  );
   expect(plan).toEqual({ signedIn: true, plan: null });
 }, 60_000);

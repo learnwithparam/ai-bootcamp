@@ -39,7 +39,9 @@ async function waitForApproval(
 export async function login(server: string): Promise<string> {
   const setup = await fetch(`${server}/api/cli-client`);
   if (!setup.ok) throw new Error(`${server} is not ready: ${await setup.text()}`);
-  const { clientId, resource, scope } = (await setup.json()) as Record<string, string>;
+  const { clientId, resource, scope } = (await setup.json()) as Partial<Record<string, string>>;
+  if (!clientId || !resource || !scope)
+    throw new Error(`${server}/api/cli-client did not name the client to sign in with.`);
   const started = await post(`${server}/api/auth/device/code`, { client_id: clientId, scope, resource });
   if (!started.ok) throw new Error(`Could not start sign-in: ${await started.text()}`);
   const code = (await started.json()) as { device_code: string; user_code: string; interval: number };
