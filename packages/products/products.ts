@@ -47,6 +47,14 @@ export const PRODUCTS: Product[] = [
     port: 3102,
     ideas: ["loop", "context", "decision model", "boundary", "verification", "human in the loop"],
   },
+  {
+    folder: "04-mcp-server-and-cli",
+    slug: "mcp-server-and-cli",
+    title: "MCP server and CLI",
+    job: "Offer the school's catalog as one set of tools, used from chat, from Claude or Cursor, and from a terminal.",
+    port: 3104,
+    ideas: ["mcp", "cli", "boundary"],
+  },
 ];
 
 export const ALL_PORTS = [GALLERY_PORT, ...PRODUCTS.map((product) => product.port)];

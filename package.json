@@ -7,14 +7,16 @@
     "packages/*",
     "gallery",
     "01-invoice-inbox",
-    "02-site-assistant"
+    "02-site-assistant",
+    "04-mcp-server-and-cli"
   ],
   "scripts": {
     "setup": "bun scripts/setup.ts",
     "dev": "bun scripts/dev.ts",
     "seed": "bun scripts/seed.ts",
     "proof": "bun scripts/proof.ts",
-    "check": "bun scripts/check.ts"
+    "check": "bun scripts/check.ts",
+    "cli": "bun 04-mcp-server-and-cli/cli/learnwithparam.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.9",

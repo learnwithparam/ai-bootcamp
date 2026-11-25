@@ -17,6 +17,8 @@ if (command === "generate") {
 
 console.log("== Sign-in tables");
 await $`bunx auth@1.7.23 migrate --config packages/auth/auth.ts -y`;
+// The MCP server adds OAuth tables (clients, tokens, consents, signing keys) to the same accounts.
+await $`bunx auth@1.7.23 migrate --config 04-mcp-server-and-cli/auth/auth.ts -y`;
 
 for (const product of PRODUCTS) {
   if (!existsSync(join(product.folder, "drizzle.config.ts"))) continue;

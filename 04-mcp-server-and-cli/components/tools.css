@@ -1,0 +1,63 @@
+/* The tools page: tools on the left, chat on the right. */
+.workbench {
+  display: grid;
+  grid-template-columns: minmax(320px, 420px) 1fr;
+  min-height: 0;
+}
+
+.side {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 16px;
+  overflow-y: auto;
+  border-right: 1px solid var(--line);
+}
+
+.tools {
+  display: grid;
+  gap: 12px;
+}
+
+.tool p,
+.connect p {
+  margin: 0 0 8px;
+  color: var(--fg2);
+}
+
+.tool .field {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.tool-output {
+  margin: 8px 0 0;
+  padding: 8px;
+  max-height: 260px;
+  overflow: auto;
+  border-radius: var(--r);
+  background: var(--bg);
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.tool-error {
+  color: var(--fail);
+}
+
+@media (max-width: 800px) {
+  .workbench {
+    grid-template-columns: 1fr;
+  }
+  .side {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+}
+
+.device-code {
+  font-family: var(--mono);
+  font-size: 1.5rem;
+  letter-spacing: 0.2em;
+}
