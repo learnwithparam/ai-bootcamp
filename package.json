@@ -10,7 +10,8 @@
     "02-site-assistant",
     "04-mcp-server-and-cli",
     "05-admin-assistant",
-    "06-research-agent"
+    "06-research-agent",
+    "07-legal-intake"
   ],
   "scripts": {
     "setup": "bun scripts/setup.ts",

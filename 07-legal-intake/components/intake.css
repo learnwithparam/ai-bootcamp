@@ -1,0 +1,204 @@
+/* The legal intake screens, on the shared buildcamp theme. Every colour comes from packages/ui/tokens.css.
+   One loud thing only: the letter, set like paper. */
+
+.desk {
+  width: min(880px, 100% - 32px);
+  margin: 0 auto;
+  padding: 28px 0 64px;
+  display: grid;
+  gap: 28px;
+  align-content: start;
+  overflow-y: auto;
+}
+
+.desk > * {
+  min-width: 0;
+}
+.back {
+  color: var(--fg2);
+  font-size: 14px;
+}
+
+.desk h1 {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.intro p,
+.client-wait {
+  max-width: 62ch;
+  color: var(--fg2);
+}
+
+.intake-form,
+.review-form {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--fg);
+  border-radius: var(--r);
+  background: var(--surface);
+}
+
+.field-label {
+  display: grid;
+  gap: 6px;
+  font-weight: 700;
+}
+
+.field-label .field {
+  font-weight: 400;
+}
+
+.field-label span {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.intake-form .button,
+.review-actions {
+  justify-self: start;
+}
+
+.review-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.check-line {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.queue {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+
+.queue-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--line);
+  color: inherit;
+  text-decoration: none;
+}
+
+.queue-row:hover,
+.queue-row:focus-visible {
+  background: var(--hl);
+}
+
+.queue-name {
+  flex: 1 1 200px;
+  font-weight: 700;
+}
+
+.queue-area,
+.queue-deadline,
+.matter-cost,
+.story-meta {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.matter {
+  display: grid;
+  gap: 20px;
+}
+
+.matter-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+}
+
+.assessment .area {
+  margin: 0;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.deadline {
+  padding: 10px 12px;
+  border-left: 4px solid var(--wait);
+  background: var(--waitbg);
+}
+
+.conflicts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.conflict {
+  padding: 10px 12px;
+  border-left: 4px solid var(--wait);
+  background: var(--waitbg);
+}
+
+.conflict-exact {
+  border-color: var(--fail);
+  background: var(--failbg);
+}
+
+.clear {
+  color: var(--pass);
+  font-weight: 700;
+}
+
+.story summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.story p {
+  white-space: pre-wrap;
+}
+
+.letter-field {
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1.6;
+}
+
+/* The one loud thing: the letter the client reads, set like a page of paper. */
+.letter {
+  padding: 40px 44px;
+  border: 1px solid var(--line);
+  border-top: 6px solid var(--fg);
+  background: var(--surface);
+  box-shadow:
+    0 1px 0 var(--line),
+    0 12px 32px -24px var(--fg);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.letter-date {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 14px;
+}
+
+.letter-body {
+  max-width: 64ch;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 600px) {
+  .letter {
+    padding: 24px 20px;
+  }
+}

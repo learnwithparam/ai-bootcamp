@@ -19,6 +19,7 @@ This repo is where you see those ideas working together in a product.
 | 3 | [MCP server and CLI](04-mcp-server-and-cli/README.md) | Offer the school's catalog as one set of tools, used from chat, from Claude or Cursor, and from a terminal. | mcp, cli, boundary |
 | 4 | [Admin assistant](05-admin-assistant/README.md) | Answer the owner's questions about signups, make Stripe coupons after approval, and draft the newsletter. | skills, ui the agent draws, human in the loop, boundary |
 | 5 | [Research agent](06-research-agent/README.md) | Research a company on the live web, check every claim against its page, and score it as a lead. | graph, verification, structured output |
+| 6 | [Legal intake](07-legal-intake/README.md) | Take a client's request, check it for conflicts, and wait for a lawyer to decide, even across a restart. | graph, human in the loop, boundary, verification |
 <!-- products:end -->
 
 ## How each product folder is laid out

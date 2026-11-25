@@ -71,6 +71,14 @@ export const PRODUCTS: Product[] = [
     port: 3106,
     ideas: ["graph", "verification", "structured output"],
   },
+  {
+    folder: "07-legal-intake",
+    slug: "legal-intake",
+    title: "Legal intake",
+    job: "Take a client's request, check it for conflicts, and wait for a lawyer to decide, even across a restart.",
+    port: 3107,
+    ideas: ["graph", "human in the loop", "boundary", "verification"],
+  },
 ];
 
 export const ALL_PORTS = [GALLERY_PORT, ...PRODUCTS.map((product) => product.port)];
