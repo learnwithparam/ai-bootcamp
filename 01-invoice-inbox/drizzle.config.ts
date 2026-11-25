@@ -9,5 +9,7 @@ export default defineConfig({
   schema: "./db/schema.ts",
   out: "./db/migrations",
   schemaFilter: ["invoice_inbox"],
+  // Each product records its own applied migrations, so one product's history never hides another's.
+  migrations: { schema: "drizzle", table: "invoice_inbox_migrations" },
   dbCredentials: { url },
 });

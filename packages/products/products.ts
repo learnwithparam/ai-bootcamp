@@ -39,6 +39,14 @@ export const PRODUCTS: Product[] = [
     port: 3101,
     ideas: ["structured output", "verification", "human in the loop"],
   },
+  {
+    folder: "02-site-assistant",
+    slug: "site-assistant",
+    title: "Site assistant",
+    job: "Answer visitors from the site's own pages, show members their plan, and hand off to a person.",
+    port: 3102,
+    ideas: ["loop", "context", "decision model", "boundary", "verification", "human in the loop"],
+  },
 ];
 
 export const ALL_PORTS = [GALLERY_PORT, ...PRODUCTS.map((product) => product.port)];

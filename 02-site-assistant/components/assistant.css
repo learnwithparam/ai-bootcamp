@@ -1,0 +1,65 @@
+/* Styles only this product needs. Colours come from the shared tokens. */
+
+.source a {
+  color: var(--fg);
+}
+
+.plan {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 16px;
+  margin: 0;
+}
+
+.plan dt {
+  color: var(--muted);
+}
+
+.plan dd {
+  margin: 0;
+}
+
+.handed-off .card-head {
+  background: var(--passbg);
+}
+
+.chat-error {
+  border-color: var(--fail);
+  background: var(--failbg);
+  margin-top: 8px;
+}
+
+.queue {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.queue h1 {
+  margin: 0 0 4px;
+}
+
+.hint,
+.empty-queue {
+  color: var(--muted);
+}
+
+.tickets {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 16px;
+}
+
+.ticket-summary {
+  margin: 0 0 8px;
+}
+
+.transcript {
+  padding-left: 20px;
+  color: var(--fg2);
+}
+
+.tickets form {
+  margin-top: 12px;
+}

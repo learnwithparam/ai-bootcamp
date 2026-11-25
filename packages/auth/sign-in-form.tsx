@@ -1,8 +1,8 @@
 "use client";
 
-import { authClient } from "@bootcamp/auth/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { authClient } from "./client";
 
 // Real accounts: the password is hashed and the session is kept in Postgres. One account works in every product.
 export function SignInForm() {
@@ -20,7 +20,7 @@ export function SignInForm() {
     <form action={submit} className="sign-in-form">
       <Fields creating={creating} />
       {error ? (
-        <p className="upload-failed" role="alert">
+        <p className="form-error" role="alert">
           {error}
         </p>
       ) : null}

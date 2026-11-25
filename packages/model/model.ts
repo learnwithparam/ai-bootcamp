@@ -1,6 +1,6 @@
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createOpenRouter } from "@openrouter/ai-sdk-provider";
-import type { LanguageModel } from "ai";
+import type { EmbeddingModel, LanguageModel } from "ai";
 
 // The one place a product gets its model. Set MODEL in .env as provider:model, for example
 //   MODEL=openrouter:openai/gpt-6-luna
@@ -27,4 +27,10 @@ export function model(setting: string = required("MODEL")): LanguageModel {
     return createAnthropic({ apiKey: required("ANTHROPIC_API_KEY") })(name);
   }
   throw new Error(`MODEL provider must be openrouter or anthropic, got "${provider}".`);
+}
+
+// The model that turns text into a list of numbers, so pages can be searched by meaning.
+// Anthropic has no embedding model, so this always goes through OpenRouter. Set EMBEDDING_MODEL in the settings file.
+export function embeddingModel(name: string = required("EMBEDDING_MODEL")): EmbeddingModel {
+  return createOpenRouter({ apiKey: required("OPENROUTER_API_KEY") }).textEmbeddingModel(name);
 }

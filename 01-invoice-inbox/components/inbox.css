@@ -1,79 +1,11 @@
 /* The invoice inbox screens, on the shared buildcamp theme. Every colour comes from packages/ui/tokens.css.
    One loud thing only: a figure that disagrees with the order gets a highlighter stroke. */
 
-a {
-  color: inherit;
-}
-
-:focus-visible {
-  outline: 2px solid var(--fg);
-  outline-offset: 2px;
-}
-
-.topbar-title {
-  text-decoration: none;
-}
-
-.topbar-user {
-  margin-left: auto;
-  color: var(--muted);
-  font-size: 14px;
-}
-
-.button {
-  white-space: nowrap;
-}
-
-.button:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
-.topbar .button {
-  margin-left: 0;
-}
-
-.status-fail {
-  background: var(--failbg);
-  color: var(--fail);
-}
-
 mark {
   padding: 0 3px;
   background: linear-gradient(176deg, transparent 12%, var(--accent) 12% 88%, transparent 88%);
   color: var(--on-accent);
 }
-
-.field {
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid var(--line);
-  border-radius: var(--r);
-  background: var(--surface);
-  color: var(--fg);
-  font: inherit;
-}
-
-.field:focus {
-  border-color: var(--fg);
-  outline: none;
-}
-
-.field-label {
-  display: block;
-  margin-bottom: 6px;
-  color: var(--fg2);
-  font-size: 14px;
-}
-
-.link-button {
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--fg2);
-  text-decoration: underline;
-}
-
 /* Inbox */
 .inbox {
   width: min(880px, 100% - 32px);
@@ -319,26 +251,6 @@ mark {
 }
 
 /* Sign in */
-.sign-in {
-  width: min(380px, 100% - 32px);
-  margin: 12vh auto 0;
-}
-
-.sign-in h1 {
-  margin: 0;
-  font-size: 24px;
-}
-
-.sign-in p {
-  margin: 4px 0 20px;
-  color: var(--fg2);
-}
-
-.sign-in-form {
-  display: grid;
-  gap: 10px;
-  justify-items: start;
-}
 
 @media (max-width: 900px) {
   .upload {

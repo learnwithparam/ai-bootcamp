@@ -1,5 +1,5 @@
+import { Topbar } from "@bootcamp/auth/topbar";
 import { InvoiceList } from "../components/InvoiceList";
-import { Topbar } from "../components/Topbar";
 import { UploadBox } from "../components/UploadBox";
 import { listInvoices } from "../db/queries";
 import { uploadInvoices } from "./actions";
@@ -14,7 +14,7 @@ export default async function InboxPage() {
   const decided = all.filter((invoice) => invoice.status === "approved" || invoice.status === "rejected");
   return (
     <div className="app">
-      <Topbar userName={user.name} />
+      <Topbar title="Invoice inbox" userName={user.name} />
       <main className="inbox">
         <UploadBox action={uploadInvoices} />
         <InvoiceList

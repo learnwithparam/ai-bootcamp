@@ -9,7 +9,8 @@ export type Question<Choice extends string> = {
   criteria: Record<Choice, string>;
 };
 
-export type Decision<Choice extends string> = { choice: Choice; confidence: number };
+// costUsd is what OpenRouter charged for this one decision.
+export type Decision<Choice extends string> = { choice: Choice; confidence: number; costUsd: number };
 
 type Answer = { type: string; choice: string; confidence: number };
 
@@ -34,10 +35,13 @@ export async function decide<Choice extends string>(
   if (!response.ok) {
     throw new Error(`Decision request failed (${response.status}): ${await response.text()}`);
   }
-  const { answers } = (await response.json()) as { answers: Record<string, Answer> };
+  const { answers, usage } = (await response.json()) as {
+    answers: Record<string, Answer>;
+    usage?: { cost?: number };
+  };
   const answer = answers.decision;
   if (!answer || !(answer.choice in question.criteria)) {
     throw new Error(`Decision model returned an unknown choice: ${JSON.stringify(answer)}`);
   }
-  return { choice: answer.choice as Choice, confidence: answer.confidence };
+  return { choice: answer.choice as Choice, confidence: answer.confidence, costUsd: usage?.cost ?? 0 };
 }

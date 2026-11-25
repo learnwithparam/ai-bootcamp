@@ -15,6 +15,7 @@ This repo is where you see those ideas working together in a product.
 | # | Product | The job it does | Ideas it shows |
 |---|---|---|---|
 | 1 | [Invoice inbox](01-invoice-inbox/README.md) | Read supplier invoices and match each one to its purchase order. | structured output, verification, human in the loop |
+| 2 | [Site assistant](02-site-assistant/README.md) | Answer visitors from the site's own pages, show members their plan, and hand off to a person. | loop, context, decision model, boundary, verification, human in the loop |
 <!-- products:end -->
 
 ## How each product folder is laid out

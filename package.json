@@ -6,7 +6,8 @@
   "workspaces": [
     "packages/*",
     "gallery",
-    "01-invoice-inbox"
+    "01-invoice-inbox",
+    "02-site-assistant"
   ],
   "scripts": {
     "setup": "bun scripts/setup.ts",

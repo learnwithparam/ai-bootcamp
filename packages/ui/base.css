@@ -48,6 +48,7 @@ pre {
 
 .topbar-title {
   font-weight: 700;
+  text-decoration: none;
 }
 
 .topbar-desk {
@@ -66,11 +67,17 @@ pre {
 }
 
 .button {
+  white-space: nowrap;
   padding: 6px 12px;
   border: 1px solid var(--fg);
   border-radius: var(--r);
   background: var(--surface);
   color: var(--fg);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .button-primary {
@@ -79,7 +86,7 @@ pre {
 }
 
 .topbar .button {
-  margin-left: auto;
+  margin-left: 0;
 }
 
 /* Thread */
@@ -330,6 +337,84 @@ pre {
 .composer .button:disabled {
   opacity: 0.4;
   cursor: default;
+}
+
+/* Forms, sign-in and the top bar's account links, shared by every product. */
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+}
+
+.topbar-user {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.status-fail {
+  background: var(--failbg);
+  color: var(--fail);
+}
+
+.field {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--fg);
+  font: inherit;
+}
+
+.field:focus {
+  border-color: var(--fg);
+  outline: none;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--fg2);
+  font-size: 14px;
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fg2);
+  text-decoration: underline;
+}
+
+.sign-in {
+  width: min(380px, 100% - 32px);
+  margin: 12vh auto 0;
+}
+
+.sign-in h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.sign-in p {
+  margin: 4px 0 20px;
+  color: var(--fg2);
+}
+
+.sign-in-form {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+
+.form-error {
+  margin: 0;
+  color: var(--fail);
+  font-size: 14px;
 }
 
 @media (max-width: 600px) {

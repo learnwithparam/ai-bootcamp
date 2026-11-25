@@ -1,4 +1,4 @@
-import { SignInForm } from "../../components/SignInForm";
+import { SignInForm } from "@bootcamp/auth/sign-in-form";
 
 export default function SignInPage() {
   return (
