@@ -2,17 +2,17 @@ import { afterAll, describe, expect, test } from "bun:test";
 import { eq, like } from "drizzle-orm";
 import {
   addToSupportTeam,
-  countPages,
   customerOf,
   db,
   isOnSupportTeam,
   markAnswered,
   openTicket,
   recordTurn,
+  savePage,
   searchSections,
   usageFor,
 } from "../db/queries";
-import { sections, supportTeam, tickets, turns } from "../db/schema";
+import { pages, supportTeam, tickets, turns } from "../db/schema";
 import { checkCitations, type Source } from "../rules/citations";
 import { checkLimits, readLimits } from "../rules/limits";
 import { formatPrice } from "../rules/price";
@@ -22,11 +22,13 @@ import { htmlSections, linkedPages, markdownSections } from "../rules/sections";
 
 const TEST_VISITOR = `test:${crypto.randomUUID()}`;
 const TEST_ACCOUNT = `test-account-${crypto.randomUUID()}`;
+const TEST_PAGE = `https://test.invalid/${crypto.randomUUID()}`;
 
 afterAll(async () => {
   await db.delete(turns).where(eq(turns.visitor, TEST_VISITOR));
   await db.delete(supportTeam).where(eq(supportTeam.userId, TEST_ACCOUNT));
   await db.delete(tickets).where(like(tickets.email, "rules-test-%"));
+  await db.delete(pages).where(eq(pages.url, TEST_PAGE));
 });
 
 describe("cutting a page into sections", () => {
@@ -102,19 +104,19 @@ describe("small rules", () => {
 });
 
 describe("the database", () => {
-  test("the site is seeded", async () => {
-    expect(await countPages()).toBeGreaterThan(50);
-  });
+  // A made-up embedding for this test's own page: three sections that each point a different way.
+  // It tests the query, so no model is needed; the real embeddings are tested in agent.test.ts.
+  const pointing = (axis: number) => Array.from({ length: 1536 }, (_, index) => (index === axis ? 1 : 0));
 
   test("a section's own embedding finds that section first, numbered from 1", async () => {
-    const [stored] = await db
-      .select({ url: sections.url, embedding: sections.embedding })
-      .from(sections)
-      .limit(1);
-    if (!stored) throw new Error("No sections in Postgres. Run `bun run seed site-assistant`.");
-    const found = await searchSections(stored.embedding, 3);
+    const page = {
+      title: "Test page",
+      sections: ["One", "Two", "Three"].map((heading) => ({ heading, body: `The ${heading} section.` })),
+    };
+    await savePage(TEST_PAGE, page, [pointing(0), pointing(1), pointing(2)]);
+    const found = await searchSections(pointing(1), 3);
     expect(found.map((each) => each.number)).toEqual([1, 2, 3]);
-    expect(found[0]?.url).toBe(stored.url);
+    expect(found[0]).toMatchObject({ url: TEST_PAGE, heading: "Two", title: "Test page" });
   });
 
   test("usage counts this visitor's questions and everyone's spend today", async () => {

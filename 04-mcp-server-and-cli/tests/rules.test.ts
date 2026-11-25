@@ -57,7 +57,16 @@ describe("where sign-in sends you next", () => {
   });
 
   test("anything that could leave the site lands on the home page", () => {
-    for (const next of ["https://evil.com", "//evil.com", "/\\evil.com", "/\\/evil.com", undefined]) {
+    for (const next of [
+      "https://evil.com",
+      "//evil.com",
+      "/\\evil.com",
+      "/\\/evil.com",
+      "/.//evil.com",
+      "/..//evil.com",
+      "/./\\evil.com",
+      undefined,
+    ]) {
       expect(samePath(next)).toBe("/");
     }
   });
