@@ -133,7 +133,8 @@ test("an account is on the team only after the team script adds it, and its role
 });
 
 test("a newsletter may link only to learnwithparam.com, in any link form", () => {
-  const allowed = "[a](https://www.learnwithparam.com/live) and https://www.learnwithparam.com/blog";
+  const allowed =
+    "**Two labs.** [Book](https://www.learnwithparam.com/live) at 10:30. Note: [blog](https://www.learnwithparam.com)";
   expect(foreignLinks(allowed)).toEqual([]);
   const sneaky = [
     "[b](https://www.learnwithparam.com.evil.test/x)",
@@ -152,6 +153,11 @@ test("a newsletter may link only to learnwithparam.com, in any link form", () =>
     "[i](https:\\/\\/evil.test)",
     '<a href="https://evil.test">x</a>',
     "[j][ref]\n\n  [ref]: https://www.learnwithparam.com",
+    "write to someone@evil.test",
+    "see evil.test for more",
+    "[k](https://www.learnwithparam.com/%2F%2Fevil.test)",
+    "chat on xmpp:someone",
+    "a [l]: https://evil.test mid-line",
   ];
   for (const body of disguised) expect(foreignLinks(body).length).toBeGreaterThan(0);
 });

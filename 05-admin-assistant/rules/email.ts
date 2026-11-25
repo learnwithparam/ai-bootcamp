@@ -79,25 +79,22 @@ export function plainLine(line: string): string {
 }
 
 // A newsletter may link only to the school's own site. The tools refuse other links, and so does approval.
-// The mail tool may link more than this preview does (bare addresses, <autolinks>, reference links),
-// so the check reads every address-like piece of the body, not only [text](url), and parses each one.
+// This is an allowlist, because the mail tool may find links this preview never draws.
+// A link is allowed only as [words](https://www.learnwithparam.com/a-plain-path). With those taken out,
+// the rest must hold nothing a mail tool could turn into a link: no address, scheme, domain, @, HTML or escape.
 export const SITE = "https://www.learnwithparam.com";
 
-const ADDRESS_LIKE =
-  /(?:\b(?:https?|ftp|file|data|javascript|vbscript|mailto|tel|sms):|\bwww\.|(?<![\w:])\/\/)[^\s)\]>"'<]*/gi;
+const SITE_LINK = /\[[^\]]+\]\(https:\/\/www\.learnwithparam\.com(?:\/[\w\-./]*)?\)/g;
+const LINK_LIKE =
+  /[<>\\@]|&[#\w]+;|\]\(|\[[^\]]*\]:|\b[a-z][a-z0-9+.-]*:\S+|\bwww\.\S*|\/\/\S*|\b[\w-]+(?:\.[\w-]+)*\.[a-z]{2,}\b/gi;
 
-function isSiteLink(text: string): boolean {
-  const withScheme = text.toLowerCase().startsWith("www.") ? "https://".concat(text) : text;
-  const url = URL.parse(withScheme.startsWith("//") ? "https:".concat(withScheme) : withScheme);
-  return url?.origin === SITE && url.username === "" && url.password === "";
+// Every piece of the body that could become a link to somewhere else. Empty means the body may be sent.
+export function foreignLinks(markdown: string): string[] {
+  const rest = markdown.replaceAll(SITE_LINK, " ");
+  return [...rest.matchAll(LINK_LIKE)].map((match) => match[0]);
 }
 
-// Marks outside the small Markdown above that another renderer could turn into a hidden link:
-// raw HTML, entities, backslash escapes and reference definitions. A body with any of them is refused whole.
-const LINK_TRICKS = /[<>\\]|&[#\w]+;|^\s*\[[^\]]*\]:/gm;
-
-export function foreignLinks(markdown: string): string[] {
-  const tricks = [...markdown.matchAll(LINK_TRICKS)].map((match) => match[0].trim());
-  const addresses = [...markdown.matchAll(ADDRESS_LIKE)].map((match) => match[0]);
-  return [...tricks, ...addresses.filter((text) => !isSiteLink(text))];
+// What the drafting tools tell the model, so it can rewrite the body rather than guess.
+export function linkProblem(found: string[]): string {
+  return `Link only as [words](${SITE}/path), and write nothing else that looks like a link: no other address, domain, @, or HTML. Rewrite: ${found.join(", ")}.`;
 }

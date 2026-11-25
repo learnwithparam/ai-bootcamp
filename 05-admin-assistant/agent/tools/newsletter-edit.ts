@@ -2,7 +2,7 @@ import { tool } from "ai";
 import { z } from "zod";
 import { newsletterById, reviseNewsletter } from "../../db/newsletters";
 import { recordChange } from "../../db/queries";
-import { foreignLinks } from "../../rules/email";
+import { foreignLinks, linkProblem } from "../../rules/email";
 
 export type OpenNewsletterOutput =
   | { found: true; id: number; status: string; subject: string; body: string }
@@ -38,7 +38,7 @@ export function reviseNewsletterTool(userId: string) {
       if (outside.length) {
         return {
           revised: false,
-          problem: `Only learnwithparam.com links are allowed. Remove ${outside.join(", ")}.`,
+          problem: linkProblem(outside),
         };
       }
       const saved = await reviseNewsletter(id, subject, body);

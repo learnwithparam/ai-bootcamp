@@ -73,7 +73,7 @@ export const APPROVE_PROBLEMS = {
   gone: "This newsletter is not a draft any more.",
   pending: "Keep or undo the assistant's change before approving.",
   changed: "The draft changed after you opened it. Read it again, then approve.",
-  links: "The draft links outside learnwithparam.com. Remove those links first.",
+  links: "The draft has a link, address or domain outside learnwithparam.com. Remove it first.",
 } as const;
 export type ApproveProblem = keyof typeof APPROVE_PROBLEMS;
 
