@@ -1,0 +1,53 @@
+// The list of products, in learning order. The gallery, the dev command, sign-in and the checks
+// all read this list, so a product's port and folder are written only here.
+
+export type Idea =
+  | "graph"
+  | "loop"
+  | "verification"
+  | "boundary"
+  | "skills"
+  | "context"
+  | "harness"
+  | "mcp"
+  | "cli"
+  | "browser automation"
+  | "decision model"
+  | "voice"
+  | "human in the loop"
+  | "ui the agent draws"
+  | "memory"
+  | "structured output";
+
+export type Product = {
+  folder: string;
+  slug: string;
+  title: string;
+  job: string;
+  port: number;
+  ideas: Idea[];
+};
+
+export const GALLERY_PORT = 3100;
+
+export const PRODUCTS: Product[] = [
+  {
+    folder: "01-invoice-inbox",
+    slug: "invoice-inbox",
+    title: "Invoice inbox",
+    job: "Read supplier invoices and match each one to its purchase order.",
+    port: 3101,
+    ideas: ["structured output", "verification", "human in the loop"],
+  },
+];
+
+export const ALL_PORTS = [GALLERY_PORT, ...PRODUCTS.map((product) => product.port)];
+
+export function findProduct(slug: string): Product {
+  const product = PRODUCTS.find((each) => each.slug === slug);
+  if (!product) {
+    const known = PRODUCTS.map((each) => each.slug).join(", ");
+    throw new Error(`No product called "${slug}". Known products: ${known}.`);
+  }
+  return product;
+}

@@ -1,0 +1,28 @@
+# One Postgres (with pgvector) for every product, plus Langfuse for traces.
+# Langfuse's own file is the official one from github.com/langfuse/langfuse, unchanged.
+# langfuse/local.yml gives Langfuse its own database and closes the ports it does not need on your machine.
+include:
+  - path:
+      - langfuse/docker-compose.yml
+      - langfuse/local.yml
+
+services:
+  products-db:
+    image: pgvector/pgvector:0.8.1-pg17
+    restart: always
+    environment:
+      POSTGRES_USER: bootcamp
+      POSTGRES_PASSWORD: bootcamp
+      POSTGRES_DB: bootcamp
+    ports:
+      - 127.0.0.1:5433:5432
+    volumes:
+      - products_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bootcamp"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  products_db:

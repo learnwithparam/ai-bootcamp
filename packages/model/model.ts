@@ -1,0 +1,30 @@
+import { createAnthropic } from "@ai-sdk/anthropic";
+import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+import type { LanguageModel } from "ai";
+
+// The one place a product gets its model. Set MODEL in .env as provider:model, for example
+//   MODEL=openrouter:openai/gpt-6-luna
+//   MODEL=anthropic:claude-haiku-5-5
+// Changing provider is that one line. Every product calls model() and nothing else.
+
+export function required(name: string): string {
+  const value = process.env[name];
+  if (!value) throw new Error(`${name} is not set. Add it to .env (see .env.example).`);
+  return value;
+}
+
+export function model(setting: string = required("MODEL")): LanguageModel {
+  const split = setting.indexOf(":");
+  const provider = setting.slice(0, split);
+  const name = setting.slice(split + 1);
+  if (split < 1 || !name) {
+    throw new Error(`MODEL must look like provider:model, got "${setting}".`);
+  }
+  if (provider === "openrouter") {
+    return createOpenRouter({ apiKey: required("OPENROUTER_API_KEY") }).chat(name);
+  }
+  if (provider === "anthropic") {
+    return createAnthropic({ apiKey: required("ANTHROPIC_API_KEY") })(name);
+  }
+  throw new Error(`MODEL provider must be openrouter or anthropic, got "${provider}".`);
+}

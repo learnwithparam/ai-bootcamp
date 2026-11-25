@@ -1,0 +1,13 @@
+{
+  "name": "@bootcamp/gallery",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@bootcamp/products": "workspace:*",
+    "@bootcamp/ui": "workspace:*",
+    "next": "16.4.6",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  }
+}

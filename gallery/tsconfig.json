@@ -1,0 +1,13 @@
+{
+  "//": "The repo's settings, plus the Next.js editor plugin. Next.js reads this file when it starts.",
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules", ".next"]
+}

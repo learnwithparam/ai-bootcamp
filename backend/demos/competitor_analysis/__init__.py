@@ -1,2 +1,0 @@
-# Competitor Analysis Research Agent
-

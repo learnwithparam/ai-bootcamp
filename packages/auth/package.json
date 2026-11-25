@@ -1,0 +1,16 @@
+{
+  "name": "@bootcamp/auth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./auth.ts",
+    "./client": "./client.ts"
+  },
+  "dependencies": {
+    "@bootcamp/db": "workspace:*",
+    "better-auth": "1.7.23",
+    "@bootcamp/model": "workspace:*",
+    "@bootcamp/products": "workspace:*"
+  }
+}

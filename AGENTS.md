@@ -7,14 +7,14 @@ Optimise for a working first command and a clear error when something is missing
 
 ## Running it
 
-```bash
-make help
-make install
-make dev
-make test
-```
+Run every command from the repo root, so Bun loads the root environment file.
 
-All targets: `help`, `install`, `dev`, `dev-no-build`, `dev-local`, `build`, `build-no-cache`, `start`, `stop`, `restart`, `api`, `frontend`, `logs`, `logs-api` ....
+```bash
+bun run setup                  # Postgres and Langfuse in Docker, migrations, seed data
+bun run dev invoice-inbox      # one product on its own port
+bun run check                  # types, Biome, structure, learner pages, prose, unit tests
+bun run proof invoice-inbox    # the real-model tests behind each page's "Prove it"
+```
 
 ## Rules
 
