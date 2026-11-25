@@ -5,7 +5,6 @@ import { StatusChip } from "@bootcamp/ui/parts";
 import type { ListCouponsOutput } from "../agent/tools/list-coupons";
 import type { LoadSkillOutput } from "../agent/tools/load-skill";
 import type { RecentAccountsOutput } from "../agent/tools/recent-accounts";
-import type { SaveDraftOutput } from "../agent/tools/save-newsletter-draft";
 import type { SignupsOutput } from "../agent/tools/signups-by-day";
 import { SignupsChart } from "./SignupsChart";
 
@@ -58,26 +57,6 @@ export const AccountsCard: ToolCallMessagePartComponent = ({ result, status }) =
   );
 };
 
-export const DraftCard: ToolCallMessagePartComponent = ({ result, status }) => {
-  const output = result as SaveDraftOutput | undefined;
-  return (
-    <div className="card">
-      <div className="card-head">
-        <span className="label">Draft saved</span>
-        <StatusChip running={status.type === "running"} />
-      </div>
-      {output ? (
-        <div className="card-body">
-          <p>
-            <strong>{output.subject}</strong>
-          </p>
-          <a href="/log">Read it under Drafts and changes</a>
-        </div>
-      ) : null}
-    </div>
-  );
-};
-
 export const CodesCard: ToolCallMessagePartComponent = ({ result, status }) => {
   const output = result as ListCouponsOutput | undefined;
   return (
@@ -90,7 +69,7 @@ export const CodesCard: ToolCallMessagePartComponent = ({ result, status }) => {
       <table className="card-body rows">
         <tbody>
           {output?.codes.map((code) => (
-            <tr key={code.code}>
+            <tr key={code.id}>
               <td>
                 <code>{code.code}</code>
               </td>

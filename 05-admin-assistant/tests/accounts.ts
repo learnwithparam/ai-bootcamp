@@ -16,7 +16,10 @@ export async function makeAccount(name: string): Promise<{ id: string; email: st
 
 export async function removeAccounts(ids: string[]) {
   for (const id of ids) {
-    await db.execute(sql`delete from admin_assistant.owners where user_id = ${id}`);
+    await db.execute(sql`delete from admin_assistant.team where user_id = ${id}`);
+    await db.execute(sql`delete from admin_assistant.changes where user_id = ${id}`);
+    await db.execute(sql`delete from admin_assistant.discount_drafts where asked_by = ${id}`);
+    await db.execute(sql`delete from admin_assistant.newsletters where written_by = ${id}`);
     await db.execute(sql`delete from "user" where id = ${id}`);
   }
 }

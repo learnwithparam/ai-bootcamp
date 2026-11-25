@@ -2,8 +2,8 @@ import { expect, test } from "bun:test";
 import type { UIMessage } from "ai";
 import { activeToolsFor, skillsLoadedIn } from "../agent/agent";
 import { SKILLS } from "../agent/skills/skills";
-import { allTools, NEEDS_APPROVAL } from "../agent/tools/all";
-import type { CreateCouponOutput } from "../agent/tools/create-coupon";
+import { allTools, SAVES_SOMETHING } from "../agent/tools/all";
+import type { DraftCouponOutput } from "../agent/tools/draft-coupon";
 import { forTheModel } from "../agent/tools/recent-accounts";
 
 // The structure of the skills, walked as a whole, so a new skill or tool is covered with no new test.
@@ -24,7 +24,7 @@ test("every tool but load_skill belongs to exactly one skill", () => {
 
 test("before any skill is loaded, only load_skill can be called", () => {
   expect(activeToolsFor([])).toEqual(["load_skill"]);
-  expect(activeToolsFor(["coupons"]).sort()).toEqual(["create_coupon", "list_coupons", "load_skill"]);
+  expect(activeToolsFor(["coupons"]).sort()).toEqual(["draft_coupon", "list_coupons", "load_skill"]);
   expect(activeToolsFor(["no-such-skill"])).toEqual(["load_skill"]);
 });
 
@@ -54,18 +54,31 @@ test("a skill stays loaded for the rest of the conversation", () => {
   expect(skillsLoadedIn(history)).toEqual(["reports"]);
 });
 
-test("every tool that changes Stripe waits for approval", () => {
-  expect(NEEDS_APPROVAL).toContain("create_coupon");
+test("no tool can reach Stripe's write calls or send mail", async () => {
+  const sources = await Promise.all(
+    [...new Bun.Glob("agent/tools/*.ts").scanSync({ cwd: `${import.meta.dir}/..` })].map((file) =>
+      Bun.file(`${import.meta.dir}/../${file}`).text(),
+    ),
+  );
+  expect(sources.length).toBeGreaterThan(5);
+  for (const source of sources) {
+    expect(source).not.toContain("makeCode");
+    expect(source).not.toContain("@bootcamp/mail");
+  }
 });
 
-test("an approved coupon outside the limits is refused before Stripe is called", async () => {
-  const execute = tools.create_coupon.execute;
-  if (!execute) throw new Error("create_coupon has no execute");
+test("every tool that saves something is listed, so the page under the panel is drawn again", () => {
+  for (const name of SAVES_SOMETHING) expect(names).toContain(name);
+});
+
+test("a code outside the limits is refused before anything is saved", async () => {
+  const execute = tools.draft_coupon.execute;
+  if (!execute) throw new Error("draft_coupon has no execute");
   const output = (await execute(
     { code: "HUGE90", percentOff: 90, duration: "once" },
     { toolCallId: "test", messages: [], context: {} },
-  )) as CreateCouponOutput;
-  expect(output).toEqual({ made: false, problem: "The largest discount allowed is 50%." });
+  )) as DraftCouponOutput;
+  expect(output).toEqual({ drafted: false, problem: "The largest discount allowed is 50%." });
 });
 
 test("the model never sees a name or email from recent_accounts, only the count", () => {

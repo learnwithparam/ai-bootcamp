@@ -4,6 +4,7 @@ import type { CouponRequest } from "../rules/coupon";
 // Discount codes live in Stripe. A coupon holds the discount; a promotion code is the word a customer types.
 
 export type CodeSummary = {
+  id: string;
   code: string;
   active: boolean;
   percentOff: number | null;
@@ -16,9 +17,14 @@ export type MadeCode = { code: string; couponId: string; promotionCodeId: string
 
 export async function listCodes(limit = 20): Promise<CodeSummary[]> {
   const found = await stripe().promotionCodes.list({ limit, expand: ["data.promotion.coupon"] });
-  return found.data.map((each) => {
+  // A code whose coupon was deleted can never be used again, so it is left out.
+  const live = found.data.filter(
+    (each) => typeof each.promotion.coupon === "object" && each.promotion.coupon?.percent_off != null,
+  );
+  return live.map((each) => {
     const coupon = typeof each.promotion.coupon === "object" ? each.promotion.coupon : null;
     return {
+      id: each.id,
       code: each.code,
       active: each.active,
       percentOff: coupon?.percent_off ?? null,

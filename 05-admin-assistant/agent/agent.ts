@@ -1,5 +1,4 @@
-import { createHash } from "node:crypto";
-import { model, required } from "@bootcamp/model";
+import { model } from "@bootcamp/model";
 import {
   convertToModelMessages,
   type StepResult,
@@ -11,11 +10,11 @@ import {
 // The system prompt is plain text in instructions.md, next to this file.
 import instructions from "./instructions.md" with { type: "text" };
 import { skillMenu, skillNamed } from "./skills/skills";
-import { allTools, NEEDS_APPROVAL, type ToolName } from "./tools/all";
+import { allTools, type ToolName } from "./tools/all";
 
-// Start here. The owner's message goes to a model that sees only one tool, load_skill, and one line per skill.
+// Start here. The message goes to a model that sees only one tool, load_skill, and one line per skill.
 // Loading a skill switches on that skill's tools for the rest of the conversation.
-// A tool that changes something stops and waits for the owner to approve its exact input on a card.
+// No tool changes Stripe or sends mail. Tools save drafts, and an owner approves them on the admin pages.
 
 // The skills loaded earlier in the conversation, read from the load_skill calls in the history.
 export function skillsLoadedIn(messages: UIMessage[]): string[] {
@@ -43,12 +42,14 @@ export function activeToolsFor(skillNames: string[]): ToolName[] {
   return ["load_skill", ...new Set(fromSkills)];
 }
 
-// The approval card is signed with this secret, so an approval the browser made up, or one for an edited coupon,
-// is refused before the tool runs. It is derived from the sign-in secret, so there is no extra setting.
-export function approvalSecret(): string {
-  return createHash("sha256")
-    .update(`tool-approval:${required("BETTER_AUTH_SECRET")}`)
-    .digest("hex");
+// The page the person has open, so "this newsletter" means the one on screen. Only known pages are described.
+export function describePage(path: string): string {
+  const newsletter = /^\/newsletters\/(\d+)$/.exec(path);
+  if (newsletter) return `The person has newsletter ${newsletter[1]} open in the editor.`;
+  const known = ["/", "/customers", "/discounts", "/newsletters", "/activity"];
+  return known.includes(path)
+    ? `The person is on the ${path === "/" ? "Home" : path.slice(1)} page.`
+    : "The page is not known.";
 }
 
 // On OpenRouter each step's usage.raw.cost holds its price in dollars.
@@ -56,15 +57,13 @@ export function costOf(steps: StepResult<ToolSet>[]): number {
   return steps.reduce((sum, step) => sum + ((step.usage.raw as { cost?: number } | undefined)?.cost ?? 0), 0);
 }
 
-export async function answerOwner(messages: UIMessage[], ownerId: string) {
+export async function answerTeam(messages: UIMessage[], userId: string, page: string) {
   const loadedBefore = skillsLoadedIn(messages);
   return streamText({
     model: model(),
-    system: instructions.replace("{{skills}}", skillMenu()),
+    system: instructions.replace("{{skills}}", skillMenu()).replace("{{page}}", describePage(page)),
     messages: await convertToModelMessages(messages),
-    tools: allTools(ownerId),
-    toolApproval: Object.fromEntries(NEEDS_APPROVAL.map((name) => [name, "user-approval"])),
-    experimental_toolApprovalSecret: approvalSecret(),
+    tools: allTools(userId),
     prepareStep: ({ steps }) => ({
       activeTools: activeToolsFor([...loadedBefore, ...skillsLoadedInSteps(steps)]),
     }),

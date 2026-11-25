@@ -4,13 +4,16 @@ import { findProduct } from "@bootcamp/products";
 import { checkPage } from "@bootcamp/ui/check-page";
 import { eq } from "drizzle-orm";
 import { type Browser, chromium, type Page } from "playwright";
-import { codeExists, type MadeCode, removeCode } from "../db/coupons";
-import { addOwner, db } from "../db/queries";
-import { changes } from "../db/schema";
+import { codeExists, removeCode } from "../db/coupons";
+import { saveDiscountDraft } from "../db/discounts";
+import { createNewsletter, newsletterById, reviseNewsletter } from "../db/newsletters";
+import { addToTeam, db } from "../db/queries";
+import { discountDrafts } from "../db/schema";
 import { makeAccount, PASSWORD, removeAccounts } from "./accounts";
 
-// The owner's path in a real browser, against the real model and Stripe's test mode:
-// a stranger sees nothing, the owner asks for a chart, then approves a discount code and opens it in Stripe.
+// Each role's path in a real browser, against the real model and Stripe's test mode:
+// a stranger sees nothing, staff can draft but not approve, and the owner approves on the Discounts page
+// and keeps or undoes the assistant's edit to a newsletter.
 
 const URL = `http://localhost:${findProduct("admin-assistant").port}`;
 let server: ChildProcess | undefined;
@@ -41,15 +44,29 @@ async function startServer() {
 beforeAll(async () => {
   await startServer();
   browser = await chromium.launch();
-  accounts.push(await makeAccount("Test Owner"), await makeAccount("Test Stranger"));
-  await addOwner(accounts[0]?.id as string);
+  accounts.push(
+    await makeAccount("Test Owner"),
+    await makeAccount("Test Stranger"),
+    await makeAccount("Test Staff"),
+  );
+  await addToTeam(accounts[0]?.id as string, "owner");
+  await addToTeam(accounts[2]?.id as string, "staff");
 }, 90_000);
 
 afterAll(async () => {
-  const owner = accounts[0]?.id as string;
-  const made = await db.select().from(changes).where(eq(changes.userId, owner));
-  for (const change of made) if (change.tool === "create_coupon") await removeCode(change.output as MadeCode);
-  await db.delete(changes).where(eq(changes.userId, owner));
+  for (const account of accounts) {
+    const made = await db.select().from(discountDrafts).where(eq(discountDrafts.askedBy, account.id));
+    for (const draft of made) {
+      if (draft.couponId && draft.promotionCodeId) {
+        await removeCode({
+          code: draft.code,
+          couponId: draft.couponId,
+          promotionCodeId: draft.promotionCodeId,
+          link: "",
+        });
+      }
+    }
+  }
   await removeAccounts(accounts.map((account) => account.id));
   await browser?.close();
   if (server?.pid) process.kill(-server.pid);
@@ -65,9 +82,11 @@ async function signIn(email: string): Promise<Page> {
   return page;
 }
 
+const code = () => `E2E${String(Math.floor(Math.random() * 1e6)).padStart(6, "0")}`;
+
 test("a signed-in stranger gets a 404 on the page and on the chat", async () => {
   const page = await signIn(accounts[1]?.email as string);
-  expect(await page.getByText("Ask about signups, codes or the newsletter").count()).toBe(0);
+  expect(await page.getByRole("button", { name: "Ask the assistant" }).count()).toBe(0);
   const cookies = await page.context().cookies();
   const response = await fetch(`${URL}/api/chat`, {
     method: "POST",
@@ -77,27 +96,58 @@ test("a signed-in stranger gets a 404 on the page and on the chat", async () => 
   expect(response.status).toBe(404);
 }, 60_000);
 
-test("the owner asks for signups and gets a chart", async () => {
+test("the owner opens the assistant from Home, asks for signups and gets a chart", async () => {
   const page = await signIn(accounts[0]?.email as string);
+  await page.getByRole("heading", { name: "Suggested for you" }).waitFor();
+  await checkPage(page);
+  await page.locator(".assistant-pill").click();
   await page.getByRole("button", { name: "How many people signed up in the last 30 days?" }).click();
-  await page.locator("svg.chart").waitFor({ timeout: 60_000 });
-  expect(await page.locator("svg.chart .bar").count()).toBe(30);
+  await page.locator(".assistant-panel svg.chart").waitFor({ timeout: 60_000 });
+  expect(await page.locator(".assistant-panel svg.chart .bar").count()).toBe(30);
   await checkPage(page);
 }, 90_000);
 
-test("the owner approves a code in the browser, and it is made in Stripe", async () => {
-  const code = `E2E${String(Math.floor(Math.random() * 1e6)).padStart(6, "0")}`;
+test("staff see a waiting draft but cannot approve it", async () => {
+  const draft = await saveDiscountDraft(
+    { code: code(), percentOff: 15, duration: "once" },
+    accounts[2]?.id as string,
+  );
+  const page = await signIn(accounts[2]?.email as string);
+  await page.goto(`${URL}/discounts`);
+  const row = page.locator(".draft-row", { hasText: draft.code });
+  await row.waitFor();
+  expect(await row.getByText("Waiting for an owner").count()).toBe(1);
+  expect(await row.getByRole("button", { name: "Approve and make it" }).count()).toBe(0);
+  await checkPage(page);
+}, 60_000);
+
+test("the owner approves a draft on the Discounts page, and it is made in Stripe", async () => {
+  const draft = await saveDiscountDraft(
+    { code: code(), percentOff: 15, duration: "once" },
+    accounts[0]?.id as string,
+  );
+  expect(await codeExists(draft.code)).toBe(false);
   const page = await signIn(accounts[0]?.email as string);
+  await page.goto(`${URL}/discounts`);
   await page
-    .getByPlaceholder("Ask about signups, codes or the newsletter")
-    .fill(`Make a 15% code ${code} for the first payment.`);
-  await page.getByRole("button", { name: "Send" }).click();
-  const approve = page.getByRole("button", { name: "Approve and make it" });
-  await approve.waitFor({ timeout: 60_000 });
-  expect(await codeExists(code)).toBe(false);
-  await approve.click();
-  const link = page.getByRole("link", { name: "Open it in Stripe" });
-  await link.waitFor({ timeout: 60_000 });
-  expect(await link.getAttribute("href")).toStartWith("https://dashboard.stripe.com/test/");
-  expect(await codeExists(code)).toBe(true);
-}, 150_000);
+    .locator(".draft-row", { hasText: draft.code })
+    .getByRole("button", { name: "Approve and make it" })
+    .click();
+  await page.locator(".draft-row", { hasText: draft.code }).waitFor({ state: "detached", timeout: 60_000 });
+  expect(await codeExists(draft.code)).toBe(true);
+  await page.getByRole("cell", { name: draft.code }).waitFor();
+}, 120_000);
+
+test("the owner reads the assistant's edit as a diff and undoes it", async () => {
+  const letter = await createNewsletter("Old subject", "# Hello\n\nFirst line.", accounts[0]?.id as string);
+  await reviseNewsletter(letter.id, "New subject", "# Hello\n\nA better first line.");
+  const page = await signIn(accounts[0]?.email as string);
+  await page.goto(`${URL}/newsletters/${letter.id}`);
+  await page.locator(".diff-added", { hasText: "A better first line." }).waitFor();
+  await checkPage(page);
+  await page.getByRole("button", { name: "Undo the change" }).click();
+  await page.locator(".diff").waitFor({ state: "detached" });
+  const after = await newsletterById(letter.id);
+  expect(after?.subject).toBe("Old subject");
+  expect(after?.body).toBe("# Hello\n\nFirst line.");
+}, 60_000);

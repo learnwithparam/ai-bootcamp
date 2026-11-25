@@ -1,7 +1,7 @@
 import { afterAll, expect, test } from "bun:test";
 import type { Item } from "@bootcamp/catalog";
 import { SKILLS } from "../agent/skills/skills";
-import { accountByEmail, addOwner, isOwner, signupsByDay } from "../db/queries";
+import { accountByEmail, addToTeam, roleOf, signupsByDay } from "../db/queries";
 import { couponProblem, describeCoupon, MAX_PERCENT_OFF } from "../rules/coupon";
 import { everyDay, todayUtc } from "../rules/days";
 import { parseSkill } from "../rules/skill-file";
@@ -111,13 +111,14 @@ test("a new account is counted on today's bar", async () => {
   expect(today(after)).toBe(today(before) + 1);
 });
 
-test("an account is the owner only after the owner script adds it", async () => {
+test("an account is on the team only after the team script adds it, and its role can change", async () => {
   const account = await makeAccount("Owner To Be");
   made.push(account.id);
-  expect(await isOwner(account.id)).toBe(false);
+  expect(await roleOf(account.id)).toBeNull();
   const found = await accountByEmail(account.email.toUpperCase());
   expect(found?.id).toBe(account.id);
-  await addOwner(account.id);
-  await addOwner(account.id);
-  expect(await isOwner(account.id)).toBe(true);
+  await addToTeam(account.id, "staff");
+  expect(await roleOf(account.id)).toBe("staff");
+  await addToTeam(account.id, "owner");
+  expect(await roleOf(account.id)).toBe("owner");
 });
