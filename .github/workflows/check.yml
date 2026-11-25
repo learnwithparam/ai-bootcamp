@@ -30,4 +30,6 @@ jobs:
           bun-version: 1.4.4
       - run: bun install --frozen-lockfile
       - run: bun scripts/migrate.ts
+      # The rules tests check invoices against the real Northwind orders, so load them first.
+      - run: bun run seed
       - run: bun run check

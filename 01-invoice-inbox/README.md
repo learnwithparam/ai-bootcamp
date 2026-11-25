@@ -108,6 +108,9 @@ The test then checks that every line it read equals the order line in Postgres,
 and that an invoice is flagged exactly when its order had a discount.
 The answer key is Northwind itself, so nobody hand-labelled anything.
 
+`tests/e2e.test.ts` walks the whole path in a real browser: create an account, upload two invoices,
+reject the one with wrong prices with a note, and find it under **Decided**.
+
 Last run: 20 of 20 read correctly, 0 wrong calls, $0.0022 for all 20 (about $0.0001 an invoice), 4 seconds with the calls in parallel,
 on `openai/gpt-6-luna` through OpenRouter.
 

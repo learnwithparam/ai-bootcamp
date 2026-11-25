@@ -1,0 +1,36 @@
+name: proof
+
+# Nightly, and by hand: a fresh clone runs the learner's own first command, `bun run setup`,
+# then `bun run proof`, which calls the real model and drives each product in a real browser.
+# Cost is capped by the spend limit set on the OpenRouter key stored in OPENROUTER_API_KEY.
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - run: bun install --frozen-lockfile
+      - name: Write the settings file with the model key, as a learner would
+        env:
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          python3 - <<'PY'
+          import os, re
+          text = open(".env.example").read()
+          key = os.environ["OPENROUTER_API_KEY"]
+          if not key:
+              raise SystemExit("Add the OPENROUTER_API_KEY secret to this repo.")
+          open(".env", "w").write(re.sub(r"^OPENROUTER_API_KEY=$", "OPENROUTER_API_KEY=" + key, text, flags=re.M))
+          PY
+      - run: bun run setup
+      - run: bunx playwright install --with-deps chromium
+      - run: bun run proof

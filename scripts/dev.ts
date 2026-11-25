@@ -9,5 +9,6 @@ const folder = slug ? findProduct(slug).folder : "gallery";
 const port = slug ? findProduct(slug).port : GALLERY_PORT;
 
 console.log(`Starting ${folder} on http://localhost:${port}`);
-// Next.js runs on Node. Bun installs the packages and runs this script, and the child inherits the repo's settings.
-await $`bunx next dev ${folder} --port ${port}`;
+// Next.js runs on Node, from the version pinned in the product's package.json (bunx would fetch the latest).
+// Bun installs the packages and runs this script, and the child inherits the repo's settings.
+await $`./node_modules/.bin/next dev --port ${port}`.cwd(folder);
