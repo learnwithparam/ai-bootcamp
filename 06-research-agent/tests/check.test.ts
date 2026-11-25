@@ -1,4 +1,5 @@
 import { afterAll, expect, test } from "bun:test";
+import { Readable } from "node:stream";
 import { checkClaims } from "../agent/nodes/check";
 import { LIMIT_BYTES, readLimited, readPage } from "../agent/read-page";
 
@@ -63,18 +64,20 @@ test("a private address is never opened, even when a trusted page redirects to o
   expect(warnings).toContain("Refused to open http://127.0.0.1/secret: it is not a public web address.");
 });
 
+// The check runs in the lookup the connection itself uses, so the refusal comes from the connection.
 test("a name that resolves to this machine is refused, even though it reads like a public site", async () => {
-  const warnings: string[] = [];
-  const warn = console.warn;
-  console.warn = (message: string) => warnings.push(message);
+  const errors: string[] = [];
+  const error = console.error;
+  console.error = (...parts: unknown[]) => errors.push(parts.join(" "));
   const page = await readPage(`http://localhost.:${site.port}/about`);
-  console.warn = warn;
+  console.error = error;
   expect(page).toBeNull();
-  expect(warnings[0]).toContain("it is not a public web address");
+  expect(errors[0]).toContain("localhost. is not a public web address.");
 });
 
 test("an endless page is read only up to the limit, then the read stops", async () => {
   const response = await fetch(`${home}/endless`);
-  const text = await readLimited(response);
+  if (!response.body) throw new Error("The endless page sent no body.");
+  const text = await readLimited(Readable.fromWeb(response.body as never));
   expect(text.length).toBe(LIMIT_BYTES);
 });

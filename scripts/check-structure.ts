@@ -27,6 +27,30 @@ const DEPRECATED =
 
 export type Problem = string;
 
+// What may sit at the top of a product folder: the shared shape, then the few parts one product adds
+// (auth and cli in 04, sample-invoices in 01, extensions in 10). A stray script here is a leftover, not a lesson.
+const TOP_LEVEL = new Set([
+  ...["README.md", "package.json", "tsconfig.json", "next.config.ts", "next-env.d.ts", "drizzle.config.ts"],
+  ...[
+    "instrumentation.ts",
+    "agent",
+    "rules",
+    "db",
+    "app",
+    "components",
+    "tests",
+    "screenshots",
+    "node_modules",
+  ],
+  ...["auth", "cli", "sample-invoices", "extensions"],
+]);
+
+function checkTopLevel(folder: string): Problem[] {
+  return readdirSync(folder)
+    .filter((name) => !name.startsWith(".") && !TOP_LEVEL.has(name))
+    .map((name) => `${folder}/${name}: not part of a product's shape. Move it into a part, or delete it.`);
+}
+
 function walk(folder: string): string[] {
   return readdirSync(folder).flatMap((name) => {
     if (SKIP.has(name)) return [];
@@ -127,6 +151,7 @@ export function checkStructure(): Problem[] {
   const roots = ["packages", "scripts", "gallery", ...PRODUCTS.map((product) => product.folder)];
   const files = roots.filter((root) => statSync(root, { throwIfNoEntry: false })).flatMap(walk);
   const problems = checkColours(files);
+  for (const product of PRODUCTS) problems.push(...checkTopLevel(product.folder));
   for (const path of files.filter((file) => CODE.test(file))) {
     const product = PRODUCTS.find((each) => path.startsWith(`${each.folder}/`))?.folder;
     problems.push(...checkCodeFile(path, product));

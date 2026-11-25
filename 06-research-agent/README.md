@@ -74,7 +74,8 @@ flowchart LR
 3. **research** runs once per topic, all four at the same time. LangGraph's `Send` starts them, and a reducer joins their claims.
    Each claim must name the exact page it came from and copy 8 to 30 words from it.
 4. **check** has no model in it. It opens each cited page once, strips it to its visible words, and looks for each quote.
-   Only public web addresses are opened, and every redirect is checked again, so a page cannot send the server into a private network.
+   Only public web addresses are opened. The check runs inside the lookup the connection uses, and again on every redirect,
+   so neither a page nor a name can send the server into a private network.
 5. **scoreLead** asks the model for four facts, each naming the claims it came from. A fact that leans on a failed claim is dropped.
    Then plain code turns the facts into points: team size 30, a recent round 20, hiring engineers 25, building with AI 25.
 6. **Every step is saved.** `agent/agent.ts` listens to the graph and writes each step's result and the running cost to the row.
@@ -103,7 +104,7 @@ Read in this order. Each file is short.
 3. `agent/nodes/identify.ts` and `agent/prompts/identify.md` - finds which company was meant.
 4. `agent/nodes/research.ts` and `agent/prompts/research.md` - one researcher, and the quote it must copy.
 5. `rules/claims.ts` - how a quote is matched to a page, with no AI in this file.
-6. `agent/read-page.ts` and `rules/public-url.ts` - opens a cited page, and only a public one.
+6. `agent/read-page.ts`, `agent/open-url.ts` and `rules/public-url.ts` - opens a cited page, and only a public one.
 7. `agent/nodes/check.ts` - marks each claim found, missing or unreadable.
 8. `agent/nodes/score.ts` and `rules/score.ts` - facts from kept claims, then the score in code.
 9. `agent/agent.ts` - runs the graph and saves each step.
@@ -129,7 +130,7 @@ and that a made-up company fails with a clear message.
 `tests/e2e.test.ts` walks the path in a real browser: create an account, research Linear, wait for the score and its sources,
 then open the same report as another account and get a 404.
 
-Last run: 9 of 16 claims kept, every kept quote found again on its page, $0.185 for the report,
+Last run: 15 of 16 claims kept, every kept quote found again on its page, $0.124 for the report,
 with web search on `openai/gpt-6-luna` through OpenRouter.
 
 ## Learn the idea in depth

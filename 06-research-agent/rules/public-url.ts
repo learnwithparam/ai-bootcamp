@@ -16,14 +16,18 @@ const PRIVATE_V4 = [
   /^(22[4-9]|2[3-5]\d)\./,
 ];
 
+// IPv6 is allowed only in the global unicast range, 2000::/3. Inside it, 6to4 (2002::/16), Teredo (2001:0::/32)
+// and the documentation range carry or stand for other addresses, so they are refused too.
+function isPublicIpv6(ip: string): boolean {
+  const canonical = new URL(`http://[${ip}]/`).hostname.slice(1, -1);
+  if (!/^[23][0-9a-f]{0,3}:/.test(canonical) || canonical.split(":")[0]?.length !== 4) return false;
+  return !/^(2002:|2001::|2001:0:|2001:db8:)/.test(canonical);
+}
+
 export function isPublicIp(address: string): boolean {
   const ip = address.toLowerCase().replace(/^\[|\]$/g, "");
-  const mapped = ip.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/);
-  if (mapped?.[1]) return isPublicIp(mapped[1]);
   if (isIP(ip) === 4) return !PRIVATE_V4.some((range) => range.test(ip));
-  if (isIP(ip) !== 6) return false;
-  if (ip === "::" || ip === "::1" || ip.startsWith("::ffff:")) return false;
-  return !/^(fc|fd|fe[89ab]|ff)/.test(ip);
+  return isIP(ip) === 6 && isPublicIpv6(ip);
 }
 
 export function isPublicUrl(url: string): boolean {
