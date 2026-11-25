@@ -1,27 +1,31 @@
 import { afterAll, describe, expect, test } from "bun:test";
 import { eq, like } from "drizzle-orm";
 import {
+  addToSupportTeam,
   countPages,
+  customerOf,
   db,
+  isOnSupportTeam,
   markAnswered,
   openTicket,
   recordTurn,
   searchSections,
   usageFor,
 } from "../db/queries";
-import { sections, tickets, turns } from "../db/schema";
+import { sections, supportTeam, tickets, turns } from "../db/schema";
 import { checkCitations, type Source } from "../rules/citations";
 import { checkLimits, readLimits } from "../rules/limits";
 import { formatPrice } from "../rules/price";
 import { htmlSections, linkedPages, markdownSections } from "../rules/sections";
-import { isOnSupportTeam, supportTeam } from "../rules/support";
 
 // The rules, with no model. The database tests use the seeded Postgres: run `bun run setup` first.
 
 const TEST_VISITOR = `test:${crypto.randomUUID()}`;
+const TEST_ACCOUNT = `test-account-${crypto.randomUUID()}`;
 
 afterAll(async () => {
   await db.delete(turns).where(eq(turns.visitor, TEST_VISITOR));
+  await db.delete(supportTeam).where(eq(supportTeam.userId, TEST_ACCOUNT));
   await db.delete(tickets).where(like(tickets.email, "rules-test-%"));
 });
 
@@ -95,13 +99,6 @@ describe("small rules", () => {
     expect(formatPrice(14_900, "usd", "year")).toBe("$149 a year");
     expect(formatPrice(4_950, "usd", "month")).toBe("$49.50 a month");
   });
-
-  test("only emails in SUPPORT_EMAILS see the support queue, in any letter case", () => {
-    const team = supportTeam(" Owner@Example.com, ,helper@example.com");
-    expect(isOnSupportTeam("owner@example.com", team)).toBe(true);
-    expect(isOnSupportTeam("visitor@example.com", team)).toBe(false);
-    expect(isOnSupportTeam(undefined, supportTeam(undefined))).toBe(false);
-  });
 });
 
 describe("the database", () => {
@@ -136,5 +133,18 @@ describe("the database", () => {
     });
     expect(await markAnswered(id, "first@example.com")).toBe(true);
     expect(await markAnswered(id, "second@example.com")).toBe(false);
+  });
+});
+
+// Access is keyed by account, never by email: anyone can sign up with an email they do not own.
+describe("accounts", () => {
+  test("an account reads the support queue only after it is added, by account", async () => {
+    expect(await isOnSupportTeam(TEST_ACCOUNT)).toBe(false);
+    await addToSupportTeam(TEST_ACCOUNT);
+    expect(await isOnSupportTeam(TEST_ACCOUNT)).toBe(true);
+  });
+
+  test("an account that never checked out has no Stripe customer", async () => {
+    expect(await customerOf(TEST_ACCOUNT)).toBeNull();
   });
 });

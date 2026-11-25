@@ -8,6 +8,13 @@
       "when": 1795605535168,
       "tag": "0000_create-tables",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795606459398,
+      "tag": "0001_members-and-support-team",
+      "breakpoints": true
     }
   ]
 }

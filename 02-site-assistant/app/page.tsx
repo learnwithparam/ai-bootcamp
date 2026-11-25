@@ -9,7 +9,7 @@ export default async function AssistantPage() {
   return (
     <div className="app">
       <Topbar title="Ask learnwithparam" userName={user?.name}>
-        {canSeeSupport(user?.email) ? (
+        {(await canSeeSupport(user?.id)) ? (
           <Link href="/support" className="link-button">
             Support queue
           </Link>

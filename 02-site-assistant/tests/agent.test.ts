@@ -48,7 +48,7 @@ function message(text: string): UIMessage {
 }
 
 async function ask(testCase: Case) {
-  const visitor = { id: VISITOR, email: null };
+  const visitor = { id: VISITOR, userId: null, email: null };
   const { action, decision, reply } = await answerVisitor([message(testCase.question)], visitor, SITE);
   const [text, steps] = await Promise.all([reply.text, reply.steps]);
   const citations = checkCitations(text, sourcesShown(steps));

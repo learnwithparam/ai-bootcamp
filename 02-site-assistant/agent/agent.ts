@@ -22,7 +22,8 @@ import { type SearchOutput, searchSite } from "./tools/search-site";
 //   2. the assistant replies with only the tools that action allows,
 //   3. plain code checks every [n] citation and records the cost of the turn.
 
-export type Visitor = { id: string; email: string | null };
+// id counts questions for the limits. userId and email come from the session, never from the conversation.
+export type Visitor = { id: string; userId: string | null; email: string | null };
 
 const STEPS: Record<Action, number> = { answer: 5, ask_follow_up: 1, hand_off: 2, decline: 1 };
 
@@ -40,8 +41,8 @@ function toolsFor(action: Action, visitor: Visitor, conversation: Turn[], return
   if (action === "answer") {
     return {
       search_site: searchSite({ next: 1 }),
-      my_plan: myPlan(visitor.email),
-      billing_portal: billingPortal(visitor.email, returnUrl),
+      my_plan: myPlan(visitor.userId),
+      billing_portal: billingPortal(visitor.userId, returnUrl),
     };
   }
   if (action === "hand_off") return { hand_off: handOff(visitor.email, conversation) };

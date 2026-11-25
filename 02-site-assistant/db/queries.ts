@@ -4,7 +4,7 @@ import type { Source } from "../rules/citations";
 import type { Usage } from "../rules/limits";
 import type { Page } from "../rules/sections";
 import * as schema from "./schema";
-import { pages, sections, tickets, turns } from "./schema";
+import { members, pages, sections, supportTeam, tickets, turns } from "./schema";
 
 export const db = connect(schema);
 
@@ -79,4 +79,32 @@ export async function markAnswered(id: number, answeredBy: string): Promise<bool
     .where(and(eq(tickets.id, id), isNull(tickets.answeredAt)))
     .returning({ id: tickets.id });
   return changed.length === 1;
+}
+
+export type Account = { id: string; name: string; email: string; createdAt: Date };
+
+// Looks up an account in the shared better-auth table. Only the scripts call this, never the chat.
+export async function accountByEmail(email: string): Promise<Account | null> {
+  const found = await db.execute<Account>(
+    sql`select id, name, email, "createdAt" from "user" where email = ${email.toLowerCase()}`,
+  );
+  return found.rows[0] ?? null;
+}
+
+export async function customerOf(userId: string): Promise<string | null> {
+  const [member] = await db.select().from(members).where(eq(members.userId, userId));
+  return member?.customerId ?? null;
+}
+
+export async function saveMember(userId: string, customerId: string) {
+  await db.insert(members).values({ userId, customerId }).onConflictDoNothing();
+}
+
+export async function isOnSupportTeam(userId: string): Promise<boolean> {
+  const [row] = await db.select().from(supportTeam).where(eq(supportTeam.userId, userId));
+  return Boolean(row);
+}
+
+export async function addToSupportTeam(userId: string) {
+  await db.insert(supportTeam).values({ userId }).onConflictDoNothing();
 }

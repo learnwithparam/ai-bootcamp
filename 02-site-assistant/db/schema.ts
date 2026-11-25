@@ -65,3 +65,17 @@ export const turns = site.table(
   },
   (table) => [index("turns_visitor_time").on(table.visitor, table.askedAt)],
 );
+
+// Who pays: the Stripe customer of each account, saved when that account checks out.
+// It is keyed by the account, never by an email: anyone can sign up with an email they do not own.
+export const members = site.table("members", {
+  userId: text("user_id").primaryKey(),
+  customerId: text("customer_id").notNull().unique(),
+  joinedAt: timestamp("joined_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+// The accounts that may read the support queue, added one by one with `db/support.ts`.
+export const supportTeam = site.table("support_team", {
+  userId: text("user_id").primaryKey(),
+  addedAt: timestamp("added_at", { withTimezone: true }).notNull().defaultNow(),
+});

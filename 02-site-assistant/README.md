@@ -28,7 +28,13 @@ cut them into sections at each heading, and stored each section with its embeddi
 This product needs one more key in `.env`: `STRIPE_SECRET_KEY`, a **test mode** key that starts with `sk_test_`.
 The code refuses a live key outside production. Get one at [dashboard.stripe.com/test/apikeys](https://dashboard.stripe.com/test/apikeys).
 
-To see the support queue, put the email you will sign in with in `SUPPORT_EMAILS` in `.env`.
+To see the support queue, create an account, then add it to the support team:
+
+```bash
+bun 02-site-assistant/db/support.ts you@example.com
+```
+
+The team is a list of accounts, not emails. Anyone can sign up with any email, so check the name and sign-up time it prints.
 
 ## Run it
 
@@ -58,7 +64,7 @@ A signed-in member asks about their plan. The plan card comes from Stripe, not f
 
 ![A member's plan card: Pro (yearly), $149 a year, renews 2027-11-25, active, and a Manage billing button.](screenshots/member.png)
 
-A refund request becomes a ticket. Only emails in `SUPPORT_EMAILS` can open the queue.
+A refund request becomes a ticket. Only accounts on the support team can open the queue.
 
 ![The support queue with one ticket: the visitor's email, a one-line summary, the conversation and a Mark answered button.](screenshots/support.png)
 
@@ -118,7 +124,7 @@ Read in this order. Each file is short.
 6. `agent/tools/hand-off.ts` - opens a ticket with the whole conversation.
 7. `rules/limits.ts` - the per-minute limit and the daily spend cap. No AI in this file.
 8. `rules/citations.ts` - finds every `[n]` and flags the ones the assistant was never shown.
-9. `db/schema.ts` - pages, sections with their embeddings, turns and tickets.
+9. `db/schema.ts` - pages, sections with their embeddings, turns, tickets, members and the support team.
 10. `app/api/chat/route.ts` - who is asking, the limits, then the agent.
 11. `components/Chat.tsx` and `components/cards.tsx` - the chat and the card each tool draws.
 
@@ -130,14 +136,15 @@ bun run proof site-assistant                     # real questions to the real mo
 ```
 
 `tests/rules.test.ts` checks cutting pages into sections, the limits, the citation check, prices,
-the support team setting, and the queries against the seeded Postgres, with no model.
+the support team, and the queries against the seeded Postgres, with no model.
 
 `tests/agent.test.ts` is the metric. It asks seven real questions: three the site can answer,
 a refund, a prompt injection, a question about the weather, and a single word.
 It passes only when every action is the right one, every answer cites a right page, and there are no bad citations.
 
 `tests/e2e.test.ts` walks the path in a real browser: a cited answer with its sources,
-a 429 for a visitor over the limit, and a new member opening the Stripe portal in a new tab.
+a 429 for a visitor over the limit, a new member opening the Stripe portal in a new tab,
+and a sign-up with a paying customer's email that still sees no plan.
 
 Last run: 7 of 7 right, 0 bad citations, three runs in a row, about $0.001 for all seven questions,
 on `openai/gpt-6-luna` with `openai/gpt-6-luna-decisions` through OpenRouter.

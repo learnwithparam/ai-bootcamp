@@ -1,7 +1,7 @@
 import { currentSession } from "@bootcamp/auth";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
-import { isOnSupportTeam, supportTeam } from "../rules/support";
+import { isOnSupportTeam } from "../db/queries";
 
 // The chat works without signing in. Signing in adds the visitor's own plan and billing.
 export async function maybeUser() {
@@ -9,14 +9,15 @@ export async function maybeUser() {
   return session?.user ?? null;
 }
 
-export function canSeeSupport(email: string | undefined): boolean {
-  return isOnSupportTeam(email, supportTeam(process.env.SUPPORT_EMAILS));
+// Support is a row added by `db/support.ts` for one account, never an email: anyone can sign up with any email.
+export async function canSeeSupport(userId: string | undefined): Promise<boolean> {
+  return userId ? isOnSupportTeam(userId) : false;
 }
 
 // The support queue and its action call this first. Anyone else gets a plain not-found page.
 export async function requireSupport() {
   const user = await maybeUser();
   if (!user) redirect("/sign-in");
-  if (!canSeeSupport(user.email)) notFound();
+  if (!(await canSeeSupport(user.id))) notFound();
   return user;
 }

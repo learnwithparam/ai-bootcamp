@@ -1,21 +1,20 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { findPlan, type Plan } from "../../db/billing";
+import { customerOf } from "../../db/queries";
 
-export type PlanOutput = { signedIn: false } | { signedIn: true; plan: Omit<Plan, "customerId"> | null };
+export type PlanOutput = { signedIn: false } | { signedIn: true; plan: Plan | null };
 
-// The signed-in visitor's own plan, read from Stripe by the email they signed in with.
-// The email comes from the session, never from the conversation, so nobody can ask about someone else's plan.
-export function myPlan(email: string | null) {
+// The signed-in visitor's own plan. The account comes from the session, never from the conversation,
+// and its Stripe customer was saved at checkout, so nobody can reach someone else's plan.
+export function myPlan(userId: string | null) {
   return tool({
     description: "The visitor's own plan, price and renewal date. Works only when they are signed in.",
     inputSchema: z.object({}),
     execute: async (): Promise<PlanOutput> => {
-      if (!email) return { signedIn: false };
-      const plan = await findPlan(email);
-      if (!plan) return { signedIn: true, plan: null };
-      const { customerId: _hidden, ...shown } = plan;
-      return { signedIn: true, plan: shown };
+      if (!userId) return { signedIn: false };
+      const customerId = await customerOf(userId);
+      return { signedIn: true, plan: customerId ? await findPlan(customerId) : null };
     },
   });
 }
