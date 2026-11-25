@@ -30,6 +30,8 @@ export const auth = betterAuth({
       consentPage: "/consent",
       resource: MCP_RESOURCE,
       refreshTokenReuseInterval: 0,
+      // A web app on this laptop, like the team workspace, gets people back on plain http. Anywhere else needs https.
+      allowInsecureRedirectUri: (url: URL) => ["localhost", "127.0.0.1"].includes(url.hostname),
     }),
     cimd({ fetchClientMetadataResource, metadataProfile: "mcp-2026-07-28" }),
     oauthDeviceAuthorization({ verificationUri: "/device" }),

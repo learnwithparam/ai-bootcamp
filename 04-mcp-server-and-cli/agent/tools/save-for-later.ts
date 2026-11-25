@@ -6,6 +6,7 @@ export const saveForLater = personalTool({
   name: "save_for_later",
   description:
     "Save one catalog item to the signed-in person's list. Use the url that search_catalog returned.",
+  changesData: true,
   input: z.object({ url: z.url().describe("The item's link, exactly as search_catalog returned it.") }),
   run: async ({ url }, userId) => {
     const item = await itemByUrl(url);

@@ -89,6 +89,11 @@ flowchart LR
 5. **The CLI** has no browser of its own, so it uses the device flow: it gets a short code, you approve it on `/device`,
    and it polls until it gets a token. The device page only accepts codes for the CLI's own client.
 6. **Tokens expire.** The CLI uses its refresh token when less than a minute is left.
+7. **A web app that connects for its users** runs on a server and can keep a secret, so you register it by hand:
+   `bun 04-mcp-server-and-cli/auth/register-app.ts "Team workspace" http://localhost:3109/api/connectors/callback`.
+   It prints a client id and a secret once. The [team workspace](../09-team-workspace/README.md) connects this way.
+8. **Each tool says whether it changes data.** MCP clients see the others marked `readOnlyHint`,
+   so a client may run a search without asking and ask before a save.
 
 ## Try these
 
@@ -128,6 +133,7 @@ Read in this order. Each file is short.
 13. `../packages/catalog/catalog.ts` - reads llms.txt into items, and which sessions are upcoming. No AI in this file.
     The admin assistant reads the same catalog, so it lives in `packages/`.
 14. `rules/same-path.ts` - the sign-in page sends you back only to a path on this site.
+15. `auth/register-app.ts` - registers a web app with a client secret and its one return address.
 
 ## Prove it
 

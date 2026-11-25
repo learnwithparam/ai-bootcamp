@@ -1,0 +1,200 @@
+/* Styles only this product needs. Colours come from the shared tokens. */
+
+.workspace {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 0;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-right: 1px solid var(--line);
+  background: var(--surface);
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.new-chat {
+  text-align: center;
+  text-decoration: none;
+}
+
+.chat-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.chat-list a {
+  display: block;
+  padding: 6px 8px;
+  border-radius: var(--r);
+  color: var(--fg2);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-list a:hover,
+.chat-list a[aria-current="page"] {
+  background: var(--hl);
+  color: var(--fg);
+}
+
+.sidebar-empty {
+  color: var(--muted);
+  margin: 0;
+}
+
+.sidebar-foot {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.workspace-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.workspace-main .thread {
+  flex: 1;
+}
+
+.chat-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.chat-head h1 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.page {
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+.page h1 {
+  margin: 0;
+}
+
+.page p {
+  margin: 0;
+}
+
+.memory-list,
+.connector-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.memory-row,
+.connector-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.connector-row .status {
+  margin-left: 8px;
+}
+
+.connector-url {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 14px;
+  margin: 4px 0 0;
+}
+
+.connector-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.add-connector {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.add-connector h2 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.add-connector .button {
+  align-self: flex-start;
+  margin-top: 8px;
+}
+
+.notice-pass {
+  background: var(--passbg);
+}
+
+.approve-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.chat-error {
+  color: var(--fail);
+}
+
+.tool-input {
+  font-family: var(--mono);
+  font-size: 14px;
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.memory-chip {
+  color: var(--fg2);
+  font-family: var(--mono);
+  font-size: 14px;
+  margin: 4px 0;
+}
+
+.memory-refused {
+  color: var(--wait);
+}
+
+@media (max-width: 720px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    max-height: 30vh;
+  }
+}

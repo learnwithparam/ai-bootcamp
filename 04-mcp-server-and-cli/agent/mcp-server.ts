@@ -8,7 +8,11 @@ export function mcpServer(userId: string | null): McpServer {
   for (const tool of TOOLS) {
     server.registerTool(
       tool.name,
-      { description: tool.description, inputSchema: tool.input },
+      {
+        description: tool.description,
+        inputSchema: tool.input,
+        annotations: { readOnlyHint: !tool.changesData },
+      },
       async (input) => {
         const output = await tool.run(input, userId);
         return { content: [{ type: "text", text: JSON.stringify(output, null, 2) }] };

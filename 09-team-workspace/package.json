@@ -1,0 +1,32 @@
+{
+  "name": "@bootcamp/team-workspace",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "echo 'Add yourself after you sign up: bun 09-team-workspace/db/member.ts you@example.com --admin'",
+    "seed": "echo 'The team workspace starts empty. Your chats, memories and connectors are your own.'"
+  },
+  "dependencies": {
+    "@ai-sdk/mcp": "2.0.104",
+    "@assistant-ui/react": "0.15.38",
+    "@assistant-ui/react-ai-sdk": "1.4.25",
+    "@bootcamp/auth": "workspace:*",
+    "@bootcamp/db": "workspace:*",
+    "@bootcamp/model": "workspace:*",
+    "@bootcamp/products": "workspace:*",
+    "@bootcamp/tracing": "workspace:*",
+    "@bootcamp/ui": "workspace:*",
+    "ai": "7.0.181",
+    "better-auth": "1.7.23",
+    "drizzle-orm": "0.45.4",
+    "next": "16.4.6",
+    "pg": "8.23.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "drizzle-kit": "0.31.11"
+  }
+}
