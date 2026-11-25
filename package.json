@@ -9,7 +9,8 @@
     "01-invoice-inbox",
     "02-site-assistant",
     "04-mcp-server-and-cli",
-    "05-admin-assistant"
+    "05-admin-assistant",
+    "06-research-agent"
   ],
   "scripts": {
     "setup": "bun scripts/setup.ts",

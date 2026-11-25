@@ -1,0 +1,31 @@
+{
+  "name": "@bootcamp/research-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "echo 'The research agent searches the live web. There is nothing to set up.'",
+    "seed": "echo 'The research agent searches the live web. There is nothing to seed.'"
+  },
+  "dependencies": {
+    "@bootcamp/auth": "workspace:*",
+    "@bootcamp/db": "workspace:*",
+    "@bootcamp/model": "workspace:*",
+    "@bootcamp/products": "workspace:*",
+    "@bootcamp/tracing": "workspace:*",
+    "@bootcamp/ui": "workspace:*",
+    "@langchain/core": "1.5.1",
+    "@langchain/langgraph": "1.7.5",
+    "ai": "7.0.181",
+    "better-auth": "1.7.23",
+    "drizzle-orm": "0.45.4",
+    "next": "16.4.6",
+    "pg": "8.23.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "drizzle-kit": "0.31.11"
+  }
+}

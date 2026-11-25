@@ -34,3 +34,12 @@ export function model(setting: string = required("MODEL")): LanguageModel {
 export function embeddingModel(name: string = required("EMBEDDING_MODEL")): EmbeddingModel {
   return createOpenRouter({ apiKey: required("OPENROUTER_API_KEY") }).textEmbeddingModel(name);
 }
+
+// A model that searches the live web before it answers, and returns the pages it used as sources.
+// It runs on OpenRouter's web search, so it always goes through OpenRouter. Set SEARCH_MODEL in the settings file.
+export function searchModel(name: string = required("SEARCH_MODEL"), pages = 5): LanguageModel {
+  return createOpenRouter({ apiKey: required("OPENROUTER_API_KEY") }).chat(name, {
+    plugins: [{ id: "web", max_results: pages }],
+    usage: { include: true },
+  });
+}

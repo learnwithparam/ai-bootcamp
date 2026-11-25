@@ -18,6 +18,7 @@ This repo is where you see those ideas working together in a product.
 | 2 | [Site assistant](02-site-assistant/README.md) | Answer visitors from the site's own pages, show members their plan, and hand off to a person. | loop, context, decision model, boundary, verification, human in the loop |
 | 3 | [MCP server and CLI](04-mcp-server-and-cli/README.md) | Offer the school's catalog as one set of tools, used from chat, from Claude or Cursor, and from a terminal. | mcp, cli, boundary |
 | 4 | [Admin assistant](05-admin-assistant/README.md) | Answer the owner's questions about signups, make Stripe coupons after approval, and draft the newsletter. | skills, ui the agent draws, human in the loop, boundary |
+| 5 | [Research agent](06-research-agent/README.md) | Research a company on the live web, check every claim against its page, and score it as a lead. | graph, verification, structured output |
 <!-- products:end -->
 
 ## How each product folder is laid out
