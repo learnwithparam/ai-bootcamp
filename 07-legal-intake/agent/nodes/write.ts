@@ -1,5 +1,6 @@
 import { model } from "@bootcamp/model";
 import { generateText } from "ai";
+import type { Deadline } from "../../rules/intake";
 import type { State } from "../graph";
 import { costOf, fill } from "../prompt";
 import prompt from "../prompts/letter.md" with { type: "text" };
@@ -12,6 +13,8 @@ export async function writeLetter({
   assessment,
   decision,
 }: Pick<State, "request" | "assessment" | "decision">) {
+  const dateLine = (date: Deadline | null) =>
+    date ? `${date.date}${date.quote ? ` ("${date.quote}")` : ""}` : "none stated";
   const result = await generateText({
     model: model(),
     prompt: fill(prompt, {
@@ -19,9 +22,7 @@ export async function writeLetter({
       choice: decision.choice === "accept" ? "We will take the matter on." : "We cannot take the matter on.",
       note: decision.note || "none",
       summary: decision.choice === "accept" ? assessment.summary : "not given for a decline",
-      deadline: assessment.deadline
-        ? `${assessment.deadline.date} ("${assessment.deadline.quote}")`
-        : "none stated",
+      deadline: dateLine(request.keyDate ?? assessment.deadline),
     }),
     experimental_telemetry: { isEnabled: true, functionId: "legal-intake-letter" },
   });

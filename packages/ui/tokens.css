@@ -21,9 +21,9 @@
   --line: #dfdfdf;
   --accent: #faff69;
   --on-accent: #151515;
-  --pass: #008138;
+  --pass: #00722f;
   --fail: #bf000f;
-  --wait: #b75000;
+  --wait: #a04600;
   --passbg: #dcebe3;
   --failbg: #f3dcde;
   --waitbg: #f2e6dc;
@@ -39,6 +39,9 @@
   --shadow: 0 1px 2px rgba(21, 21, 21, 0.06), 0 8px 24px rgba(21, 21, 21, 0.08);
   --shadow-sm: 0 1px 2px rgba(21, 21, 21, 0.08);
   --scrim: rgba(21, 21, 21, 0.32);
+  --firm: #1e4d3f;
+  --firm-soft: #e6efe9;
+  --on-firm: #ffffff;
   color-scheme: light;
 }
 

@@ -1,13 +1,17 @@
 import { currentSession } from "@bootcamp/auth";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
-import { isLawyer } from "../db/queries";
+import { staffRole } from "../db/queries";
+import type { Role } from "../rules/board";
 
-// Every queue page and lawyer action calls this first. No session means the sign-in page.
-// A signed-in account that is not a lawyer gets a not-found page, as if the queue did not exist.
-export async function requireLawyer() {
+export type Staff = { id: string; name: string; role: Role };
+
+// Every firm page and action calls this first. No session means the sign-in page.
+// A signed-in account that is not on the staff gets a not-found page, as if the board did not exist.
+export async function requireStaff(): Promise<Staff> {
   const session = await currentSession(await headers());
   if (!session) redirect("/sign-in");
-  if (!(await isLawyer(session.user.id))) notFound();
-  return session.user;
+  const role = await staffRole(session.user.id);
+  if (!role) notFound();
+  return { id: session.user.id, name: session.user.name, role };
 }

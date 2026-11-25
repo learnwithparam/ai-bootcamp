@@ -5,8 +5,9 @@ import { after } from "next/server";
 import { resumeIntake, retryIntake, STOPPED } from "../../agent/agent";
 import type { ActionState } from "../../components/ReviewForm";
 import { claim, intakeById, updateIntake } from "../../db/queries";
+import { canDecide } from "../../rules/board";
 import { type Decision, whyNotAccept, whyNotSend } from "../../rules/intake";
-import { requireLawyer } from "../session";
+import { requireStaff } from "../session";
 
 // The lawyer's two answers. Each checks the rule on the page's side, claims the request, then resumes the saved graph.
 
@@ -22,7 +23,8 @@ function readDecision(form: FormData, lawyerId: string): Decision {
 }
 
 export async function decide(_previous: ActionState, form: FormData): Promise<ActionState> {
-  const lawyer = await requireLawyer();
+  const lawyer = await requireStaff();
+  if (!canDecide(lawyer.role)) return { error: "Only a lawyer can accept or decline a matter." };
   const id = String(form.get("id"));
   const intake = await intakeById(id);
   if (!intake?.assessment) return { error: "This request is not waiting for a decision." };
@@ -39,7 +41,8 @@ export async function decide(_previous: ActionState, form: FormData): Promise<Ac
 }
 
 export async function approve(_previous: ActionState, form: FormData): Promise<ActionState> {
-  await requireLawyer();
+  const staff = await requireStaff();
+  if (!canDecide(staff.role)) return { error: "Only a lawyer can approve a letter." };
   const id = String(form.get("id"));
   const letter = String(form.get("letter") ?? "");
   const refused = whyNotSend(letter, (await intakeById(id))?.conflicts ?? []);
@@ -59,7 +62,7 @@ export async function approve(_previous: ActionState, form: FormData): Promise<A
 
 // A step that failed, such as the model not answering, runs again from the last saved step.
 export async function retry(_previous: ActionState, form: FormData): Promise<ActionState> {
-  await requireLawyer();
+  await requireStaff();
   const id = String(form.get("id"));
   const intake = await intakeById(id);
   const next = intake?.decision ? "drafting" : "assessing";

@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 
 export type ActionState = { error?: string };
-type Answer = (previous: ActionState, form: FormData) => Promise<ActionState>;
+export type Answer = (previous: ActionState, form: FormData) => Promise<ActionState>;
 
 function ErrorLine({ error }: ActionState) {
   return error ? (
@@ -14,10 +14,33 @@ function ErrorLine({ error }: ActionState) {
 }
 
 // The first pause: accept or decline. When the check found a possible match, the lawyer must clear it first.
-export function DecisionForm({ id, action, possible }: { id: string; action: Answer; possible: boolean }) {
+// locked: a paralegal sees the form, but only a lawyer can press it.
+type DecisionProps = { id: string; action: Answer; possible: boolean; locked: boolean };
+
+function DecisionButtons({ disabled }: { disabled: boolean }) {
+  return (
+    <div className="review-actions">
+      <button
+        type="submit"
+        name="choice"
+        value="accept"
+        className="button button-primary"
+        disabled={disabled}
+      >
+        Accept the matter
+      </button>
+      <button type="submit" name="choice" value="decline" className="button" disabled={disabled}>
+        Decline
+      </button>
+    </div>
+  );
+}
+
+export function DecisionForm({ id, action, possible, locked }: DecisionProps) {
   const [state, send, sending] = useActionState(action, {});
   return (
     <form action={send} className="review-form">
+      {locked ? <p className="form-hint">Only a lawyer can accept or decline a matter.</p> : null}
       <input type="hidden" name="id" value={id} />
       <label className="field-label">
         Note for the letter (optional)
@@ -29,38 +52,34 @@ export function DecisionForm({ id, action, possible }: { id: string; action: Ans
           or companies.
         </label>
       ) : null}
-      <div className="review-actions">
-        <button
-          type="submit"
-          name="choice"
-          value="accept"
-          className="button button-primary"
-          disabled={sending}
-        >
-          Accept the matter
-        </button>
-        <button type="submit" name="choice" value="decline" className="button" disabled={sending}>
-          Decline
-        </button>
-      </div>
+      <DecisionButtons disabled={sending || locked} />
       <ErrorLine error={state.error} />
     </form>
   );
 }
 
 // The second pause: the lawyer edits the draft. What they approve is exactly what the client reads.
-export function LetterForm({ id, draft, action }: { id: string; draft: string; action: Answer }) {
+type LetterProps = { id: string; draft: string; action: Answer; locked: boolean };
+
+export function LetterForm({ id, draft, action, locked }: LetterProps) {
   const [state, send, sending] = useActionState(action, {});
   return (
     <form action={send} className="review-form">
       <input type="hidden" name="id" value={id} />
       <label className="field-label">
         Letter to the client
-        <span>Drafted by the model from your decision. Edit anything, then approve.</span>
-        <textarea name="letter" className="field letter-field" rows={14} defaultValue={draft} />
+        <span>Drafted by the assistant from the decision. Edit anything, then approve.</span>
+        <textarea
+          name="letter"
+          className="field letter-field agent-filled"
+          rows={16}
+          defaultValue={draft}
+          readOnly={locked}
+        />
       </label>
       <div className="review-actions">
-        <button type="submit" className="button button-primary" disabled={sending}>
+        {locked ? <span className="form-hint">Only a lawyer can approve a letter.</span> : null}
+        <button type="submit" className="button button-primary" disabled={sending || locked}>
           {sending ? "Saving..." : "Approve and send"}
         </button>
       </div>

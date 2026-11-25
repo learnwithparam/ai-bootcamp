@@ -1,6 +1,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import { connect } from "@bootcamp/db";
 import { and, desc, eq, getTableColumns, gte, inArray, sql } from "drizzle-orm";
+import { type Role, TABS } from "../rules/board";
 import type { PartyRecord } from "../rules/conflicts";
 import type { Intake, Request, Status } from "../rules/intake";
 import * as schema from "./schema";
@@ -57,8 +58,19 @@ export async function intakeById(id: string): Promise<Intake | null> {
   return row ?? null;
 }
 
-export async function queue(limit = 50): Promise<Intake[]> {
+export async function queue(limit = 200): Promise<Intake[]> {
   return db.select(columns).from(intakes).orderBy(desc(intakes.createdAt)).limit(limit);
+}
+
+// The number beside "Intake board" in the side nav: requests the firm still has to finish.
+const OPEN = TABS.find((tab) => tab.key === "open")?.statuses ?? [];
+
+export async function openCount(): Promise<number> {
+  const [row] = await db
+    .select({ count: sql<number>`count(*)::int` })
+    .from(intakes)
+    .where(inArray(intakes.status, OPEN));
+  return row?.count ?? 0;
 }
 
 export async function updateIntake(id: string, change: Partial<typeof intakes.$inferInsert>) {
@@ -87,13 +99,17 @@ export async function partyRecords(): Promise<PartyRecord[]> {
   return db.select({ name: parties.name, role: parties.role, matter: parties.matter }).from(parties);
 }
 
-export async function isLawyer(userId: string): Promise<boolean> {
-  const [row] = await db.select().from(lawyers).where(eq(lawyers.userId, userId));
-  return Boolean(row);
+// null: the account is not on the firm's staff.
+export async function staffRole(userId: string): Promise<Role | null> {
+  const [row] = await db.select({ role: lawyers.role }).from(lawyers).where(eq(lawyers.userId, userId));
+  return row?.role ?? null;
 }
 
-export async function addLawyer(userId: string) {
-  await db.insert(lawyers).values({ userId }).onConflictDoNothing();
+export async function addStaff(userId: string, role: Role) {
+  await db
+    .insert(lawyers)
+    .values({ userId, role })
+    .onConflictDoUpdate({ target: lawyers.userId, set: { role } });
 }
 
 // Only the lawyer script calls this, never a page.

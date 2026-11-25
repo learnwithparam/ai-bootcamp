@@ -1,9 +1,11 @@
 import { afterAll, expect, test } from "bun:test";
 import { pausedAt, resumeIntake, startIntake } from "../agent/agent";
+import { collect, OPENING } from "../agent/collect";
 import { checkpoints } from "../db/checkpoints";
 import { intakeById, removeIntakes, takeRequest } from "../db/queries";
+import { EMPTY_DRAFT, missing } from "../rules/collect";
 import { whyNotTake } from "../rules/form";
-import type { Decision, Request } from "../rules/intake";
+import type { Decision, Request, Turn } from "../rules/intake";
 
 // The real graph and the real model, saved to a real Postgres. Runs in `bun run proof`. Needs `bun run setup` first,
 // which loads the firm's records the conflict check reads.
@@ -16,7 +18,14 @@ afterAll(async () => {
   for (const id of made) await checkpoints.deleteThread(id);
 });
 
-async function send(request: Request) {
+// What the client typed becomes the transcript and the story, as the intake page sends it.
+async function send(fields: Omit<Request, "keyDate" | "goal" | "transcript">) {
+  const request: Request = {
+    ...fields,
+    keyDate: null,
+    goal: "A reply from a lawyer",
+    transcript: [{ from: "client", text: fields.story }],
+  };
   const taken = await takeRequest(request, whyNotTake);
   if (!("id" in taken)) throw new Error(taken.refused);
   made.push(taken.id);
@@ -94,3 +103,37 @@ test("a conflict the client never typed, found in the story, blocks an accept", 
   await resumeIntake(id, `${pause.draft}\n\nWe act for Marcus Bell.`);
   expect((await pausedAt(id))?.refused).toContain("Take out");
 }, 120_000);
+
+test("the conversation fills the form from the client's words, and asks for what is still missing", async () => {
+  const transcript: Turn[] = [
+    OPENING,
+    {
+      from: "client",
+      text:
+        "Hi, I'm Lena Marsh. I cancelled my gym membership with Quayside Fitness Ltd in August with 30 days notice, " +
+        "but they still take 45 pounds a month. They told me the debt goes to a collector on 9 January 2027.",
+    },
+  ];
+  const first = await collect(transcript, EMPTY_DRAFT, []);
+  expect(first.draft.clientName).toBe("Lena Marsh");
+  expect(first.draft.otherParties).toEqual(["Quayside Fitness Ltd"]);
+  expect(first.draft.keyDate?.date).toBe("2027-01-09");
+  expect(first.draft.clientEmail).toBe("");
+  expect(first.reply.trim()).toMatch(/\?$/);
+
+  const edited = { ...first.draft, clientName: "Lena M. Marsh" };
+  const second = await collect(
+    [
+      ...transcript,
+      { from: "agent", text: first.reply },
+      { from: "client", text: "lena.marsh@example.com, and I want my money back." },
+    ],
+    edited,
+    ["clientName"],
+  );
+  expect(second.draft.clientName).toBe("Lena M. Marsh");
+  expect(second.draft.clientEmail).toBe("lena.marsh@example.com");
+  expect(missing(second.draft)).toEqual([]);
+  expect(first.cost + second.cost).toBeLessThan(0.01);
+  console.log(`Two intake turns for $${(first.cost + second.cost).toFixed(4)}`);
+}, 60_000);

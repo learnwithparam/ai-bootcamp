@@ -199,6 +199,8 @@
 
 .panel-head {
   display: flex;
+  margin: 0;
+  font-size: 16px;
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
@@ -208,6 +210,10 @@
 
 .panel-body {
   padding: 16px;
+}
+
+.panel-body > :first-child {
+  margin-top: 0;
 }
 
 @media (max-width: 860px) {

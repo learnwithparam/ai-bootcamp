@@ -15,10 +15,26 @@ export type PracticeArea = (typeof PRACTICE_AREAS)[number];
 // The firm takes on these areas only. Anything else is declined with a pointer to get help elsewhere.
 export const HANDLED: PracticeArea[] = ["employment", "tenancy", "consumer"];
 
-export type Request = { clientName: string; clientEmail: string; otherParties: string[]; story: string };
+// One message in the intake conversation. The client's turns are their own words; the agent's are its questions.
+export type Turn = { from: "client" | "agent"; text: string };
+
+// A transcript only grows, so a turn's place in it is its identity. The screens key each turn by it.
+export const numbered = (turns: Turn[]) => turns.map((turn, place) => ({ ...turn, place }));
 
 // A deadline counts only when the client's own words say it. quote is copied from the story.
+// An empty quote means the client typed the date into the form themselves.
 export type Deadline = { date: string; quote: string };
+
+// What the client sends. story is every client turn joined, so later steps read only the client's words.
+export type Request = {
+  clientName: string;
+  clientEmail: string;
+  otherParties: string[];
+  keyDate: Deadline | null;
+  goal: string;
+  story: string;
+  transcript: Turn[];
+};
 
 export type Assessment = {
   area: PracticeArea;

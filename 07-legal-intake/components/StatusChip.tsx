@@ -10,18 +10,19 @@ const LABEL: Record<Status, string> = {
   failed: "Failed",
 };
 
+// Yellow while the agent works, amber while it waits for a lawyer.
 const TONE: Record<Status, string> = {
-  assessing: "status-wait",
-  "needs review": "status-wait",
-  drafting: "status-wait",
-  "letter ready": "status-wait",
-  sending: "status-wait",
-  answered: "status-pass",
-  failed: "status-fail",
+  assessing: "pill-agent",
+  "needs review": "pill-wait",
+  drafting: "pill-agent",
+  "letter ready": "pill-wait",
+  sending: "pill-agent",
+  answered: "pill-pass",
+  failed: "pill-fail",
 };
 
 export function StatusChip({ status }: { status: Status }) {
-  return <span className={`status ${TONE[status]}`}>{LABEL[status]}</span>;
+  return <span className={`pill ${TONE[status]}`}>{LABEL[status]}</span>;
 }
 
 // The steps that run on their own. While a request is in one, its page reloads itself.

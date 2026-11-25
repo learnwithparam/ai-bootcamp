@@ -1,7 +1,7 @@
 import { afterAll, describe, expect, test } from "bun:test";
 import { claim, intakeById, intakeByToken, removeIntakes, takeRequest } from "../db/queries";
 import { findConflicts, type PartyRecord } from "../rules/conflicts";
-import { readRequest, whyNotTake } from "../rules/form";
+import { whyNotTake } from "../rules/form";
 import { type Assessment, deadlineInStory, namesInStory, whyNotAccept, whyNotSend } from "../rules/intake";
 
 // The business rules and the queries, against a real Postgres. No model.
@@ -85,21 +85,6 @@ describe("what the model may add", () => {
 });
 
 describe("the public form", () => {
-  test("a request is read and tidied, and a thin one is refused", () => {
-    const { request } = readRequest({
-      clientName: " Ana ",
-      clientEmail: "ANA@x.org",
-      otherParties: "A Ltd, B;C",
-      story: STORY,
-    });
-    expect(request?.clientEmail).toBe("ana@x.org");
-    expect(request?.otherParties).toEqual(["A Ltd"]);
-    expect(readRequest({ clientName: "Ana", clientEmail: "ana@x.org", story: "help" }).error).toContain(
-      "at least",
-    );
-    expect(readRequest({ clientName: "Ana", clientEmail: "nope", story: STORY }).error).toContain("email");
-  });
-
   test("three a day from one email, and a cap for everyone", () => {
     expect(whyNotTake(2, 10)).toBeNull();
     expect(whyNotTake(3, 10)).toContain("already have");
@@ -114,7 +99,10 @@ describe("queries", () => {
     clientName: "Test Client",
     clientEmail: email,
     otherParties: [],
+    keyDate: null,
+    goal: "Get my deposit back",
     story: STORY,
+    transcript: [{ from: "client" as const, text: STORY }],
   });
 
   test("only the private link finds a request, and the token is not stored", async () => {

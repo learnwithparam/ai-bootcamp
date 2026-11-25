@@ -1,0 +1,273 @@
+/* The client's side: Harlow Legal's own site, on the firm green. Colours come from packages/ui/tokens.css.
+   The one memorable thing is the request form filling in beside the conversation, marked in yellow. */
+
+.firm {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.firm-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  align-items: center;
+  padding: 14px max(16px, calc((100% - 1120px) / 2));
+  background: var(--firm);
+  color: var(--on-firm);
+}
+
+.firm-mark {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: var(--on-firm);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+  text-decoration: none;
+}
+
+.firm-mark span,
+.firm-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid currentColor;
+  border-radius: var(--r);
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.firm-areas {
+  display: flex;
+  gap: 20px;
+  font-size: 14px;
+}
+
+.firm-staff {
+  margin-left: auto;
+  color: var(--on-firm);
+  font-size: 14px;
+}
+
+.button-firm {
+  border-color: var(--firm);
+  background: var(--firm);
+  color: var(--on-firm);
+}
+
+.firm-home,
+.firm-intake {
+  width: min(1120px, 100% - 32px);
+  margin: 0 auto;
+  padding: 40px 0 64px;
+}
+
+.firm-narrow {
+  width: min(760px, 100% - 32px);
+}
+
+.firm-hero {
+  display: grid;
+  gap: 18px;
+  justify-items: start;
+  max-width: 44rem;
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--line);
+}
+
+.firm-hero h1,
+.firm-intake h1 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(30px, 5vw, 46px);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.firm-hero p,
+.firm-lead,
+.client-wait {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--fg2);
+}
+
+.firm-areas-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 28px;
+  padding-top: 32px;
+}
+
+.firm-areas-list h2 {
+  margin: 0 0 6px;
+  color: var(--firm);
+  font-size: 17px;
+}
+
+.firm-areas-list p {
+  margin: 0;
+  color: var(--fg2);
+}
+
+.firm-lead {
+  margin: 10px 0 24px;
+}
+
+.intake-desk {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(300px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.conversation {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 12px;
+  height: min(640px, 75vh);
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.turns {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.turn {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: var(--r-lg);
+  background: var(--surface-2);
+}
+
+.turn p {
+  margin: 4px 0 0;
+  white-space: pre-wrap;
+}
+
+.turn-client {
+  justify-self: end;
+  background: var(--firm-soft);
+}
+
+.turn-who {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.turn-typing {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.request-panel {
+  position: sticky;
+  top: 16px;
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--firm);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.request-panel h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.agent-note {
+  margin: 4px 0 0;
+}
+
+.request-progress ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin: 6px 0 0;
+  padding: 0;
+  color: var(--muted);
+  font-size: 13px;
+  list-style: none;
+}
+
+.request-progress .done {
+  color: var(--pass);
+}
+
+.request-progress svg,
+.tracker svg {
+  width: 14px;
+  height: 14px;
+  vertical-align: -2px;
+}
+
+.firm-steps {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line);
+}
+
+.firm-steps h2 {
+  margin: 0 0 20px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 26px;
+  font-weight: 400;
+}
+
+.firm-steps ol {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 28px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+
+.firm-steps li {
+  padding-left: 44px;
+  position: relative;
+  counter-increment: step;
+}
+
+.firm-steps li::before {
+  content: counter(step);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--firm);
+  color: var(--on-firm);
+  font-weight: 600;
+}
+
+.firm-steps h3 {
+  margin: 4px 0 6px;
+  font-size: 16px;
+}
+
+.firm-steps p {
+  margin: 0;
+  color: var(--fg2);
+}
+
+.firm-steps .firm-declined {
+  margin-top: 28px;
+  font-size: 14px;
+}
