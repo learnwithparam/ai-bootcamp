@@ -5,6 +5,7 @@ import { afterIdentify } from "../agent/graph";
 import {
   db,
   findReport,
+  roleOf,
   startReport,
   startWithinLimits,
   takeReport,
@@ -142,6 +143,10 @@ test("a rep takes only an account nobody owns, and only the lead assigns", () =>
   expect(may("lead", "assign")).toBe(true);
   expect(ownerOfNew("rep", "me")).toBe("me");
   expect(ownerOfNew("lead", "me")).toBeNull();
+});
+
+test("signing up alone does not put someone on the team", async () => {
+  expect(await roleOf(`stranger-${crypto.randomUUID()}`)).toBeNull();
 });
 
 test("the whole team sees every account, and two reps cannot both take one", async () => {

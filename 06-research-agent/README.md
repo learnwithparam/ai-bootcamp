@@ -28,7 +28,7 @@ Add a company as an account executive and watch its cells fill in. Assign it to 
 |---|---|---|
 | Account executive | Adds up to 5 companies at a time, which become theirs. Takes unassigned accounts. Reads each cell's sources before a call | My accounts, Unassigned with Take, the sources card, an account's full report |
 | Sales lead | Sees every account, adds companies for the team to Unassigned, and gives each account an owner | All accounts with an owner menu on every row, Unassigned, an account's report with its owner menu |
-| Anyone else | Signs up and joins as an account executive | The account executive's screens |
+| Anyone else | Can sign up, but sees a not-found page until `db/lead.ts` puts them on the team | None |
 
 The team is Priya Raman, the sales lead, and two account executives, Tomás Ortega and Grace Okafor.
 Their 11 accounts are real companies, researched for real, and include the hard cases:

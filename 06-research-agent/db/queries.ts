@@ -63,10 +63,10 @@ export async function assignReport(id: string, ownerId: string | null) {
   await db.update(reports).set({ ownerId }).where(eq(reports.id, id));
 }
 
-export async function roleOf(userId: string): Promise<Role> {
-  await db.insert(members).values({ userId }).onConflictDoNothing();
+// Only db/lead.ts and the seed put someone on the team. Signing up alone never does.
+export async function roleOf(userId: string): Promise<Role | null> {
   const [row] = await db.select({ role: members.role }).from(members).where(eq(members.userId, userId));
-  return row?.role ?? "rep";
+  return row?.role ?? null;
 }
 
 export async function setRole(userId: string, role: Role) {
