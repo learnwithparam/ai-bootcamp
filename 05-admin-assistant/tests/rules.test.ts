@@ -158,6 +158,11 @@ test("a newsletter may link only to learnwithparam.com, in any link form", () =>
     "[k](https://www.learnwithparam.com/%2F%2Fevil.test)",
     "chat on xmpp:someone",
     "a [l]: https://evil.test mid-line",
+    "[https://evil.test](https://www.learnwithparam.com/live)",
+    "[mail me@evil.test](https://www.learnwithparam.com)",
+    "visit evil\uFF0Etest",
+    "write to someone\uFF20evil.test",
+    "see b\u00FCcher.de",
   ];
   for (const body of disguised) expect(foreignLinks(body).length).toBeGreaterThan(0);
 });

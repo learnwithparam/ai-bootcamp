@@ -84,13 +84,15 @@ export function plainLine(line: string): string {
 // the rest must hold nothing a mail tool could turn into a link: no address, scheme, domain, @, HTML or escape.
 export const SITE = "https://www.learnwithparam.com";
 
-const SITE_LINK = /\[[^\]]+\]\(https:\/\/www\.learnwithparam\.com(?:\/[\w\-./]*)?\)/g;
+const SITE_LINK = /\[([^\]\n]+)\]\(https:\/\/www\.learnwithparam\.com(?:\/[\w\-./]*)?\)/g;
 const LINK_LIKE =
-  /[<>\\@]|&[#\w]+;|\]\(|\[[^\]]*\]:|\b[a-z][a-z0-9+.-]*:\S+|\bwww\.\S*|\/\/\S*|\b[\w-]+(?:\.[\w-]+)*\.[a-z]{2,}\b/gi;
+  /[<>\\@]|&[#\w]+;|\]\(|\[[^\]]*\]:|[\p{L}][\p{L}\p{N}+.-]*:\S+|www\.\S*|\/\/\S*|[\p{L}\p{N}_-]+(?:\.[\p{L}\p{N}_-]+)*\.\p{L}{2,}/giu;
 
 // Every piece of the body that could become a link to somewhere else. Empty means the body may be sent.
+// NFKC turns lookalikes such as a full-width dot or at sign into the plain ones first. An allowed link keeps
+// its words in the scan, so a label cannot hide an address.
 export function foreignLinks(markdown: string): string[] {
-  const rest = markdown.replaceAll(SITE_LINK, " ");
+  const rest = markdown.normalize("NFKC").replaceAll(SITE_LINK, (_link, label: string) => ` ${label} `);
   return [...rest.matchAll(LINK_LIKE)].map((match) => match[0]);
 }
 
