@@ -87,13 +87,9 @@ const ADDRESS_LIKE =
   /(?:\b(?:https?|ftp|file|data|javascript|vbscript|mailto|tel|sms):|\bwww\.|(?<![\w:])\/\/)[^\s)\]>"'<]*/gi;
 
 function isSiteLink(text: string): boolean {
-  const candidate = text.toLowerCase().startsWith("www.") ? "https://" + text : text;
-  try {
-    const url = new URL(candidate.startsWith("//") ? "https:" + candidate : candidate);
-    return url.origin === SITE && url.username === "" && url.password === "";
-  } catch {
-    return false;
-  }
+  const withScheme = text.toLowerCase().startsWith("www.") ? "https://".concat(text) : text;
+  const url = URL.parse(withScheme.startsWith("//") ? "https:".concat(withScheme) : withScheme);
+  return url?.origin === SITE && url.username === "" && url.password === "";
 }
 
 export function foreignLinks(markdown: string): string[] {
