@@ -87,6 +87,14 @@ export const PRODUCTS: Product[] = [
     port: 3108,
     ideas: ["browser automation", "decision model", "boundary", "verification", "human in the loop"],
   },
+  {
+    folder: "09-team-workspace",
+    slug: "team-workspace",
+    title: "Team workspace",
+    job: "Give a team one chat with saved history, memory across chats, and the tools of the MCP servers it connects.",
+    port: 3109,
+    ideas: ["mcp", "memory", "context", "boundary", "human in the loop"],
+  },
 ];
 
 export const ALL_PORTS = [GALLERY_PORT, ...PRODUCTS.map((product) => product.port)];

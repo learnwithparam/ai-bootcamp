@@ -12,7 +12,8 @@
     "05-admin-assistant",
     "06-research-agent",
     "07-legal-intake",
-    "08-browser-agent"
+    "08-browser-agent",
+    "09-team-workspace"
   ],
   "scripts": {
     "setup": "bun scripts/setup.ts",

@@ -199,6 +199,32 @@
         "drizzle-kit": "0.31.11",
       },
     },
+    "09-team-workspace": {
+      "name": "@bootcamp/team-workspace",
+      "version": "0.1.0",
+      "dependencies": {
+        "@ai-sdk/mcp": "2.0.104",
+        "@assistant-ui/react": "0.15.38",
+        "@assistant-ui/react-ai-sdk": "1.4.25",
+        "@bootcamp/auth": "workspace:*",
+        "@bootcamp/db": "workspace:*",
+        "@bootcamp/model": "workspace:*",
+        "@bootcamp/products": "workspace:*",
+        "@bootcamp/tracing": "workspace:*",
+        "@bootcamp/ui": "workspace:*",
+        "ai": "7.0.181",
+        "better-auth": "1.7.23",
+        "drizzle-orm": "0.45.4",
+        "next": "16.4.6",
+        "pg": "8.23.1",
+        "react": "19.3.1",
+        "react-dom": "19.3.1",
+        "zod": "4.6.7",
+      },
+      "devDependencies": {
+        "drizzle-kit": "0.31.11",
+      },
+    },
     "gallery": {
       "name": "@bootcamp/gallery",
       "version": "0.1.0",
@@ -384,6 +410,8 @@
     "@bootcamp/site-assistant": ["@bootcamp/site-assistant@workspace:02-site-assistant"],
 
     "@bootcamp/stripe": ["@bootcamp/stripe@workspace:packages/stripe"],
+
+    "@bootcamp/team-workspace": ["@bootcamp/team-workspace@workspace:09-team-workspace"],
 
     "@bootcamp/tracing": ["@bootcamp/tracing@workspace:packages/tracing"],
 
