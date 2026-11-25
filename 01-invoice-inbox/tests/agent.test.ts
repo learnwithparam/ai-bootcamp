@@ -1,5 +1,4 @@
 import { expect, test } from "bun:test";
-import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { checkBill, readInvoice } from "../agent/agent";
@@ -30,7 +29,7 @@ async function readOne(orderNumber: number): Promise<Result> {
     .sort();
   const truth = order.lines.map((line) => `${line.product}|${line.unitPriceCents}|${line.quantity}`).sort();
   const pdf = readFileSync(join(SAMPLE_FOLDER, fileName));
-  const { reading } = await checkBill(randomUUID(), pdf, new Date(0), invoice);
+  const { reading } = await checkBill(pdf, invoice, []);
   const raw = usage.raw as { cost?: number } | undefined;
   return {
     orderNumber,

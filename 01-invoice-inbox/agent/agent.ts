@@ -1,6 +1,6 @@
 import { model } from "@bootcamp/model";
 import { generateText, type LanguageModelUsage, Output } from "ai";
-import { billPdf, earlierNumbers, findBill, type Reading, saveReading } from "../db/bills";
+import { billPdf, findBill, oneNumberAtATime, otherCopies, type Reading, saveReading } from "../db/bills";
 import { findOrder } from "../db/queries";
 import { duplicateProblem, suggestFix } from "../rules/bill";
 import { formatCents, type Invoice, invoiceSchema, toCents } from "../rules/invoice";
@@ -43,12 +43,14 @@ const STATUS_NOTE = {
   review: "Sent to a clerk to review.",
 } as const;
 
-// Step 2 to 5 for one bill: check the reading against the page, the order and earlier bills, then suggest a fix.
-export async function checkBill(id: string, pdf: Buffer, receivedAt: Date, invoice: Invoice) {
+type Copy = { id: string; number: string };
+
+// Step 2 to 5 for one bill: check the reading against the page, the order and the other bills, then suggest a fix.
+export async function checkBill(pdf: Buffer, invoice: Invoice, others: Copy[]) {
   const fields = checkFields(invoice, await readPageText(pdf));
   const order = await findOrder(Number(invoice.invoiceNumber));
   const problems = matchInvoiceToOrder(invoice, order);
-  const duplicate = duplicateProblem(invoice.invoiceNumber, await earlierNumbers(id, receivedAt));
+  const duplicate = duplicateProblem(invoice.invoiceNumber, others);
   if (duplicate) problems.unshift(duplicate.problem);
   const fix = suggestFix(invoice, order, problems);
   const status = problems.length === 0 ? "approval" : "review";
@@ -74,6 +76,14 @@ export async function checkBill(id: string, pdf: Buffer, receivedAt: Date, invoi
   return { reading, notes };
 }
 
+// Checks and saves one reading while no other copy of the same bill number is being saved.
+export function saveChecked(id: string, pdf: Buffer, invoice: Invoice) {
+  return oneNumberAtATime(invoice.invoiceNumber, async (tx) => {
+    const { reading, notes } = await checkBill(pdf, invoice, await otherCopies(id, tx));
+    await saveReading(id, reading, notes, tx);
+  });
+}
+
 // The whole job for one bill that has just arrived. A bill the model cannot read is marked unreadable,
 // with the reason in the activity log and the server log, so a person reads the PDF instead.
 export async function processBill(id: string): Promise<void> {
@@ -81,8 +91,7 @@ export async function processBill(id: string): Promise<void> {
   if (!bill || !pdf || bill.status !== "reading") return;
   try {
     const { invoice } = await readInvoice(pdf, bill.fileName);
-    const { reading, notes } = await checkBill(id, pdf, bill.receivedAt, invoice);
-    await saveReading(id, reading, notes);
+    await saveChecked(id, pdf, invoice);
   } catch (error) {
     console.error(`Reading bill ${id} (${bill.fileName}) failed:`, error);
     const reading: Reading = {

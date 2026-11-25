@@ -164,12 +164,14 @@ Read in this order. Each file is short.
 ## Prove it
 
 ```bash
-bun test 01-invoice-inbox/tests/rules.test.ts 01-invoice-inbox/tests/bill.test.ts   # the rules, no model
-bun run proof invoice-inbox                                                         # the real model
+bun test 01-invoice-inbox/tests/rules.test.ts 01-invoice-inbox/tests/bill.test.ts 01-invoice-inbox/tests/duplicates.test.ts   # no model
+bun run proof invoice-inbox   # the real model
 ```
 
 `tests/rules.test.ts` checks each order rule on real Northwind orders in Postgres.
 `tests/bill.test.ts` checks due dates, duplicates, roles, typed amounts, the suggested fix and finding fields on a page.
+`tests/duplicates.test.ts` saves two copies of a new bill at the same moment and checks that exactly one is flagged.
+Each bill number is saved under its own lock in Postgres, so two copies read together cannot both pass.
 
 `tests/agent.test.ts` is the metric. The model reads all 28 sample bills.
 The test checks that every line it read equals the order line in Postgres,

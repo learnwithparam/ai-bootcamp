@@ -1,4 +1,4 @@
-import { and, asc, count, desc, eq, ilike, inArray, isNotNull, lt, ne, or, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, inArray, isNotNull, ne, or, sql } from "drizzle-orm";
 import { type BillRecord, type BillStatus, TABS, type Tab } from "../rules/bill";
 import { db } from "./queries";
 import { billEvents, bills } from "./schema";
@@ -36,20 +36,24 @@ export async function billPdf(id: string): Promise<Buffer | undefined> {
   return row?.pdf;
 }
 
-// The numbers of the bills that arrived before this one and were not rejected, for the duplicate check.
-export async function earlierNumbers(id: string, receivedAt: Date) {
-  const rows = await db
+type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
+// Readings of one bill number are checked and saved one at a time. Two copies read at the same moment
+// would each miss the other, and both would go on to be paid. With the lock, the second one sees the first.
+export function oneNumberAtATime<T>(invoiceNumber: string, work: (tx: Tx) => Promise<T>): Promise<T> {
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`invoice-inbox:${invoiceNumber}`}))`);
+    return work(tx);
+  });
+}
+
+// Every other bill already read and not rejected, oldest first, for the duplicate check.
+export async function otherCopies(id: string, on: Tx) {
+  return on
     .select({ id: bills.id, number: sql<string>`${bills.extracted}->>'invoiceNumber'` })
     .from(bills)
-    .where(
-      and(
-        ne(bills.id, id),
-        isNotNull(bills.extracted),
-        ne(bills.status, "rejected"),
-        lt(bills.receivedAt, receivedAt),
-      ),
-    );
-  return rows;
+    .where(and(ne(bills.id, id), isNotNull(bills.extracted), ne(bills.status, "rejected")))
+    .orderBy(asc(bills.receivedAt));
 }
 
 export type Reading = Pick<
@@ -59,8 +63,8 @@ export type Reading = Pick<
 
 // The assistant's work, saved in one go with the lines it adds to the activity log.
 // Each line is a millisecond after the one before, so the log reads in the order the work was done.
-export async function saveReading(id: string, reading: Reading, notes: string[]) {
-  await db.transaction(async (tx) => {
+export async function saveReading(id: string, reading: Reading, notes: string[], on: Tx | typeof db = db) {
+  await on.transaction(async (tx) => {
     const saved = await tx
       .update(bills)
       .set(reading)
