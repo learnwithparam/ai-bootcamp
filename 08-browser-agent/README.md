@@ -100,7 +100,8 @@ flowchart LR
    The reply address is the sender's, from the header, and the story is the client's own words, never a summary.
    A name counts only when the email contains it. An email too short for the portal stops before the browser opens.
 2. **Stagehand fills the portal.** For each field, the model finds the input by its label and code types the value as a variable,
-   so the email's words never become instructions. The browser may open the portal's address and nothing else.
+   so the email's words never become instructions. The browser may open the portal's host and no other site,
+   and a run counts as sent only on a page with the portal's own origin.
 3. **Code checks the form.** It reads each field back, with its label, and compares it with the answer it meant to type.
    A wrong field stops the run, whatever the decision model says next.
 4. **The decision model decides, code acts.** `decideSend` asks the OpenRouter decision model to choose `submit`, `stop` or `ask_human`.

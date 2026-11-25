@@ -1,7 +1,7 @@
 import { setTimeout as sleep } from "node:timers/promises";
 import { addCost, emailById, logStep, runById, updateRun } from "../db/queries";
 import { type Email, FIELD_NAMES, type Form, formFromEmail, whyNotFill } from "../rules/email";
-import { checkForm, nextMove, onPortal, type Placed, SENT_PAGE, type Status } from "../rules/run";
+import { checkForm, nextMove, onPortal, type Placed, type Status, sentPage } from "../rules/run";
 import { openPortal, picture, type Session } from "./browser";
 import { decideSend } from "./decide-send";
 import { answersToPlace, findSendButton, placeAnswer, readBack, replayAnswers } from "./fill-form";
@@ -77,11 +77,11 @@ async function send(runId: string, session: Session, submitSelector: string) {
   if (!onPortal(before, PORTAL)) throw new Error(`The browser left the portal: ${before}`);
   await session.page.locator(submitSelector).click();
   let now = await session.page.url();
-  for (let wait = 0; wait < 40 && !SENT_PAGE.test(now); wait++) {
+  for (let wait = 0; wait < 40 && !sentPage(now, PORTAL); wait++) {
     await sleep(500);
     now = await session.page.url();
   }
-  if (!SENT_PAGE.test(now)) {
+  if (!sentPage(now, PORTAL)) {
     await step(runId, 5, "The portal did not accept the request.", session);
     throw new Error(`The portal did not accept the request from run ${runId}.`);
   }

@@ -2,7 +2,7 @@ import { afterAll, describe, expect, test } from "bun:test";
 import { sql } from "drizzle-orm";
 import { addEmail, claim, db, failStalled, removeEmails, runById, startRun, updateRun } from "../db/queries";
 import { type Email, type Form, formFromEmail, whyNotFill } from "../rules/email";
-import { checkForm, nextMove, onPortal, SENT_PAGE, type Seen, whyNotStart } from "../rules/run";
+import { checkForm, nextMove, onPortal, type Seen, sentPage, whyNotStart } from "../rules/run";
 
 // The limits the agent cannot change, and the queries, against a real Postgres. No model, no browser.
 
@@ -94,8 +94,12 @@ describe("what code does with the decision", () => {
   test("the browser stays on the portal, and a sent page is the portal's private link", () => {
     expect(onPortal("http://127.0.0.1:3107/requests/x", "http://127.0.0.1:3107")).toBe(true);
     expect(onPortal("https://harbor-collect.example.com/", "http://127.0.0.1:3107")).toBe(false);
-    expect(SENT_PAGE.test(`http://127.0.0.1:3107/requests/${"a".repeat(32)}`)).toBe(true);
-    expect(SENT_PAGE.test("http://127.0.0.1:3107/")).toBe(false);
+    const portal = "http://127.0.0.1:3107";
+    const path = `/requests/${"a".repeat(32)}`;
+    expect(sentPage(`${portal}${path}`, portal)).toBe(true);
+    expect(sentPage(`${portal}/`, portal)).toBe(false);
+    expect(sentPage(`http://127.0.0.1:9999${path}`, portal)).toBe(false);
+    expect(sentPage(`https://127.0.0.1:3107${path}`, portal)).toBe(false);
   });
 });
 

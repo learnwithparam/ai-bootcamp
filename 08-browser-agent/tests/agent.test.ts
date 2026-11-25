@@ -5,7 +5,7 @@ import { openPortal } from "../agent/browser";
 import { PORTAL } from "../agent/portal";
 import { INBOX } from "../db/inbox";
 import { addEmail, claim, removeEmails, runById, startRun } from "../db/queries";
-import { SENT_PAGE, whyNotStart } from "../rules/run";
+import { sentPage, whyNotStart } from "../rules/run";
 import { ensureRunning, removePortalRequests } from "./portal";
 
 // The real model and a real Chrome, filling the real legal intake portal from 07. Runs in `bun run proof`.
@@ -62,7 +62,7 @@ test("a clear request reaches the portal with the client's own reply address", a
     ruth = { ...ruth, ...(await runById(ruth.id)) };
   }
   expect(ruth.status).toBe("submitted");
-  expect(ruth.requestUrl).toMatch(SENT_PAGE);
+  expect(sentPage(ruth.requestUrl ?? "", PORTAL)).toBe(true);
   expect(await portalRequests([ruth.fromEmail])).toEqual([ruth.fromEmail]);
   expect(ruth.cost).toBeLessThan(0.02);
 }, 180_000);

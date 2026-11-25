@@ -109,8 +109,11 @@ export function onPortal(url: string, portal: string): boolean {
   return URL.canParse(url) && new URL(url).origin === new URL(portal).origin;
 }
 
-// After a submit the portal moves to the client's private page.
-export const SENT_PAGE = /\/requests\/[\w-]{32}$/;
+// After a submit the portal moves to the client's private page. Its origin must be the portal's own, so a page
+// on another port or scheme with the same path never counts as sent.
+export function sentPage(url: string, portal: string): boolean {
+  return onPortal(url, portal) && /^\/requests\/[\w-]{32}$/.test(new URL(url).pathname);
+}
 
 export type Run = {
   id: string;
