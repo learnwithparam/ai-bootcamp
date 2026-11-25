@@ -1,8 +1,18 @@
 import { afterAll, expect, test } from "bun:test";
 import { checkClaims } from "../agent/nodes/check";
-import { readPage } from "../agent/read-page";
+import { LIMIT_BYTES, readLimited, readPage } from "../agent/read-page";
 
 // The quote check against a real web server on this machine. No model: the claims are written here.
+
+// A page that never ends: it sends 64 KB pieces for as long as anyone reads.
+// Reading it whole would never finish, so this test returning at all shows the read stops at the limit.
+function endless() {
+  return new ReadableStream({
+    pull(controller) {
+      controller.enqueue(new Uint8Array(65_536).fill(97));
+    },
+  });
+}
 
 const site = Bun.serve({
   port: 0,
@@ -13,6 +23,7 @@ const site = Bun.serve({
         headers: { "content-type": "text/html" },
       });
     if (path === "/hop") return Response.redirect("http://127.0.0.1/secret", 302);
+    if (path === "/endless") return new Response(endless(), { headers: { "content-type": "text/plain" } });
     if (path === "/file") return new Response("%PDF-1.7", { headers: { "content-type": "application/pdf" } });
     return new Response("Not found", { status: 404 });
   },
@@ -50,4 +61,20 @@ test("a private address is never opened, even when a trusted page redirects to o
   console.warn = warn;
   expect(hop).toBeNull();
   expect(warnings).toContain("Refused to open http://127.0.0.1/secret: it is not a public web address.");
+});
+
+test("a name that resolves to this machine is refused, even though it reads like a public site", async () => {
+  const warnings: string[] = [];
+  const warn = console.warn;
+  console.warn = (message: string) => warnings.push(message);
+  const page = await readPage(`http://localhost.:${site.port}/about`);
+  console.warn = warn;
+  expect(page).toBeNull();
+  expect(warnings[0]).toContain("it is not a public web address");
+});
+
+test("an endless page is read only up to the limit, then the read stops", async () => {
+  const response = await fetch(`${home}/endless`);
+  const text = await readLimited(response);
+  expect(text.length).toBe(LIMIT_BYTES);
 });

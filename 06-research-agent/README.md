@@ -23,7 +23,7 @@ Open "Left out" and see which claims failed the check, and why.
 Finish [00-setup](../00-setup/README.md). This product needs only the OpenRouter key from `.env`.
 Web search runs through OpenRouter on the model in `SEARCH_MODEL`, so there is nothing else to sign up for.
 
-Each report costs about $0.12 to $0.16. An account may run one report at a time and 10 a day.
+Each report costs about $0.12 to $0.19. An account may run one report at a time and 10 a day.
 
 ## Run it
 
@@ -119,7 +119,8 @@ bun run proof research-agent                     # the real model, the live web,
 ```
 
 `tests/check.test.ts` serves pages from this machine and checks that a quote is found, missing or unreadable.
-It also proves that a trusted page which redirects to a private address is refused.
+It also proves that a trusted page which redirects to a private address is refused, that a name resolving to this machine
+is refused, and that an endless page is read only up to the limit.
 
 `tests/agent.test.ts` is the metric. It researches Vercel for real, then opens every kept claim's page again, apart from the agent,
 and passes only when every quote is there. It also checks that the score's reasons name only kept claims,
@@ -128,7 +129,7 @@ and that a made-up company fails with a clear message.
 `tests/e2e.test.ts` walks the path in a real browser: create an account, research Linear, wait for the score and its sources,
 then open the same report as another account and get a 404.
 
-Last run: 13 of 15 claims kept, every kept quote found again on its page, $0.146 for the report,
+Last run: 9 of 16 claims kept, every kept quote found again on its page, $0.185 for the report,
 with web search on `openai/gpt-6-luna` through OpenRouter.
 
 ## Learn the idea in depth

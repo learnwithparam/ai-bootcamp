@@ -2,12 +2,20 @@ import { afterAll, expect, test } from "bun:test";
 import { END, Send } from "@langchain/langgraph";
 import { inArray } from "drizzle-orm";
 import { afterIdentify } from "../agent/graph";
-import { db, findReport, reportsBy, startReport, updateReport, usage } from "../db/queries";
+import {
+  db,
+  findReport,
+  reportsBy,
+  startReport,
+  startWithinLimits,
+  updateReport,
+  usage,
+} from "../db/queries";
 import { reports } from "../db/schema";
 import { cleanUrl, keptClaims, quoteIsOnPage, withoutCitations } from "../rules/claims";
 import { companyQuery, whyNotStart } from "../rules/limits";
 import { pageText } from "../rules/page-text";
-import { isPublicUrl } from "../rules/public-url";
+import { isPublicIp, isPublicUrl } from "../rules/public-url";
 import { backedFacts, type Facts, leadScore } from "../rules/score";
 import { TOPICS } from "../rules/topics";
 
@@ -67,6 +75,18 @@ test("only public web addresses may be opened", () => {
     "not a url",
   ];
   for (const url of refused) expect(isPublicUrl(url)).toBe(false);
+  for (const ip of ["8.8.8.8", "2606:4700::1111"]) expect(isPublicIp(ip)).toBe(true);
+  const privateIps = [
+    "::ffff:127.0.0.1",
+    "::ffff:10.0.0.1",
+    "100.64.0.1",
+    "0.0.0.0",
+    "::",
+    "fe80::1",
+    "fd00::1",
+    "224.0.0.1",
+  ];
+  for (const ip of privateIps) expect(isPublicIp(ip)).toBe(false);
 });
 
 const FACTS: Facts = {
@@ -121,4 +141,12 @@ test("a report is found only by the account that asked for it", async () => {
   expect(await usage(owner)).toEqual({ runningNow: 1, startedToday: 1 });
   await updateReport(id, { status: "done" });
   expect(await usage(owner)).toEqual({ runningNow: 0, startedToday: 1 });
+});
+
+test("two reports started at the same moment cannot both pass the running limit", async () => {
+  const owner = `racer-${crypto.randomUUID()}`;
+  made.push(owner);
+  const both = await Promise.all([startWithinLimits("Linear", owner), startWithinLimits("Vercel", owner)]);
+  expect(both.filter((one) => one.id).length).toBe(1);
+  expect(both.filter((one) => one.refused).length).toBe(1);
 });

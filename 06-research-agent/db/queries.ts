@@ -1,5 +1,6 @@
 import { connect } from "@bootcamp/db";
-import { and, count, desc, eq, gte } from "drizzle-orm";
+import { and, count, desc, eq, gte, sql } from "drizzle-orm";
+import { whyNotStart } from "../rules/limits";
 import * as schema from "./schema";
 import { type Report, reports } from "./schema";
 
@@ -36,15 +37,38 @@ export async function reportsBy(userId: string, limit = 20): Promise<Report[]> {
 }
 
 // How many reports this account has running now, and how many it started in the last 24 hours.
-export async function usage(userId: string): Promise<{ runningNow: number; startedToday: number }> {
+type Database = Pick<typeof db, "select">;
+
+export async function usage(userId: string, on: Database = db) {
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  const [running] = await db
+  const mine = eq(reports.createdBy, userId);
+  const [running] = await on
     .select({ total: count() })
     .from(reports)
-    .where(and(eq(reports.createdBy, userId), eq(reports.status, "running")));
-  const [today] = await db
+    .where(and(mine, eq(reports.status, "running")));
+  const [today] = await on
     .select({ total: count() })
     .from(reports)
-    .where(and(eq(reports.createdBy, userId), gte(reports.createdAt, since)));
+    .where(and(mine, gte(reports.createdAt, since)));
   return { runningNow: running?.total ?? 0, startedToday: today?.total ?? 0 };
+}
+
+// Two quick clicks must not both pass the limits. A lock per account makes the second wait
+// until the first has saved its row, so it counts that row and is refused.
+export async function startWithinLimits(
+  company: string,
+  userId: string,
+): Promise<{ id?: string; refused?: string }> {
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`research:${userId}`}))`);
+    const { runningNow, startedToday } = await usage(userId, tx);
+    const refused = whyNotStart(runningNow, startedToday);
+    if (refused) return { refused };
+    const [row] = await tx
+      .insert(reports)
+      .values({ company, createdBy: userId })
+      .returning({ id: reports.id });
+    if (!row) throw new Error("The report was not saved.");
+    return { id: row.id };
+  });
 }
