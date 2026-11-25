@@ -1,5 +1,6 @@
 "use server";
 
+import { required } from "@bootcamp/model";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
@@ -36,9 +37,11 @@ export type TalkResult = {
   error?: string;
 };
 
+// The visitor's address comes only from the one header your proxy sets, named in LEGAL_INTAKE_IP_HEADER.
+// X-Forwarded-For is never read: a visitor can type it and get a fresh daily limit with every message.
 async function visitor() {
-  const forwarded = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim();
-  return visitorHash(forwarded || "local");
+  const address = (await headers()).get(required("LEGAL_INTAKE_IP_HEADER"))?.trim();
+  return visitorHash(address || "unknown");
 }
 
 export async function talk(input: {
