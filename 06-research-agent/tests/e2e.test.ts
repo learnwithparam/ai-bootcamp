@@ -46,9 +46,9 @@ afterAll(async () => {
 async function createAccount(page: Page, name: string) {
   await page.goto(`${URL}/sign-in`);
   await page.getByRole("button", { name: "Create an account" }).click();
-  await page.getByPlaceholder("Your name").fill(name);
-  await page.getByPlaceholder("Email").fill(`${name.toLowerCase()}-${crypto.randomUUID()}@example.com`);
-  await page.getByPlaceholder("Password, at least 10 characters").fill("a long test password");
+  await page.getByLabel("Your name").fill(name);
+  await page.getByLabel("Email").fill(`${name.toLowerCase()}-${crypto.randomUUID()}@example.com`);
+  await page.getByLabel("Password").fill("a long test password");
   await page.getByRole("button", { name: "Create account" }).click();
   await page.waitForURL(`${URL}/`);
 }

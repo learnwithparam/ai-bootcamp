@@ -2,6 +2,7 @@ import { tool } from "ai";
 import { z } from "zod";
 import { newsletterById, reviseNewsletter } from "../../db/newsletters";
 import { recordChange } from "../../db/queries";
+import { foreignLinks } from "../../rules/email";
 
 export type OpenNewsletterOutput =
   | { found: true; id: number; status: string; subject: string; body: string }
@@ -33,6 +34,13 @@ export function reviseNewsletterTool(userId: string) {
       body: z.string().min(50),
     }),
     execute: async ({ id, subject, body }): Promise<ReviseNewsletterOutput> => {
+      const outside = foreignLinks(body);
+      if (outside.length) {
+        return {
+          revised: false,
+          problem: `Only learnwithparam.com links are allowed. Remove ${outside.join(", ")}.`,
+        };
+      }
       const saved = await reviseNewsletter(id, subject, body);
       if (!saved)
         return {

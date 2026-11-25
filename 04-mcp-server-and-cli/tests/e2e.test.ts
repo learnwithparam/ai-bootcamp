@@ -57,9 +57,9 @@ async function approveInBrowser(code: string) {
   const page = await (await browser.newContext()).newPage();
   await page.goto(`${URL}/device?user_code=${code}`);
   await page.getByRole("button", { name: "Create an account" }).click();
-  await page.getByPlaceholder("Your name").fill("E2E Learner");
-  await page.getByPlaceholder("Email").fill(`e2e-${crypto.randomUUID()}@example.com`);
-  await page.getByPlaceholder("Password, at least 10 characters").fill("a-long-test-password");
+  await page.getByLabel("Your name").fill("E2E Learner");
+  await page.getByLabel("Email").fill(`e2e-${crypto.randomUUID()}@example.com`);
+  await page.getByLabel("Password").fill("a-long-test-password");
   await page.getByRole("button", { name: "Create account" }).click();
   await page.getByRole("button", { name: "Approve" }).click();
   await page.getByRole("heading", { name: "The CLI is signed in" }).waitFor();

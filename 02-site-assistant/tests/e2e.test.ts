@@ -57,9 +57,9 @@ afterAll(async () => {
 async function signUp(page: Page, email: string) {
   await page.goto(`${URL}/sign-in`);
   await page.getByRole("button", { name: "Create an account" }).click();
-  await page.getByPlaceholder("Your name").fill("Test Member");
-  await page.getByPlaceholder("Email").fill(email);
-  await page.getByPlaceholder("Password, at least 10 characters").fill("a long test password");
+  await page.getByLabel("Your name").fill("Test Member");
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Password").fill("a long test password");
   await page.getByRole("button", { name: "Create account" }).click();
   await page.waitForURL(`${URL}/`);
 }

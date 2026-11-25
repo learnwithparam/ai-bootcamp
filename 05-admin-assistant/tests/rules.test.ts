@@ -1,9 +1,18 @@
 import { afterAll, expect, test } from "bun:test";
 import type { Item } from "@bootcamp/catalog";
 import { SKILLS } from "../agent/skills/skills";
+import {
+  approveNewsletter,
+  createNewsletter,
+  newsletterById,
+  reviseNewsletter,
+  settleRevision,
+  versionOf,
+} from "../db/newsletters";
 import { accountByEmail, addToTeam, roleOf, signupsByDay } from "../db/queries";
 import { couponProblem, describeCoupon, MAX_PERCENT_OFF } from "../rules/coupon";
 import { everyDay, todayUtc } from "../rules/days";
+import { foreignLinks } from "../rules/email";
 import { parseSkill } from "../rules/skill-file";
 import { whatsNew } from "../rules/whats-new";
 import { makeAccount, removeAccounts } from "./accounts";
@@ -121,4 +130,27 @@ test("an account is on the team only after the team script adds it, and its role
   expect(await roleOf(account.id)).toBe("staff");
   await addToTeam(account.id, "owner");
   expect(await roleOf(account.id)).toBe("owner");
+});
+
+test("a newsletter may link only to learnwithparam.com", () => {
+  const body =
+    "[a](https://www.learnwithparam.com/live) [b](https://www.learnwithparam.com.evil.test/x) [c](https://evil.test)";
+  expect(foreignLinks(body)).toEqual(["https://www.learnwithparam.com.evil.test/x", "https://evil.test"]);
+});
+
+test("approval holds only for the exact text the owner read, with no change waiting and no outside link", async () => {
+  const owner = await makeAccount("Approving Owner");
+  made.push(owner.id);
+  const text = "A draft long enough to save, with one link: [labs](https://www.learnwithparam.com/live).";
+  const letter = await createNewsletter("Approval check", text, owner.id);
+  const read = versionOf(letter);
+  await reviseNewsletter(letter.id, "Approval check, edited", `${text} One more line.`);
+  expect(await approveNewsletter(letter.id, owner.id, read)).toBe("pending");
+  await settleRevision(letter.id, true);
+  expect(await approveNewsletter(letter.id, owner.id, read)).toBe("changed");
+  const outside = await createNewsletter("Outside link", `${text} [x](https://evil.test)`, owner.id);
+  expect(await approveNewsletter(outside.id, owner.id, versionOf(outside))).toBe("links");
+  const now = (await newsletterById(letter.id)) as NonNullable<Awaited<ReturnType<typeof newsletterById>>>;
+  expect(await approveNewsletter(letter.id, owner.id, versionOf(now))).toBeNull();
+  expect(await approveNewsletter(letter.id, owner.id, versionOf(now))).toBe("gone");
 });

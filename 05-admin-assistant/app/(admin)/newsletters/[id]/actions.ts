@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { approveNewsletter, saveNewsletter, settleRevision } from "../../../../db/newsletters";
 import { recordChange } from "../../../../db/queries";
 import { requireOwner, requireTeam } from "../../../session";
@@ -43,13 +44,13 @@ export async function undoChange(form: FormData) {
 export async function approveIssue(form: FormData) {
   const owner = await requireOwner();
   const id = Number(form.get("id"));
-  if (await approveNewsletter(id, owner.id)) {
-    await recordChange({
-      userId: owner.id,
-      by: "person",
-      action: "Approved a newsletter",
-      detail: { newsletterId: id },
-    });
-  }
+  const problem = await approveNewsletter(id, owner.id, String(form.get("version") ?? ""));
+  if (problem) redirect(`/newsletters/${id}?problem=${problem}`);
+  await recordChange({
+    userId: owner.id,
+    by: "person",
+    action: "Approved a newsletter",
+    detail: { newsletterId: id },
+  });
   refresh();
 }

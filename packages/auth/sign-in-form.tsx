@@ -52,18 +52,32 @@ function Fields({ creating }: { creating: boolean }) {
   return (
     <>
       {creating ? (
-        <input name="name" className="field" placeholder="Your name" required autoComplete="name" />
+        <label className="form-row">
+          Your name
+          <input name="name" className="field" required autoComplete="name" />
+        </label>
       ) : null}
-      <input name="email" type="email" className="field" placeholder="Email" required autoComplete="email" />
-      <input
-        name="password"
-        type="password"
-        className="field"
-        placeholder="Password, at least 10 characters"
-        required
-        minLength={10}
-        autoComplete={creating ? "new-password" : "current-password"}
-      />
+      <label className="form-row">
+        Email
+        <input name="email" type="email" className="field" required autoComplete="email" />
+      </label>
+      <label className="form-row">
+        Password
+        <input
+          name="password"
+          type="password"
+          className="field"
+          required
+          minLength={10}
+          aria-describedby={creating ? "password-hint" : undefined}
+          autoComplete={creating ? "new-password" : "current-password"}
+        />
+        {creating ? (
+          <span className="form-hint" id="password-hint">
+            At least 10 characters.
+          </span>
+        ) : null}
+      </label>
     </>
   );
 }

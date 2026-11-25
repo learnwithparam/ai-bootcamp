@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { AskButton } from "../../../../components/AskButton";
 import { DiffView } from "../../../../components/DiffView";
 import { EmailPreview } from "../../../../components/EmailPreview";
-import { newsletterById } from "../../../../db/newsletters";
+import { APPROVE_PROBLEMS, newsletterById, versionOf } from "../../../../db/newsletters";
 import type { Newsletter } from "../../../../db/schema";
 import { requireTeam } from "../../../session";
 import { approveIssue, keepChange, saveIssue, undoChange } from "./actions";
@@ -49,11 +49,24 @@ function Editor({ letter }: { letter: Newsletter }) {
         <input type="hidden" name="id" value={letter.id} />
         <label className="form-row form-row-wide">
           Subject
-          <input name="subject" defaultValue={letter.subject} required minLength={5} maxLength={80} />
+          <input
+            className="field"
+            name="subject"
+            defaultValue={letter.subject}
+            required
+            minLength={5}
+            maxLength={80}
+          />
         </label>
         <label className="form-row form-row-wide">
           Body
-          <textarea name="body" defaultValue={letter.body} rows={18} required />
+          <textarea
+            className="field newsletter-body"
+            name="body"
+            defaultValue={letter.body}
+            rows={18}
+            required
+          />
         </label>
         <button type="submit" className="button">
           Save my edit
@@ -63,7 +76,9 @@ function Editor({ letter }: { letter: Newsletter }) {
   );
 }
 
-function Actions({ draft, id, owner }: { draft: boolean; id: number; owner: boolean }) {
+type ActionProps = { draft: boolean; id: number; owner: boolean; version: string; pending: boolean };
+
+function Actions({ draft, id, owner, version, pending }: ActionProps) {
   if (!draft) return <span className="pill pill-pass">Approved</span>;
   return (
     <div className="page-actions">
@@ -72,9 +87,12 @@ function Actions({ draft, id, owner }: { draft: boolean; id: number; owner: bool
         label="Ask for an edit"
         className="button button-quiet"
       />
-      {owner ? (
+      {owner && pending ? (
+        <span className="pill pill-wait">Keep or undo the change to approve</span>
+      ) : owner ? (
         <form action={approveIssue}>
           <input type="hidden" name="id" value={id} />
+          <input type="hidden" name="version" value={version} />
           <button type="submit" className="button button-primary">
             Approve
           </button>
@@ -86,7 +104,10 @@ function Actions({ draft, id, owner }: { draft: boolean; id: number; owner: bool
   );
 }
 
-export default async function NewsletterPage({ params }: { params: Promise<{ id: string }> }) {
+type PageProps = { params: Promise<{ id: string }>; searchParams: Promise<{ problem?: string }> };
+
+export default async function NewsletterPage({ params, searchParams }: PageProps) {
+  const { problem } = await searchParams;
   const member = await requireTeam();
   const letter = await newsletterById(Number((await params).id));
   if (!letter) notFound();
@@ -105,8 +126,17 @@ export default async function NewsletterPage({ params }: { params: Promise<{ id:
               : "Approved. Copy it into the mail tool to send."}
           </p>
         </div>
-        <Actions draft={draft} id={letter.id} owner={member.role === "owner"} />
+        <Actions
+          draft={draft}
+          id={letter.id}
+          owner={member.role === "owner"}
+          version={versionOf(letter)}
+          pending={letter.previousBody !== null}
+        />
       </header>
+      {problem && Object.hasOwn(APPROVE_PROBLEMS, problem) ? (
+        <p className="pill pill-fail">{APPROVE_PROBLEMS[problem as keyof typeof APPROVE_PROBLEMS]}</p>
+      ) : null}
       {draft && letter.previousBody !== null ? <PendingChange letter={letter} /> : null}
       <div className="newsletter-layout">
         <EmailPreview subject={letter.subject} body={letter.body} />

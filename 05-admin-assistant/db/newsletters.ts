@@ -1,4 +1,6 @@
-import { and, desc, eq, sql } from "drizzle-orm";
+import { createHash } from "node:crypto";
+import { and, desc, eq, isNull, sql } from "drizzle-orm";
+import { foreignLinks } from "../rules/email";
 import { db } from "./queries";
 import { type Newsletter, newsletters } from "./schema";
 
@@ -61,19 +63,46 @@ export async function settleRevision(id: number, keep: boolean) {
     .where(and(eq(newsletters.id, id), eq(newsletters.status, "draft")));
 }
 
-export async function approveNewsletter(id: number, ownerId: string): Promise<boolean> {
+// The version an owner read: a hash of the subject and body on their screen.
+export function versionOf(letter: { subject: string; body: string }): string {
+  return createHash("sha256").update(letter.subject).update("\n").update(letter.body).digest("hex");
+}
+
+// Why an approval was refused. The page shows one of these by its key, so a crafted address cannot put words on it.
+export const APPROVE_PROBLEMS = {
+  gone: "This newsletter is not a draft any more.",
+  pending: "Keep or undo the assistant's change before approving.",
+  changed: "The draft changed after you opened it. Read it again, then approve.",
+  links: "The draft links outside learnwithparam.com. Remove those links first.",
+} as const;
+export type ApproveProblem = keyof typeof APPROVE_PROBLEMS;
+
+// Approves only the exact text the owner read, with no assistant change still waiting and no outside link.
+// Returns why it refused, or null once approved.
+export async function approveNewsletter(
+  id: number,
+  ownerId: string,
+  version: string,
+): Promise<ApproveProblem | null> {
+  const letter = await newsletterById(id);
+  if (letter?.status !== "draft") return "gone";
+  if (letter.previousBody !== null) return "pending";
+  if (versionOf(letter) !== version) return "changed";
+  if (foreignLinks(letter.body).length) return "links";
   const rows = await db
     .update(newsletters)
-    .set({
-      status: "approved",
-      approvedBy: ownerId,
-      previousSubject: null,
-      previousBody: null,
-      updatedAt: sql`now()`,
-    })
-    .where(and(eq(newsletters.id, id), eq(newsletters.status, "draft")))
+    .set({ status: "approved", approvedBy: ownerId, updatedAt: sql`now()` })
+    .where(
+      and(
+        eq(newsletters.id, id),
+        eq(newsletters.status, "draft"),
+        eq(newsletters.subject, letter.subject),
+        eq(newsletters.body, letter.body),
+        isNull(newsletters.previousBody),
+      ),
+    )
     .returning({ id: newsletters.id });
-  return rows.length > 0;
+  return rows.length ? null : "changed";
 }
 
 export async function newsletterFacts() {

@@ -39,7 +39,8 @@ export const NewsletterSavedCard: ToolCallMessagePartComponent = ({ result, stat
         <span className="label">Newsletter draft saved</span>
         <StatusChip running={status.type === "running"} />
       </div>
-      {output ? (
+      {output && !output.saved ? <p className="card-body">{output.problem}</p> : null}
+      {output?.saved ? (
         <div className="card-body">
           <p>
             <strong>{output.subject}</strong>

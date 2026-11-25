@@ -2,6 +2,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { PRODUCTS } from "@bootcamp/products";
 import ts from "typescript";
+import { checkSelects, checkTextBoxes } from "./check-controls";
 
 // Keeps the code easy to read and to navigate. Each rule names the failure it stops.
 
@@ -147,18 +148,6 @@ function checkColours(files: string[]): Problem[] {
     .map((path) => `${path}: writes a colour. Colours live only in ${TOKENS_FILE}.`);
 }
 
-// One select style for every product, in controls.css. A product's own select rule brought back
-// the browser arrow touching the edge, so no other stylesheet may style a select.
-const SELECT_RULE = /(^|[\s,}>])select\b[^{;]*\{/m;
-const CONTROLS_FILE = "packages/ui/controls.css";
-
-function checkSelects(files: string[]): Problem[] {
-  return files
-    .filter((path) => path.endsWith(".css") && path !== CONTROLS_FILE)
-    .filter((path) => SELECT_RULE.test(readFileSync(path, "utf8").replace(/\/\*[\s\S]*?\*\//g, "")))
-    .map((path) => `${path}: styles a select. Selects are styled only in ${CONTROLS_FILE}.`);
-}
-
 // A product missing from the root workspaces cannot find its packages, and fails only when it runs.
 function checkWorkspaces(): Problem[] {
   const workspaces: string[] = JSON.parse(readFileSync("package.json", "utf8")).workspaces;
@@ -170,7 +159,12 @@ function checkWorkspaces(): Problem[] {
 export function checkStructure(): Problem[] {
   const roots = ["packages", "scripts", "gallery", ...PRODUCTS.map((product) => product.folder)];
   const files = roots.filter((root) => statSync(root, { throwIfNoEntry: false })).flatMap(walk);
-  const problems = [...checkColours(files), ...checkSelects(files), ...checkWorkspaces()];
+  const problems = [
+    ...checkColours(files),
+    ...checkSelects(files),
+    ...checkTextBoxes(files),
+    ...checkWorkspaces(),
+  ];
   for (const product of PRODUCTS) problems.push(...checkTopLevel(product.folder));
   for (const path of files.filter((file) => CODE.test(file))) {
     const product = PRODUCTS.find((each) => path.startsWith(`${each.folder}/`))?.folder;

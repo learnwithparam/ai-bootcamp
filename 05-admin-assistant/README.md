@@ -174,7 +174,7 @@ and an account whose name holds instructions shows on the card while the model i
 the owner opens the panel from Home and gets a chart, staff see a draft with no Approve button,
 the owner approves a draft and it exists in Stripe, and Undo on a newsletter puts the old text back.
 
-Last run: 36 of 36 tests passed, about $0.003 for the six model requests, on `openai/gpt-6-luna` through OpenRouter.
+Last run: 37 of 37 tests passed, about $0.003 for the six model requests, on `openai/gpt-6-luna` through OpenRouter.
 
 ## Learn the idea in depth
 

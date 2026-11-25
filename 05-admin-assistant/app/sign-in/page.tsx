@@ -4,7 +4,7 @@ export default function SignInPage() {
   return (
     <main className="sign-in">
       <h1>Admin assistant</h1>
-      <p>Sign in with the owner's account. Other accounts see a not-found page.</p>
+      <p>For the school's team. Owners and staff sign in here.</p>
       <SignInForm />
     </main>
   );

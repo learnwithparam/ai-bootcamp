@@ -166,8 +166,27 @@
   border-top: 1px solid var(--line);
 }
 
+.assistant-composer {
+  align-items: stretch;
+}
+
 .assistant-composer .composer-input {
   flex: 1;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+}
+
+.assistant-composer .composer-input:focus,
+.assistant-composer .composer-input:focus-visible {
+  border-color: var(--fg);
+  outline: none;
+}
+
+/* The floating prompt sits over the bottom of each page, so the page leaves room under its last row. */
+.shell-main {
+  padding-bottom: 104px;
 }
 
 /* Home */
@@ -249,14 +268,25 @@
 
 /* Customers */
 .search {
-  display: flex;
-  gap: 8px;
+  position: relative;
   margin-bottom: 12px;
+}
+
+.search svg {
+  position: absolute;
+  top: 50%;
+  left: 11px;
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+  transform: translateY(-50%);
+  pointer-events: none;
 }
 
 .search input {
   width: 300px;
   max-width: 100%;
+  padding-left: 34px;
 }
 
 .customer-name {
@@ -326,10 +356,8 @@
 }
 
 .newsletter-layout textarea {
-  width: 100%;
   min-height: 420px;
-  font-family: var(--mono);
-  font-size: 14px;
+  line-height: 1.6;
 }
 
 .email {

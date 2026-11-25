@@ -77,3 +77,10 @@ export function plainLine(line: string): string {
     .map((part) => part.text)
     .join("");
 }
+
+// A newsletter may link only to the school's own site. The tools refuse other links, and so does approval.
+export const SITE = "https://www.learnwithparam.com";
+
+export function foreignLinks(markdown: string): string[] {
+  return linksIn(markdown).filter((link) => link !== SITE && !link.startsWith(`${SITE}/`));
+}

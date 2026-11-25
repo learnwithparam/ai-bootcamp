@@ -75,8 +75,8 @@ afterAll(async () => {
 async function signIn(email: string, staff = true): Promise<Page> {
   const page = await (await browser.newContext()).newPage();
   await page.goto(`${URL}/sign-in`);
-  await page.getByPlaceholder("Email").fill(email);
-  await page.getByPlaceholder("Password, at least 10 characters").fill(PASSWORD);
+  await page.getByLabel("Email").fill(email);
+  await page.getByLabel("Password").fill(PASSWORD);
   await page.getByRole("button", { name: "Sign in", exact: true }).click();
   if (staff) await page.getByRole("heading", { name: "Intake board" }).waitFor();
   else await page.waitForURL(`${URL}/queue`);
