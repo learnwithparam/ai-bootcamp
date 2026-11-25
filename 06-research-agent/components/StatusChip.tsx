@@ -1,12 +1,12 @@
 import type { Report } from "../rules/report";
 
-const FIT_LABEL = { strong: "Strong fit", possible: "Possible fit", weak: "Weak fit" };
+export const FIT_LABEL = { strong: "Strong fit", possible: "Possible fit", weak: "Weak fit" };
+export const FIT_TONE = { strong: "pill-pass", possible: "pill-wait", weak: "pill-fail" };
 
-// One chip for where a report stands: still running, failed, or the fit it scored.
+// One chip for where an account stands: still being researched, failed, or the fit it scored.
 export function StatusChip({ report }: { report: Report }) {
-  if (report.status === "running") return <span className="status status-wait">{report.step}</span>;
-  if (report.status === "failed") return <span className="status status-fail">Failed</span>;
+  if (report.status === "running") return <span className="pill pill-agent">{report.step}</span>;
+  if (report.status === "failed") return <span className="pill pill-fail">Not found</span>;
   const fit = report.score?.fit ?? "weak";
-  const tone = fit === "strong" ? "status-pass" : fit === "possible" ? "status-wait" : "status-fail";
-  return <span className={`status ${tone}`}>{FIT_LABEL[fit]}</span>;
+  return <span className={`pill ${FIT_TONE[fit]}`}>{FIT_LABEL[fit]}</span>;
 }

@@ -10,14 +10,16 @@ import { keptClaims, quoteIsOnPage } from "../rules/claims";
 // The metric on the learner page: every kept claim's quote is on its page, read again here, apart from the agent.
 
 const made: string[] = [];
-afterAll(() => db.delete(reports).where(inArray(reports.createdBy, made)));
+afterAll(async () => {
+  await db.delete(reports).where(inArray(reports.createdBy, made));
+});
 
 async function research(company: string) {
   const owner = `proof-${crypto.randomUUID()}`;
   made.push(owner);
   const id = await startReport(company, owner);
   await runResearch(id, company, "2026-11-25");
-  const report = await findReport(id, owner);
+  const report = await findReport(id);
   if (!report) throw new Error("The report row is gone.");
   return report;
 }

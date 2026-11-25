@@ -5,7 +5,8 @@ export default function SignInPage() {
     <main className="sign-in">
       <h1>Research agent</h1>
       <p>
-        Sign in to research companies. Your reports are saved to your account, and only you can open them.
+        Sign in to your team's accounts. Every company is researched from the live web, and the whole team
+        sees the results.
       </p>
       <SignInForm />
     </main>

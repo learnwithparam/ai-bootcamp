@@ -14,11 +14,13 @@ export function ScoreCard({ score }: { score: Score }) {
               {reason.points} of {reason.max}
             </span>
             <span>{reason.why}</span>
-            {reason.claimIds.map((id) => (
-              <a key={id} href={`#${id}`} className="claim-ref">
-                {id}
-              </a>
-            ))}
+            <span className="claim-refs">
+              {reason.claimIds.map((id) => (
+                <a key={id} href={`#${id}`} className="claim-ref">
+                  {id}
+                </a>
+              ))}
+            </span>
           </li>
         ))}
       </ul>

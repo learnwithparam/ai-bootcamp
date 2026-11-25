@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "setup": "echo 'The research agent searches the live web. There is nothing to set up.'",
-    "seed": "echo 'The research agent searches the live web. There is nothing to seed.'"
+    "setup": "echo 'To load the sample sales team and 11 researched accounts, run: bun run seed research-agent (live web search, about $1.50).'",
+    "seed": "bun agent/seed.ts"
   },
   "dependencies": {
     "@bootcamp/auth": "workspace:*",
@@ -19,6 +19,7 @@
     "ai": "7.0.181",
     "better-auth": "1.7.23",
     "drizzle-orm": "0.45.4",
+    "lucide-react": "1.80.0",
     "next": "16.4.6",
     "pg": "8.23.1",
     "react": "19.3.1",

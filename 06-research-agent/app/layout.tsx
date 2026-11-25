@@ -1,4 +1,5 @@
 import "@bootcamp/ui/base.css";
+import "../components/accounts.css";
 import "../components/research.css";
 import type { ReactNode } from "react";
 

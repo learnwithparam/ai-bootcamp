@@ -5,25 +5,29 @@ import { afterIdentify } from "../agent/graph";
 import {
   db,
   findReport,
-  reportsBy,
   startReport,
   startWithinLimits,
+  takeReport,
+  teamReports,
   updateReport,
   usage,
 } from "../db/queries";
 import { reports } from "../db/schema";
 import { cleanUrl, keptClaims, quoteIsOnPage, withoutCitations } from "../rules/claims";
-import { companyQuery, whyNotStart } from "../rules/limits";
+import { companiesFrom, companyQuery, RUNNING_AT_ONCE, whyNotStart } from "../rules/limits";
 import { pageText } from "../rules/page-text";
 import { isPublicIp, isPublicUrl } from "../rules/public-url";
 import { backedFacts, type Facts, leadScore } from "../rules/score";
+import { may, ownerOfNew } from "../rules/team";
 import { TOPICS } from "../rules/topics";
 
 // The plain code, with no model: the quote check, the page reader, the lead score, the address guard,
 // the limits, the graph's fan-out, and the queries against a real Postgres.
 
 const made: string[] = [];
-afterAll(() => db.delete(reports).where(inArray(reports.createdBy, made)));
+afterAll(async () => {
+  await db.delete(reports).where(inArray(reports.createdBy, made));
+});
 
 const PAGE = "<p>Linear powers over 50,000 product teams.</p><script>var hidden = 1;</script>";
 
@@ -113,10 +117,12 @@ test("an old round and a tiny team score low", () => {
   expect(leadScore(old, "2026-11-25").total).toBe(50);
 });
 
-test("the limits refuse a second running report and a full day", () => {
-  expect(whyNotStart(0, 0)).toBeNull();
-  expect(whyNotStart(1, 1)).toContain("still running");
-  expect(whyNotStart(0, 10)).toContain("today");
+test("the limits refuse a paste that is too long, too many running, and a full day", () => {
+  expect(whyNotStart(0, 0, RUNNING_AT_ONCE)).toBeNull();
+  expect(whyNotStart(0, 0, RUNNING_AT_ONCE + 1)).toBe(`Add up to ${RUNNING_AT_ONCE} accounts at a time.`);
+  expect(whyNotStart(4, 4, 2)).toContain("You can add 1 more now");
+  expect(whyNotStart(0, 14, 2)).toContain("1 are left today");
+  expect(companiesFrom("Linear\n\nposthog.com, linear ,x")).toEqual(["Linear", "posthog.com"]);
   expect(companyQuery("  Linear   app ")).toBe("Linear app");
   expect(companyQuery("x")).toBeNull();
 });
@@ -129,24 +135,40 @@ test("one researcher starts per topic, and none when no company was found", () =
   expect(afterIdentify({ identity: null })).toBe(END);
 });
 
-test("a report is found only by the account that asked for it", async () => {
-  const owner = `owner-${crypto.randomUUID()}`;
-  const stranger = `stranger-${crypto.randomUUID()}`;
-  made.push(owner, stranger);
-  const id = await startReport("Linear", owner);
-  expect((await findReport(id, owner))?.company).toBe("Linear");
-  expect(await findReport(id, stranger)).toBeNull();
-  expect(await findReport("not-a-uuid", owner)).toBeNull();
-  expect(await reportsBy(stranger)).toEqual([]);
-  expect(await usage(owner)).toEqual({ runningNow: 1, startedToday: 1 });
-  await updateReport(id, { status: "done" });
-  expect(await usage(owner)).toEqual({ runningNow: 0, startedToday: 1 });
+test("a rep takes only an account nobody owns, and only the lead assigns", () => {
+  expect(may("rep", "take", { ownerId: null })).toBe(true);
+  expect(may("rep", "take", { ownerId: "someone" })).toBe(false);
+  expect(may("rep", "assign")).toBe(false);
+  expect(may("lead", "assign")).toBe(true);
+  expect(ownerOfNew("rep", "me")).toBe("me");
+  expect(ownerOfNew("lead", "me")).toBeNull();
 });
 
-test("two reports started at the same moment cannot both pass the running limit", async () => {
+test("the whole team sees every account, and two reps cannot both take one", async () => {
+  const lead = `lead-${crypto.randomUUID()}`;
+  const [ana, ben] = [`ana-${crypto.randomUUID()}`, `ben-${crypto.randomUUID()}`];
+  made.push(lead);
+  const id = await startReport("Linear", lead);
+  expect((await findReport(id))?.company).toBe("Linear");
+  expect(await findReport("not-a-uuid")).toBeNull();
+  expect((await teamReports("unassigned", ana)).some((report) => report.id === id)).toBe(true);
+  const both = await Promise.all([takeReport(id, ana), takeReport(id, ben)]);
+  expect(both.filter(Boolean)).toHaveLength(1);
+  const owner = (await findReport(id))?.ownerId;
+  expect((await teamReports("mine", owner ?? "")).map((report) => report.id)).toContain(id);
+  expect(await usage(lead)).toEqual({ runningNow: 1, startedToday: 1 });
+  await updateReport(id, { status: "done" });
+  expect(await usage(lead)).toEqual({ runningNow: 0, startedToday: 1 });
+});
+
+test("two pastes at the same moment cannot both pass the running limit", async () => {
   const owner = `racer-${crypto.randomUUID()}`;
   made.push(owner);
-  const both = await Promise.all([startWithinLimits("Linear", owner), startWithinLimits("Vercel", owner)]);
-  expect(both.filter((one) => one.id).length).toBe(1);
+  const paste = ["Linear", "Vercel", "Supabase"];
+  const both = await Promise.all([
+    startWithinLimits(paste, owner, owner),
+    startWithinLimits(paste, owner, owner),
+  ]);
+  expect(both.filter((one) => one.ids?.length === 3).length).toBe(1);
   expect(both.filter((one) => one.refused).length).toBe(1);
 });

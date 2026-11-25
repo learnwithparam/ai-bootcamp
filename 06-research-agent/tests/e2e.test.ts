@@ -2,12 +2,18 @@ import { afterAll, beforeAll, expect, test } from "bun:test";
 import { type ChildProcess, spawn } from "node:child_process";
 import { findProduct } from "@bootcamp/products";
 import { checkPage } from "@bootcamp/ui/check-page";
+import { and, eq, gt } from "drizzle-orm";
 import { type Browser, chromium, type Page } from "playwright";
+import { db } from "../db/queries";
+import { reports } from "../db/schema";
 
-// A person's whole path in a real browser: create an account, research a company, watch the report fill in,
-// and check that another account cannot open it. The model and the web are real, so this runs in `bun run proof`.
+// The team's path in a real browser, as the seeded sales team. Grace, a rep, adds a company and watches its
+// cells fill in as each researcher returns. Priya, the lead, gives the account to Tomás. The model and the
+// web are real, so this runs in `bun run proof`. The test removes its account after, so the seed stays as it was.
 
 const URL = `http://localhost:${findProduct("research-agent").port}`;
+const COMPANY = "Raycast";
+const started = new Date();
 let server: ChildProcess | undefined;
 let browser: Browser;
 
@@ -40,37 +46,72 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await browser?.close();
-  if (server?.pid) process.kill(-server.pid);
+  await db.delete(reports).where(and(eq(reports.company, COMPANY), gt(reports.createdAt, started)));
+  // Only a server this test started and that is still running.
+  if (server?.pid && server.exitCode === null) process.kill(-server.pid);
 });
 
-async function createAccount(page: Page, name: string) {
+async function signIn(who: "priya" | "grace" | "tomas"): Promise<Page> {
+  const page = await (await browser.newContext()).newPage();
   await page.goto(`${URL}/sign-in`);
-  await page.getByRole("button", { name: "Create an account" }).click();
-  await page.getByLabel("Your name").fill(name);
-  await page.getByLabel("Email").fill(`${name.toLowerCase()}-${crypto.randomUUID()}@example.com`);
-  await page.getByLabel("Password").fill("a long test password");
-  await page.getByRole("button", { name: "Create account" }).click();
-  await page.waitForURL(`${URL}/`);
+  await page.getByLabel("Email").fill(`${who}@research-seed.learnwithparam.test`);
+  await page.getByLabel("Password").fill("seeded research password");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await page.waitForURL(/\/accounts/);
+  return page;
 }
 
-test("a seller researches a company, gets a score with sources, and a stranger gets a 404", async () => {
-  const page = await (await browser.newContext()).newPage();
-  await createAccount(page, "Seller");
-  await page.getByLabel(/Research a company/).fill("linear.app");
-  await page.getByRole("button", { name: "Research" }).click();
-  await page.waitForURL(/\/reports\/[0-9a-f-]{36}$/);
-  const reportUrl = page.url();
+// The table row whose company cell names the account this test added.
+const rowOf = (page: Page) =>
+  page.locator("tr", { has: page.getByRole("rowheader", { name: new RegExp(COMPANY) }) });
 
-  // The page reloads itself while the graph runs. The score appears when it is done.
-  await page.getByLabel("Lead score").waitFor({ timeout: 150_000 });
-  await expect(page.getByRole("heading", { name: "Linear" }).count()).resolves.toBe(1);
-  const sources = page.locator(".claim-meta a[target=_blank]");
-  await expect(sources.count()).resolves.toBeGreaterThanOrEqual(4);
-  await checkPage(page);
+async function repAddsAnAccount(rep: Page) {
+  await rep.getByLabel(/Add accounts/).fill(COMPANY);
+  await rep.getByRole("button", { name: "Research" }).click();
+  await rep.getByText("Researching 1 new account.").waitFor({ timeout: 30_000 });
+  const row = rowOf(rep);
+  await row.getByText("Researching").first().waitFor();
+  // The page reloads itself while the researchers run. The score lands last.
+  await row.locator(".score-cell strong").waitFor({ timeout: 180_000 });
+  expect(await row.getByText("You", { exact: true }).count()).toBe(1);
+  expect(await rep.locator(".owner-select").count()).toBe(0);
+  return row;
+}
 
-  // A second account opens the same address and finds nothing there.
-  const stranger = await (await browser.newContext()).newPage();
-  await createAccount(stranger, "Stranger");
-  const response = await stranger.goto(reportUrl);
-  expect(response?.status()).toBe(404);
-}, 240_000);
+async function repReadsTheSources(rep: Page, row: ReturnType<typeof rowOf>) {
+  await row
+    .getByRole("button", { name: /sources? for/ })
+    .first()
+    .click();
+  const sources = rep.getByRole("dialog", { name: /sources/ });
+  await sources.waitFor();
+  await expect(sources.locator("a[target=_blank]").count()).resolves.toBeGreaterThanOrEqual(1);
+  await checkPage(rep);
+  await rep.keyboard.press("Escape");
+}
+
+async function leadAssigns() {
+  const lead = await signIn("priya");
+  const owner = lead.getByLabel(new RegExp(`Owner of ${COMPANY}`));
+  await owner.selectOption({ label: "Tomás Ortega" });
+  // Picking a name saves it at once. A reload shows what the server kept.
+  for (let attempt = 0; attempt < 20; attempt++) {
+    await lead.reload();
+    if ((await owner.locator("option:checked").textContent()) === "Tomás Ortega") break;
+    await Bun.sleep(500);
+  }
+  const tomas = await signIn("tomas");
+  await tomas.goto(`${URL}/accounts?view=mine`);
+  await tomas
+    .getByRole("row", { name: new RegExp(COMPANY) })
+    .getByText("You", { exact: true })
+    .waitFor();
+  await checkPage(lead);
+}
+
+test("a rep adds an account and reads its sources, and the lead gives it to another rep", async () => {
+  const rep = await signIn("grace");
+  const row = await repAddsAnAccount(rep);
+  await repReadsTheSources(rep, row);
+  await leadAssigns();
+}, 300_000);

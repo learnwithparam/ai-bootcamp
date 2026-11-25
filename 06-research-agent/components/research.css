@@ -1,83 +1,5 @@
-/* The research agent screens, on the shared buildcamp theme. Every colour comes from packages/ui/tokens.css.
+/* The account page, on the shared buildcamp theme. Every colour comes from packages/ui/tokens.css.
    One loud thing only: the lead score. */
-
-.desk {
-  width: min(880px, 100% - 32px);
-  margin: 0 auto;
-  padding: 28px 0 64px;
-  display: grid;
-  gap: 28px;
-  align-content: start;
-  overflow-y: auto;
-}
-
-.desk > * {
-  min-width: 0;
-}
-
-.research-form {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 12px 16px;
-  align-items: center;
-  padding: 16px;
-  border: 1px solid var(--fg);
-  border-radius: var(--r);
-  background: var(--surface);
-}
-
-.research-label {
-  grid-column: 1 / -1;
-  font-weight: 700;
-}
-
-.research-label span {
-  display: block;
-  color: var(--muted);
-  font-size: 14px;
-  font-weight: 400;
-}
-
-.research-form .form-error {
-  grid-column: 1 / -1;
-}
-
-.report-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  border-top: 1px solid var(--line);
-}
-
-.report-row {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  gap: 16px;
-  align-items: center;
-  padding: 12px 4px;
-  border-bottom: 1px solid var(--line);
-  color: var(--fg);
-  text-decoration: none;
-}
-
-.report-row:hover,
-.report-row:focus-visible {
-  background: var(--hl);
-}
-
-.report-name {
-  font-weight: 700;
-}
-
-.report-score {
-  font-family: var(--mono);
-  color: var(--fg2);
-}
-
-.back {
-  color: var(--fg2);
-  font-size: 14px;
-}
 
 .report {
   display: grid;
@@ -108,6 +30,18 @@
 .report-head p {
   margin: 0;
   color: var(--fg2);
+}
+
+.report-owner {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.report-owner .owner-select {
+  width: auto;
 }
 
 .report-cost {
@@ -154,6 +88,12 @@
   flex-wrap: wrap;
   gap: 8px;
   align-items: baseline;
+}
+
+.claim-refs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .score-points {
@@ -225,5 +165,21 @@
 @media (max-width: 560px) {
   .score-card {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .score-total strong {
+    display: inline-block;
+    font-size: 44px;
+  }
+
+  .score-reasons li {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 2px 8px;
+  }
+
+  .score-reasons .claim-refs {
+    grid-column: 2;
   }
 }

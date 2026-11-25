@@ -14,7 +14,3 @@ export async function checkClaims(claims: Claim[], options: ReadOptions = {}): P
     return { ...claim, check };
   });
 }
-
-export async function check({ claims }: { claims: Claim[] }) {
-  return { checked: await checkClaims(claims) };
-}

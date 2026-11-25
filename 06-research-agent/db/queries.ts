@@ -1,13 +1,17 @@
 import { connect } from "@bootcamp/db";
-import { and, count, desc, eq, gte, sql } from "drizzle-orm";
+import { and, count, desc, eq, gte, isNull, sql } from "drizzle-orm";
 import { whyNotStart } from "../rules/limits";
+import type { Person, Role, View } from "../rules/team";
 import * as schema from "./schema";
-import { type Report, reports } from "./schema";
+import { members, type Report, reports } from "./schema";
 
 export const db = connect(schema);
 
-export async function startReport(company: string, createdBy: string): Promise<string> {
-  const [row] = await db.insert(reports).values({ company, createdBy }).returning({ id: reports.id });
+export async function startReport(company: string, createdBy: string, ownerId: string | null = null) {
+  const [row] = await db
+    .insert(reports)
+    .values({ company, createdBy, ownerId })
+    .returning({ id: reports.id });
   if (!row) throw new Error("The report was not saved.");
   return row.id;
 }
@@ -17,26 +21,78 @@ export async function updateReport(id: string, change: Partial<typeof reports.$i
   await db.update(reports).set(change).where(eq(reports.id, id));
 }
 
-// A report belongs to the account that asked for it. Anyone else gets nothing, as if it did not exist.
-export async function findReport(id: string, userId: string): Promise<Report | null> {
+// The table is shared by the sales team, so any signed-in member may open any account.
+export async function findReport(id: string): Promise<Report | null> {
   if (!/^[0-9a-f-]{36}$/i.test(id)) return null;
-  const [row] = await db
-    .select()
-    .from(reports)
-    .where(and(eq(reports.id, id), eq(reports.createdBy, userId)));
+  const [row] = await db.select().from(reports).where(eq(reports.id, id));
   return row ?? null;
 }
 
-export async function reportsBy(userId: string, limit = 20): Promise<Report[]> {
-  return db
-    .select()
-    .from(reports)
-    .where(eq(reports.createdBy, userId))
-    .orderBy(desc(reports.createdAt))
-    .limit(limit);
+export async function teamReports(view: View, userId: string, limit = 100): Promise<Report[]> {
+  const where =
+    view === "mine"
+      ? eq(reports.ownerId, userId)
+      : view === "unassigned"
+        ? isNull(reports.ownerId)
+        : undefined;
+  return db.select().from(reports).where(where).orderBy(desc(reports.createdAt)).limit(limit);
 }
 
-// How many reports this account has running now, and how many it started in the last 24 hours.
+export async function viewCounts(userId: string) {
+  const [row] = await db
+    .select({
+      all: count(),
+      mine: sql<number>`count(*) filter (where ${reports.ownerId} = ${userId})`.mapWith(Number),
+      unassigned: sql<number>`count(*) filter (where ${reports.ownerId} is null)`.mapWith(Number),
+    })
+    .from(reports);
+  return { all: row?.all ?? 0, mine: row?.mine ?? 0, unassigned: row?.unassigned ?? 0 };
+}
+
+// Taking an account only works while nobody owns it, so two reps clicking at once cannot both get it.
+export async function takeReport(id: string, userId: string): Promise<boolean> {
+  const taken = await db
+    .update(reports)
+    .set({ ownerId: userId })
+    .where(and(eq(reports.id, id), isNull(reports.ownerId)))
+    .returning({ id: reports.id });
+  return taken.length === 1;
+}
+
+export async function assignReport(id: string, ownerId: string | null) {
+  await db.update(reports).set({ ownerId }).where(eq(reports.id, id));
+}
+
+export async function roleOf(userId: string): Promise<Role> {
+  await db.insert(members).values({ userId }).onConflictDoNothing();
+  const [row] = await db.select({ role: members.role }).from(members).where(eq(members.userId, userId));
+  return row?.role ?? "rep";
+}
+
+export async function setRole(userId: string, role: Role) {
+  await db
+    .insert(members)
+    .values({ userId, role })
+    .onConflictDoUpdate({ target: members.userId, set: { role } });
+}
+
+// Everyone on the team, for the owner column and the lead's Assign menu.
+export async function teamPeople(): Promise<Person[]> {
+  const found = await db.execute<Person>(
+    sql`select u.id, u.name, u.email, u."createdAt" from "user" u
+        join ${members} m on m.user_id = u.id order by u.name`,
+  );
+  return found.rows;
+}
+
+export async function accountByEmail(email: string): Promise<Person | null> {
+  const found = await db.execute<Person>(
+    sql`select id, name, email, "createdAt" from "user" where email = ${email.toLowerCase()}`,
+  );
+  return found.rows[0] ?? null;
+}
+
+// How many accounts this person has being researched now, and how many they added in the last 24 hours.
 type Database = Pick<typeof db, "select">;
 
 export async function usage(userId: string, on: Database = db) {
@@ -53,22 +109,22 @@ export async function usage(userId: string, on: Database = db) {
   return { runningNow: running?.total ?? 0, startedToday: today?.total ?? 0 };
 }
 
-// Two quick clicks must not both pass the limits. A lock per account makes the second wait
-// until the first has saved its row, so it counts that row and is refused.
+// Two quick pastes must not both pass the limits. A lock per person makes the second wait
+// until the first has saved its rows, so it counts them and is refused.
 export async function startWithinLimits(
-  company: string,
+  companies: string[],
   userId: string,
-): Promise<{ id?: string; refused?: string }> {
+  ownerId: string | null,
+): Promise<{ ids?: string[]; refused?: string }> {
   return db.transaction(async (tx) => {
     await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`research:${userId}`}))`);
     const { runningNow, startedToday } = await usage(userId, tx);
-    const refused = whyNotStart(runningNow, startedToday);
+    const refused = whyNotStart(runningNow, startedToday, companies.length);
     if (refused) return { refused };
-    const [row] = await tx
+    const rows = await tx
       .insert(reports)
-      .values({ company, createdBy: userId })
+      .values(companies.map((company) => ({ company, createdBy: userId, ownerId })))
       .returning({ id: reports.id });
-    if (!row) throw new Error("The report was not saved.");
-    return { id: row.id };
+    return { ids: rows.map((row) => row.id) };
   });
 }

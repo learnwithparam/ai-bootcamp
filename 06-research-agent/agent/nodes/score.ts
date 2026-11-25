@@ -25,12 +25,8 @@ const NOTHING: Facts = {
 };
 
 // The model reads four facts out of the checked claims. The number itself comes from rules/score.ts.
-export async function scoreLead(state: {
-  identity: Identity | null;
-  checked: CheckedClaim[];
-  today: string;
-}) {
-  const kept = keptClaims(state.checked);
+export async function scoreLead(state: { identity: Identity | null; claims: CheckedClaim[]; today: string }) {
+  const kept = keptClaims(state.claims);
   if (kept.length === 0) return { facts: NOTHING, score: leadScore(NOTHING, state.today), cost: 0 };
   const result = await generateText({
     model: model(),

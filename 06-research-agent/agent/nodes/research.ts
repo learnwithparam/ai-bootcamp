@@ -6,6 +6,7 @@ import type { Identity } from "../../rules/report";
 import type { Topic } from "../../rules/topics";
 import { costOf, fill } from "../prompt";
 import prompt from "../prompts/research.md" with { type: "text" };
+import { checkClaims } from "./check";
 
 const Claims = z.object({
   claims: z.array(z.object({ text: z.string(), sourceUrl: z.string(), quote: z.string() })).max(4),
@@ -14,6 +15,7 @@ const Claims = z.object({
 export type ResearchTask = { topic: Topic; identity: Identity };
 
 // One researcher, for one topic. The graph runs one of these per topic, all at the same time.
+// It checks its own quotes before it returns, so its cell on the table fills in as soon as it is done.
 export async function research({ topic, identity }: ResearchTask) {
   const result = await generateText({
     model: searchModel(),
@@ -30,5 +32,5 @@ export async function research({ topic, identity }: ResearchTask) {
     sourceUrl: cleanUrl(claim.sourceUrl),
     quote: claim.quote,
   }));
-  return { claims, cost: costOf(result.usage) };
+  return { claims: await checkClaims(claims), topicsDone: [topic.id], cost: costOf(result.usage) };
 }

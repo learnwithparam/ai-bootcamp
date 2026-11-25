@@ -50,7 +50,7 @@ export function ClaimList({ claims }: { claims: CheckedClaim[] }) {
             {dropped.map((claim) => (
               <li key={claim.id} className="claim">
                 <p className="claim-text">{claim.text}</p>
-                <span className="status status-fail">{CHECK_LABEL[claim.check]}</span>
+                <span className="pill pill-fail">{CHECK_LABEL[claim.check]}</span>
               </li>
             ))}
           </ul>
