@@ -11,7 +11,8 @@
     "04-mcp-server-and-cli",
     "05-admin-assistant",
     "06-research-agent",
-    "07-legal-intake"
+    "07-legal-intake",
+    "08-browser-agent"
   ],
   "scripts": {
     "setup": "bun scripts/setup.ts",

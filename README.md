@@ -20,6 +20,7 @@ This repo is where you see those ideas working together in a product.
 | 4 | [Admin assistant](05-admin-assistant/README.md) | Answer the owner's questions about signups, make Stripe coupons after approval, and draft the newsletter. | skills, ui the agent draws, human in the loop, boundary |
 | 5 | [Research agent](06-research-agent/README.md) | Research a company on the live web, check every claim against its page, and score it as a lead. | graph, verification, structured output |
 | 6 | [Legal intake](07-legal-intake/README.md) | Take a client's request, check it for conflicts, and wait for a lawyer to decide, even across a restart. | graph, human in the loop, boundary, verification |
+| 7 | [Browser agent](08-browser-agent/README.md) | Turn client emails into requests on the firm's intake portal, and let a decision model say when to send. | browser automation, decision model, boundary, verification, human in the loop |
 <!-- products:end -->
 
 ## How each product folder is laid out

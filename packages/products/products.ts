@@ -79,6 +79,14 @@ export const PRODUCTS: Product[] = [
     port: 3107,
     ideas: ["graph", "human in the loop", "boundary", "verification"],
   },
+  {
+    folder: "08-browser-agent",
+    slug: "browser-agent",
+    title: "Browser agent",
+    job: "Turn client emails into requests on the firm's intake portal, and let a decision model say when to send.",
+    port: 3108,
+    ideas: ["browser automation", "decision model", "boundary", "verification", "human in the loop"],
+  },
 ];
 
 export const ALL_PORTS = [GALLERY_PORT, ...PRODUCTS.map((product) => product.port)];
