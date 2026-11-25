@@ -6,8 +6,14 @@ import { MarkdownTextPrimitive } from "@assistant-ui/react-markdown";
 // Pieces every chat in this repo shares: text, thinking and a plain tool card.
 // A product draws its own card for each of its tools and falls back to ToolCard.
 
+// A reply never loads an image. Loading one sends a request to its address, so a reply steered by
+// a hostile page or name could carry private data out in that address. The alt text is shown instead.
+function NoImage({ alt }: { alt?: string }) {
+  return alt ? <span>{alt}</span> : null;
+}
+
 export function MarkdownText() {
-  return <MarkdownTextPrimitive className="markdown" />;
+  return <MarkdownTextPrimitive className="markdown" components={{ img: NoImage }} />;
 }
 
 export function StatusChip({ running }: { running: boolean }) {

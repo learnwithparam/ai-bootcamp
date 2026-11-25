@@ -134,15 +134,16 @@ bun run proof admin-assistant                     # the real model, Stripe's tes
 `tests/tools.test.ts` walks every skill, so a new skill or tool is covered with no new test.
 Each tool a skill allows must exist, each tool must belong to exactly one skill, and only `load_skill` is active before a skill is loaded.
 
-`tests/agent.test.ts` is the metric. It sends five real requests and passes only when each takes the right path:
+`tests/agent.test.ts` is the metric. It sends six real requests and passes only when each takes the right path:
 a signups question loads only the reports skill, a 20% code waits for approval and then exists in Stripe,
 a 90% code is refused with no approval card, an approval for an edited code fails its signature and makes nothing,
-and every link in a newsletter draft came from the live catalog.
+every link in a newsletter draft came from the live catalog,
+and an account whose name holds instructions shows on the owner's card while the model is sent only a count.
 
 `tests/e2e.test.ts` walks the owner's path in a real browser: a signed-in stranger gets a 404 on the page and on the chat,
 the owner gets a 30-day chart, and a code approved by clicking the button exists in Stripe.
 
-Last run: 5 of 5 right, about $0.002 for all five requests, on `openai/gpt-6-luna` through OpenRouter.
+Last run: 6 of 6 right, about $0.002 for all six requests, on `openai/gpt-6-luna` through OpenRouter.
 
 ## Learn the idea in depth
 
