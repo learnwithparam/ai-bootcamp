@@ -1,7 +1,7 @@
+import type { Item, Kind } from "@bootcamp/catalog";
 import { pool } from "@bootcamp/db";
 import { and, desc, eq, notInArray, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
-import type { Item, Kind } from "../rules/catalog";
 import { cliClient, items, saved } from "./schema";
 
 export const db = drizzle(pool);

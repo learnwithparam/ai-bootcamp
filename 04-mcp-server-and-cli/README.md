@@ -125,7 +125,9 @@ Read in this order. Each file is short.
 10. `cli/login.ts` - the device flow and the token refresh.
 11. `cli/learnwithparam.ts` - turns `save-for-later <url>` into an MCP call.
 12. `app/device/page.tsx` and `app/consent/page.tsx` - the two pages where you approve an app.
-13. `rules/catalog.ts` - reads llms.txt into items, and which sessions are upcoming. No AI in this file.
+13. `../packages/catalog/catalog.ts` - reads llms.txt into items, and which sessions are upcoming. No AI in this file.
+    The admin assistant reads the same catalog, so it lives in `packages/`.
+14. `rules/same-path.ts` - the sign-in page sends you back only to a path on this site.
 
 ## Prove it
 

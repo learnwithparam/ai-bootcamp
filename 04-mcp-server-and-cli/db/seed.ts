@@ -1,4 +1,4 @@
-import { parseCatalog } from "../rules/catalog";
+import { parseCatalog } from "@bootcamp/catalog";
 import { replaceCatalog } from "./queries";
 
 // bun run seed mcp-server-and-cli

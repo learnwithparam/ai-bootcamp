@@ -21,6 +21,9 @@ const FORBIDDEN_IMPORTS: Record<string, RegExp[]> = {
 
 // Names that mean a faked flow. The repo shows products that really run.
 const FAKE = /\b(MockLanguageModel\w*|simulateReadableStream|@faker-js|faker\.)/;
+// AI SDK 7 deprecated the stream helpers on a streamText result. The next major removes them.
+const DEPRECATED =
+  /\.(toUIMessageStreamResponse|toUIMessageStream|pipeUIMessageStreamToResponse|toTextStreamResponse)\(/;
 
 export type Problem = string;
 
@@ -101,6 +104,9 @@ function checkCodeFile(path: string, product: string | undefined): Problem[] {
   const fake = FAKE.exec(text);
   if (fake && !path.startsWith("scripts/check-"))
     problems.push(`${path}: uses ${fake[0]}. Use the real thing.`);
+  const old = DEPRECATED.exec(text);
+  if (old && !path.startsWith("scripts/check-"))
+    problems.push(`${path}: calls ${old[0]} on a stream result. Use the helper of the same name from "ai".`);
   const kind = path.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
   const source = ts.createSourceFile(path, text, ts.ScriptTarget.Latest, true, kind);
   problems.push(...checkSyntax(path, source));

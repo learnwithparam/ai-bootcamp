@@ -1,8 +1,8 @@
 import { afterAll, describe, expect, test } from "bun:test";
+import { kindOf, parseCatalog, parseLine, upcoming } from "@bootcamp/catalog";
 import { inArray } from "drizzle-orm";
 import { allItems, db, savedItems, saveItem, searchItems } from "../db/queries";
 import { saved } from "../db/schema";
-import { kindOf, parseCatalog, parseLine, upcoming } from "../rules/catalog";
 import { samePath } from "../rules/same-path";
 
 // The rules, with no model. The database tests use the seeded Postgres: run `bun run setup` first.

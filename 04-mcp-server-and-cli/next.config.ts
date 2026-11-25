@@ -9,6 +9,7 @@ const config: NextConfig = {
   turbopack: { rules: { "*.md": { type: "text" } } },
   transpilePackages: [
     "@bootcamp/auth",
+    "@bootcamp/catalog",
     "@bootcamp/db",
     "@bootcamp/model",
     "@bootcamp/tracing",

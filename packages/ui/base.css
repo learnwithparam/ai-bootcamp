@@ -350,6 +350,9 @@ a {
 }
 
 .topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
   margin-left: auto;
   color: var(--muted);
   font-size: 14px;

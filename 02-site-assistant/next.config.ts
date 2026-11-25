@@ -11,6 +11,7 @@ const config: NextConfig = {
     "@bootcamp/auth",
     "@bootcamp/db",
     "@bootcamp/model",
+    "@bootcamp/stripe",
     "@bootcamp/tracing",
     "@bootcamp/ui",
   ],

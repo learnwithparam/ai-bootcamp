@@ -1,20 +1,7 @@
-import Stripe from "stripe";
+import { stripe } from "@bootcamp/stripe";
 
 // Stripe is the record of who pays for what. The assistant reads it and never changes it:
 // a member changes their own plan in Stripe's billing portal.
-
-let client: Stripe | undefined;
-
-// A live key outside production would touch real customers' money, so it is refused.
-export function stripe(): Stripe {
-  const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) throw new Error("STRIPE_SECRET_KEY is not set. Add a test key (sk_test_) to .env.");
-  if (key.startsWith("sk_live_") && process.env.NODE_ENV !== "production") {
-    throw new Error("STRIPE_SECRET_KEY is a live key. Use a sk_test_ key outside production.");
-  }
-  client ??= new Stripe(key);
-  return client;
-}
 
 export type Plan = {
   name: string;

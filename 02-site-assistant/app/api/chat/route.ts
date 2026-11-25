@@ -1,6 +1,6 @@
 import { currentSession } from "@bootcamp/auth";
 import { required } from "@bootcamp/model";
-import type { UIMessage } from "ai";
+import { createUIMessageStreamResponse, toUIMessageStream, type UIMessage } from "ai";
 import { answerVisitor } from "../../../agent/agent";
 import { usageFor } from "../../../db/queries";
 import { checkLimits, readLimits } from "../../../rules/limits";
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
   try {
     const { messages } = (await request.json()) as { messages: UIMessage[] };
     const { reply } = await answerVisitor(messages, visitor, new URL("/", request.url).toString());
-    return reply.toUIMessageStreamResponse();
+    return createUIMessageStreamResponse({ stream: toUIMessageStream({ stream: reply.stream }) });
   } catch (error) {
     console.error("site-assistant chat failed", error);
     return new Response("The assistant could not answer just now. Try again in a minute.", { status: 500 });

@@ -55,6 +55,14 @@ export const PRODUCTS: Product[] = [
     port: 3104,
     ideas: ["mcp", "cli", "boundary"],
   },
+  {
+    folder: "05-admin-assistant",
+    slug: "admin-assistant",
+    title: "Admin assistant",
+    job: "Answer the owner's questions about signups, make Stripe coupons after approval, and draft the newsletter.",
+    port: 3105,
+    ideas: ["skills", "ui the agent draws", "human in the loop", "boundary"],
+  },
 ];
 
 export const ALL_PORTS = [GALLERY_PORT, ...PRODUCTS.map((product) => product.port)];

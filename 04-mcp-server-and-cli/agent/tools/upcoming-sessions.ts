@@ -1,6 +1,6 @@
+import { upcoming } from "@bootcamp/catalog";
 import { z } from "zod";
 import { allItems } from "../../db/queries";
-import { upcoming } from "../../rules/catalog";
 import { publicTool } from "./tool";
 
 export const upcomingSessions = publicTool({

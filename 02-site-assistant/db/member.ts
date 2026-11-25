@@ -1,4 +1,5 @@
-import { findPlan, stripe } from "./billing";
+import { stripe } from "@bootcamp/stripe";
+import { findPlan } from "./billing";
 import { accountByEmail, customerOf, saveMember } from "./queries";
 
 // bun 02-site-assistant/db/member.ts you@example.com

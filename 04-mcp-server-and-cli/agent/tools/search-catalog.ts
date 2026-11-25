@@ -1,6 +1,6 @@
+import { KINDS } from "@bootcamp/catalog";
 import { z } from "zod";
 import { searchItems } from "../../db/queries";
-import { KINDS } from "../../rules/catalog";
 import { publicTool } from "./tool";
 
 export const searchCatalog = publicTool({

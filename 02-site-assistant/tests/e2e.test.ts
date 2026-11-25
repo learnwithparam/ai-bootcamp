@@ -1,10 +1,10 @@
 import { afterAll, beforeAll, expect, test } from "bun:test";
 import { type ChildProcess, spawn } from "node:child_process";
 import { findProduct } from "@bootcamp/products";
+import { stripe } from "@bootcamp/stripe";
 import { eq } from "drizzle-orm";
 import { type Browser, chromium, type Page } from "playwright";
 import { myPlan } from "../agent/tools/my-plan";
-import { stripe } from "../db/billing";
 import { makeMember, payingCustomer } from "../db/member";
 import { accountByEmail, db, recordTurn } from "../db/queries";
 import { turns } from "../db/schema";

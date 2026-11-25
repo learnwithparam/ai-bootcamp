@@ -8,7 +8,8 @@
     "gallery",
     "01-invoice-inbox",
     "02-site-assistant",
-    "04-mcp-server-and-cli"
+    "04-mcp-server-and-cli",
+    "05-admin-assistant"
   ],
   "scripts": {
     "setup": "bun scripts/setup.ts",
