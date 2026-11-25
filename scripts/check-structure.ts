@@ -147,10 +147,18 @@ function checkColours(files: string[]): Problem[] {
     .map((path) => `${path}: writes a colour. Colours live only in ${TOKENS_FILE}.`);
 }
 
+// A product missing from the root workspaces cannot find its packages, and fails only when it runs.
+function checkWorkspaces(): Problem[] {
+  const workspaces: string[] = JSON.parse(readFileSync("package.json", "utf8")).workspaces;
+  return PRODUCTS.filter((product) => !workspaces.includes(product.folder)).map(
+    (product) => `package.json: add "${product.folder}" to "workspaces", then run bun install.`,
+  );
+}
+
 export function checkStructure(): Problem[] {
   const roots = ["packages", "scripts", "gallery", ...PRODUCTS.map((product) => product.folder)];
   const files = roots.filter((root) => statSync(root, { throwIfNoEntry: false })).flatMap(walk);
-  const problems = checkColours(files);
+  const problems = [...checkColours(files), ...checkWorkspaces()];
   for (const product of PRODUCTS) problems.push(...checkTopLevel(product.folder));
   for (const path of files.filter((file) => CODE.test(file))) {
     const product = PRODUCTS.find((each) => path.startsWith(`${each.folder}/`))?.folder;
