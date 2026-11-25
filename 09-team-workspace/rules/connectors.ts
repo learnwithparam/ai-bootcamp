@@ -30,17 +30,27 @@ const LOOPBACK = new Set(["localhost", "127.0.0.1"]);
 // null when an admin may add the connector, otherwise the reason. Tokens travel to this address, so it needs https,
 // except for a server on this same computer.
 export function whyNotAdd(form: ConnectorForm, takenNames: string[]): string | null {
-  if (!slugOf(form.name)) return "Give the connector a name with letters or digits.";
-  if (takenNames.some((name) => slugOf(name) === slugOf(form.name)))
-    return "A connector with that name is already added.";
-  if (!URL.canParse(form.url)) return "The server address must be a full link, like https://example.com/mcp.";
+  if (!slugOf(form.name)) return CONNECTOR_FAILURES.name;
+  if (takenNames.some((name) => slugOf(name) === slugOf(form.name))) return CONNECTOR_FAILURES.taken;
+  if (!URL.canParse(form.url)) return CONNECTOR_FAILURES.address;
   const url = new URL(form.url);
   if (url.protocol !== "https:" && !(url.protocol === "http:" && LOOPBACK.has(url.hostname)))
-    return "The server address must use https.";
-  if (!form.clientId.trim() || !form.clientSecret.trim())
-    return "Paste the client id and the client secret the server gave you.";
+    return CONNECTOR_FAILURES.https;
+  if (!form.clientId.trim() || !form.clientSecret.trim()) return CONNECTOR_FAILURES.client;
   return null;
 }
+
+// Every failure the Connectors page may show. A notice that is not one of these is ignored.
+export const CONNECTOR_FAILURES = {
+  name: "Give the connector a name with letters or digits.",
+  taken: "A connector with that name is already added.",
+  address: "The server address must be a full link, like https://example.com/mcp.",
+  https: "The server address must use https.",
+  client: "Paste the client id and the client secret the server gave you.",
+  start: "That server could not start a sign-in. Check that it is running.",
+  discover: "That address did not answer as an MCP server with sign-in. Nothing was saved.",
+  callback: "The sign-in did not finish. Press Connect to try again.",
+} as const;
 
 // The OAuth state names the connector, then a random part, so the callback knows which server answered.
 export function stateFor(connectorId: string, random: string): string {

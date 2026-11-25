@@ -3,7 +3,7 @@ import { SettingsTabs } from "../../components/SettingsTabs";
 import { Shell } from "../../components/Shell";
 import { memoriesOf } from "../../db/memories";
 import { chatsOf } from "../../db/queries";
-import { MEMORY } from "../../rules/memory";
+import { knownNotice, MEMORY, MEMORY_REFUSALS } from "../../rules/memory";
 import { editOneMemory, forgetMemory } from "../actions";
 import { requireMember } from "../session";
 
@@ -79,7 +79,7 @@ export default async function MemoryPage({ searchParams }: { searchParams: Promi
           The assistant reads these at the start of every chat. Only you see them. It keeps up to{" "}
           {MEMORY.perPerson}, and never a password, key or card number.
         </p>
-        {failed ? (
+        {knownNotice(failed, Object.values(MEMORY_REFUSALS)) ? (
           <p className="notice notice-fail" role="alert">
             {failed}
           </p>

@@ -89,10 +89,18 @@ const LINK_LIKE =
   /[<>\\@]|&[#\w]+;|\]\(|\[[^\]]*\]:|[\p{L}][\p{L}\p{N}+.-]*:\S+|www\.\S*|\/\/\S*|[\p{L}\p{N}_-]+(?:\.[\p{L}\p{N}_-]+)*\.\p{L}{2,}/giu;
 
 // Every piece of the body that could become a link to somewhere else. Empty means the body may be sent.
-// NFKC turns lookalikes such as a full-width dot or at sign into the plain ones first. An allowed link keeps
-// its words in the scan, so a label cannot hide an address.
+// NFKC turns lookalikes such as a full-width dot or at sign into the plain ones first. The ideographic dots
+// that browsers also read as a dot become a dot, and invisible format characters are removed, so neither can
+// split an address. An allowed link keeps its words in the scan, so a label cannot hide an address.
+const DOT_LOOKALIKES = /[\u3002\uFF0E\uFF61\uFE12]/g;
+const INVISIBLE = /[\p{Cf}\u00AD]/gu;
+
+export function plainForScan(markdown: string): string {
+  return markdown.normalize("NFKC").replace(DOT_LOOKALIKES, ".").replace(INVISIBLE, "");
+}
+
 export function foreignLinks(markdown: string): string[] {
-  const rest = markdown.normalize("NFKC").replaceAll(SITE_LINK, (_link, label: string) => ` ${label} `);
+  const rest = plainForScan(markdown).replaceAll(SITE_LINK, (_link, label: string) => ` ${label} `);
   return [...rest.matchAll(LINK_LIKE)].map((match) => match[0]);
 }
 

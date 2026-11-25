@@ -163,6 +163,10 @@ test("a newsletter may link only to learnwithparam.com, in any link form", () =>
     "visit evil\uFF0Etest",
     "write to someone\uFF20evil.test",
     "see b\u00FCcher.de",
+    "visit evil\u3002test",
+    "visit evil\uFF61test",
+    "visit evil\u200B.test",
+    "visit evil.\u00ADtest",
   ];
   for (const body of disguised) expect(foreignLinks(body).length).toBeGreaterThan(0);
 });

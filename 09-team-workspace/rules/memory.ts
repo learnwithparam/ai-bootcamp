@@ -17,16 +17,29 @@ export function looksSecret(text: string): boolean {
   return SECRET.some((pattern) => pattern.test(text));
 }
 
+// Every reason a memory is refused. The Memory page shows a notice only when it is one of these.
+export const MEMORY_REFUSALS = {
+  short: "That is too short to be worth remembering.",
+  long: `Keep a memory under ${MEMORY.maxLength} characters. Save the one fact that matters.`,
+  secret: "That looks like a password, key or card number. It is never remembered.",
+  full: `This person already has ${MEMORY.perPerson} memories. Ask them to forget some on the Memory page first.`,
+  gone: "That memory is gone.",
+} as const;
+
 // null when the memory may be saved, otherwise the reason the assistant reads back.
 export function whyNotRemember(text: string, alreadyKept: number): string | null {
   const clean = text.trim();
-  if (clean.length < MEMORY.minLength) return "That is too short to be worth remembering.";
-  if (clean.length > MEMORY.maxLength)
-    return `Keep a memory under ${MEMORY.maxLength} characters. Save the one fact that matters.`;
-  if (looksSecret(clean)) return "That looks like a password, key or card number. It is never remembered.";
-  if (alreadyKept >= MEMORY.perPerson)
-    return `This person already has ${MEMORY.perPerson} memories. Ask them to forget some on the Memory page first.`;
+  if (clean.length < MEMORY.minLength) return MEMORY_REFUSALS.short;
+  if (clean.length > MEMORY.maxLength) return MEMORY_REFUSALS.long;
+  if (looksSecret(clean)) return MEMORY_REFUSALS.secret;
+  if (alreadyKept >= MEMORY.perPerson) return MEMORY_REFUSALS.full;
   return null;
+}
+
+// A notice arrives in the page address, so anyone can put words into a link.
+// It is shown only when it is a sentence this app wrote.
+export function knownNotice(text: string | undefined, sentences: readonly string[]): string | null {
+  return text && sentences.includes(text) ? text : null;
 }
 
 // The memories as the system prompt shows them, each with its id so the assistant can forget one.

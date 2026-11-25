@@ -1,5 +1,5 @@
 import { and, asc, count, eq, sql } from "drizzle-orm";
-import { MEMORY, whyNotRemember } from "../rules/memory";
+import { MEMORY, MEMORY_REFUSALS, whyNotRemember } from "../rules/memory";
 import { db } from "./queries";
 import { memories } from "./schema";
 
@@ -48,11 +48,11 @@ export async function forget(userId: string, memoryId: string): Promise<boolean>
 export async function editMemory(userId: string, memoryId: string, text: string): Promise<string | null> {
   const refused = whyNotRemember(text, 0);
   if (refused) return refused;
-  if (!/^[0-9a-f-]{36}$/.test(memoryId)) return "That memory is gone.";
+  if (!/^[0-9a-f-]{36}$/.test(memoryId)) return MEMORY_REFUSALS.gone;
   const changed = await db
     .update(memories)
     .set({ text: text.trim() })
     .where(and(eq(memories.id, memoryId), eq(memories.userId, userId)))
     .returning({ id: memories.id });
-  return changed.length > 0 ? null : "That memory is gone.";
+  return changed.length > 0 ? null : MEMORY_REFUSALS.gone;
 }

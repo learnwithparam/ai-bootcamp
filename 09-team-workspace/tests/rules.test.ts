@@ -4,7 +4,14 @@ import { chatFor, openChat } from "../db/queries";
 import { open, seal } from "../db/sealed";
 import { chatGroup, groupChats, type Message, titleFrom, whyNotSend, withIncoming } from "../rules/chat";
 import { connectorInState, needsApproval, slugOf, stateFor, toolKey, whyNotAdd } from "../rules/connectors";
-import { looksSecret, MEMORY, memoryBlock, whyNotRemember } from "../rules/memory";
+import {
+  knownNotice,
+  looksSecret,
+  MEMORY,
+  MEMORY_REFUSALS,
+  memoryBlock,
+  whyNotRemember,
+} from "../rules/memory";
 import { removeAccounts } from "./accounts";
 
 // The limits the model cannot change, and the queries, against a real Postgres. No model.
@@ -176,4 +183,11 @@ test("chats group by calendar day, the way the sidebar shows them", () => {
   expect(chatGroup(at("2026-11-24T23:00:00Z"), now, "Asia/Kolkata")).toBe("Today");
   const groups = groupChats([{ updatedAt: at("2026-09-01T00:00:00Z") }, { updatedAt: now }], now);
   expect(groups.map((group) => group.label)).toEqual(["Today", "Older"]);
+});
+
+test("a notice from the page address shows only when it is a sentence this app wrote", () => {
+  const sentences = Object.values(MEMORY_REFUSALS);
+  expect(knownNotice(MEMORY_REFUSALS.secret, sentences)).toBe(MEMORY_REFUSALS.secret);
+  expect(knownNotice("Your account is locked. Call 555 0100.", sentences)).toBeNull();
+  expect(knownNotice(undefined, sentences)).toBeNull();
 });

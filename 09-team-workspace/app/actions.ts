@@ -7,7 +7,7 @@ import { startConnect } from "../agent/oauth";
 import { addConnector, allConnectors, disconnect, removeConnector } from "../db/connectors";
 import { editMemory, forget } from "../db/memories";
 import { deleteChat } from "../db/queries";
-import { type ConnectorForm, type SignIn, whyNotAdd } from "../rules/connectors";
+import { CONNECTOR_FAILURES, type ConnectorForm, type SignIn, whyNotAdd } from "../rules/connectors";
 import { requireAdmin, requireMember } from "./session";
 
 // Every button here checks who pressed it first, because a server action is a public endpoint.
@@ -44,7 +44,7 @@ export async function connect(form: FormData) {
     signIn = await startConnect(field(form, "id"), member.id);
   } catch (error) {
     console.error("team-workspace connect failed", error);
-    return back("failed", "That server could not start a sign-in. Check that it is running.");
+    return back("failed", CONNECTOR_FAILURES.start);
   }
   redirect(signIn ? signIn.toString() : "/connectors");
 }
@@ -74,7 +74,7 @@ export async function addConnectorForTeam(form: FormData) {
     signIn = await discoverSignIn(connector.url);
   } catch (error) {
     console.error("team-workspace connector discovery failed", error);
-    return back("failed", "That address did not answer as an MCP server with sign-in. Nothing was saved.");
+    return back("failed", CONNECTOR_FAILURES.discover);
   }
   await addConnector(connector, signIn, admin.id);
   back("added", connector.name);

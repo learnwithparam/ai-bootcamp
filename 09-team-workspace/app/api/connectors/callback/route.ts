@@ -1,6 +1,7 @@
 import { currentSession } from "@bootcamp/auth";
 import { finishConnect } from "../../../../agent/oauth";
 import { roleOf } from "../../../../db/queries";
+import { CONNECTOR_FAILURES } from "../../../../rules/connectors";
 
 // The connector's sign-in server sends the person back here with a one-time code.
 // The result goes back to the Connectors page as a short message, never as error details.
@@ -13,7 +14,7 @@ export async function GET(request: Request) {
     back.searchParams.set("connected", name);
   } catch (error) {
     console.error("team-workspace connect failed", error);
-    back.searchParams.set("failed", "The sign-in did not finish. Press Connect to try again.");
+    back.searchParams.set("failed", CONNECTOR_FAILURES.callback);
   }
   return Response.redirect(back, 303);
 }
