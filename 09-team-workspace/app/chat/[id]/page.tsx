@@ -1,4 +1,5 @@
 import type { UIMessage } from "ai";
+import { Trash2 } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Chat } from "../../../components/Chat";
 import { Shell } from "../../../components/Shell";
@@ -15,17 +16,22 @@ export default async function ChatPage({ params }: { params: Promise<{ id: strin
   const chat = UUID.test(id) ? await chatFor(id, member.id) : null;
   if (!chat) notFound();
   return (
-    <Shell userName={member.name} chats={await chatsOf(member.id)} current={id}>
+    <Shell person={{ name: member.name, role: member.role }} chats={await chatsOf(member.id)} current={id}>
       <div className="chat-head">
         <h1>{chat.title}</h1>
         <form action={removeChat}>
           <input type="hidden" name="id" value={id} />
-          <button type="submit" className="button">
-            Delete chat
+          <button type="submit" className="button button-quiet">
+            <Trash2 aria-hidden="true" /> Delete chat
           </button>
         </form>
       </div>
-      <Chat key={id} savedId={id} initial={(await messagesOf(id)) as UIMessage[]} />
+      <Chat
+        key={id}
+        savedId={id}
+        initial={(await messagesOf(id)) as UIMessage[]}
+        firstName={member.name.split(" ")[0] ?? member.name}
+      />
     </Shell>
   );
 }

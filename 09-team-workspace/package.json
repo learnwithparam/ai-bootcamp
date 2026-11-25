@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "setup": "echo 'Add yourself after you sign up: bun 09-team-workspace/db/member.ts you@example.com --admin'",
-    "seed": "echo 'The team workspace starts empty. Your chats, memories and connectors are your own.'"
+    "seed": "bun agent/seed.ts"
   },
   "dependencies": {
     "@ai-sdk/mcp": "2.0.104",
@@ -20,6 +20,7 @@
     "ai": "7.0.181",
     "better-auth": "1.7.23",
     "drizzle-orm": "0.45.4",
+    "lucide-react": "1.80.0",
     "next": "16.4.6",
     "pg": "8.23.1",
     "react": "19.3.1",

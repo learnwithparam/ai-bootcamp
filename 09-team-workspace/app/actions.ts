@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { discoverSignIn } from "../agent/discover";
 import { startConnect } from "../agent/oauth";
 import { addConnector, allConnectors, disconnect, removeConnector } from "../db/connectors";
-import { forget } from "../db/memories";
+import { editMemory, forget } from "../db/memories";
 import { deleteChat } from "../db/queries";
 import { type ConnectorForm, type SignIn, whyNotAdd } from "../rules/connectors";
 import { requireAdmin, requireMember } from "./session";
@@ -19,6 +19,14 @@ const back = (key: "failed" | "connected" | "added", text: string) =>
 export async function forgetMemory(form: FormData) {
   const member = await requireMember();
   await forget(member.id, field(form, "id"));
+  revalidatePath("/memory");
+}
+
+// The refusal is shown on the Memory page as text from the rules, never from the browser.
+export async function editOneMemory(form: FormData) {
+  const member = await requireMember();
+  const refused = await editMemory(member.id, field(form, "id"), field(form, "text"));
+  if (refused) redirect(`/memory?failed=${encodeURIComponent(refused)}`);
   revalidatePath("/memory");
 }
 

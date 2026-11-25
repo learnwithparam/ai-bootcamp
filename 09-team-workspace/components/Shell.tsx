@@ -1,26 +1,19 @@
-import { Topbar } from "@bootcamp/auth/topbar";
 import type { ReactNode } from "react";
-import { type ChatLink, Sidebar } from "./Sidebar";
+import { groupChats } from "../rules/chat";
+import { type Person, Sidebar } from "./Sidebar";
 
-// The same frame on every page: the bar, the chat list, and the page itself.
-export function Shell({
-  userName,
-  chats,
-  current,
-  children,
-}: {
-  userName: string;
-  chats: ChatLink[];
-  current?: string;
-  children: ReactNode;
-}) {
+type ChatRow = { id: string; title: string; updatedAt: Date };
+
+// The same frame on every page: the chat list grouped by day, the person's menu, and the page itself.
+export function Shell(props: { person: Person; chats: ChatRow[]; current?: string; children: ReactNode }) {
+  const groups = groupChats(props.chats, new Date()).map((group) => ({
+    label: group.label,
+    chats: group.chats.map(({ id, title }) => ({ id, title })),
+  }));
   return (
-    <div className="app">
-      <Topbar title="Team workspace" userName={userName} />
-      <div className="workspace">
-        <Sidebar chats={chats} current={current} />
-        <main className="workspace-main">{children}</main>
-      </div>
+    <div className="workspace">
+      <Sidebar groups={groups} current={props.current} person={props.person} />
+      <main className="workspace-main">{props.children}</main>
     </div>
   );
 }

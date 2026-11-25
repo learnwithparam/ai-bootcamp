@@ -42,3 +42,17 @@ export async function forget(userId: string, memoryId: string): Promise<boolean>
     .returning({ id: memories.id });
   return gone.length > 0;
 }
+
+// A person rewrites one of their own memories. The same rules as a save apply, except the count.
+// Returns why it was refused, or null once it is saved. Another person's memory id changes nothing.
+export async function editMemory(userId: string, memoryId: string, text: string): Promise<string | null> {
+  const refused = whyNotRemember(text, 0);
+  if (refused) return refused;
+  if (!/^[0-9a-f-]{36}$/.test(memoryId)) return "That memory is gone.";
+  const changed = await db
+    .update(memories)
+    .set({ text: text.trim() })
+    .where(and(eq(memories.id, memoryId), eq(memories.userId, userId)))
+    .returning({ id: memories.id });
+  return changed.length > 0 ? null : "That memory is gone.";
+}

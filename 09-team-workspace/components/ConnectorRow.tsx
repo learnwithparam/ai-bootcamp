@@ -21,7 +21,7 @@ export function ConnectorRow(props: {
 }) {
   const { connector, connected, actions } = props;
   return (
-    <li className="card card-body connector-row">
+    <li className="connector-row">
       <div>
         <strong>{connector.name}</strong>
         <span className={connected ? "status status-pass" : "status status-wait"}>

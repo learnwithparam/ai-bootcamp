@@ -48,3 +48,25 @@ export function withIncoming(history: Message[], incoming: Message): Message[] |
   });
   return [...history.slice(0, -1), { ...last, parts }];
 }
+
+// The sidebar's groups, the way ChatGPT shows them. Days are counted on the person's calendar, not in hours,
+// so a chat from 11pm yesterday reads as Yesterday at 1am today.
+export const CHAT_GROUPS = ["Today", "Yesterday", "Previous 7 days", "Previous 30 days", "Older"] as const;
+export type ChatGroup = (typeof CHAT_GROUPS)[number];
+
+export function chatGroup(updated: Date, now: Date, timeZone = "UTC"): ChatGroup {
+  const day = (date: Date) => Date.parse(date.toLocaleDateString("en-CA", { timeZone }));
+  const daysAgo = Math.round((day(now) - day(updated)) / 86_400_000);
+  if (daysAgo <= 0) return "Today";
+  if (daysAgo === 1) return "Yesterday";
+  if (daysAgo <= 7) return "Previous 7 days";
+  if (daysAgo <= 30) return "Previous 30 days";
+  return "Older";
+}
+
+export function groupChats<T extends { updatedAt: Date }>(chats: T[], now: Date, timeZone = "UTC") {
+  return CHAT_GROUPS.map((label) => ({
+    label,
+    chats: chats.filter((chat) => chatGroup(chat.updatedAt, now, timeZone) === label),
+  })).filter((group) => group.chats.length > 0);
+}

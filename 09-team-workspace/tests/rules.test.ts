@@ -1,8 +1,8 @@
 import { afterAll, describe, expect, test } from "bun:test";
-import { forget, memoriesOf, remember } from "../db/memories";
+import { editMemory, forget, memoriesOf, remember } from "../db/memories";
 import { chatFor, openChat } from "../db/queries";
 import { open, seal } from "../db/sealed";
-import { type Message, titleFrom, whyNotSend, withIncoming } from "../rules/chat";
+import { chatGroup, groupChats, type Message, titleFrom, whyNotSend, withIncoming } from "../rules/chat";
 import { connectorInState, needsApproval, slugOf, stateFor, toolKey, whyNotAdd } from "../rules/connectors";
 import { looksSecret, MEMORY, memoryBlock, whyNotRemember } from "../rules/memory";
 import { removeAccounts } from "./accounts";
@@ -133,6 +133,10 @@ describe("the queries", () => {
     const saved = await remember(ana, "Leads the data team.", null);
     if (!("id" in saved)) throw new Error(saved.refused);
     expect(await memoriesOf(ben)).toEqual([]);
+    expect(await editMemory(ben, saved.id, "Leads nothing.")).toBe("That memory is gone.");
+    expect(await editMemory(ana, saved.id, "My password is orange-kettle-42")).toContain("password");
+    expect(await editMemory(ana, saved.id, "Leads the data team in Lisbon.")).toBeNull();
+    expect((await memoriesOf(ana)).map((memory) => memory.text)).toEqual(["Leads the data team in Lisbon."]);
     expect(await forget(ben, saved.id)).toBe(false);
     expect(await forget(ana, saved.id)).toBe(true);
   });
@@ -159,4 +163,17 @@ describe("the queries", () => {
     expect(sealed).not.toContain("client-secret-value");
     expect(open(sealed)).toBe("client-secret-value");
   });
+});
+
+test("chats group by calendar day, the way the sidebar shows them", () => {
+  const now = new Date("2026-11-25T01:00:00Z");
+  const at = (iso: string) => new Date(iso);
+  expect(chatGroup(at("2026-11-25T00:10:00Z"), now)).toBe("Today");
+  expect(chatGroup(at("2026-11-24T23:00:00Z"), now)).toBe("Yesterday");
+  expect(chatGroup(at("2026-11-18T12:00:00Z"), now)).toBe("Previous 7 days");
+  expect(chatGroup(at("2026-10-26T12:00:00Z"), now)).toBe("Previous 30 days");
+  expect(chatGroup(at("2026-09-01T12:00:00Z"), now)).toBe("Older");
+  expect(chatGroup(at("2026-11-24T23:00:00Z"), now, "Asia/Kolkata")).toBe("Today");
+  const groups = groupChats([{ updatedAt: at("2026-09-01T00:00:00Z") }, { updatedAt: now }], now);
+  expect(groups.map((group) => group.label)).toEqual(["Today", "Older"]);
 });

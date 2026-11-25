@@ -7,8 +7,8 @@ import { requireMember } from "./session";
 export default async function NewChatPage() {
   const member = await requireMember();
   return (
-    <Shell userName={member.name} chats={await chatsOf(member.id)}>
-      <Chat initial={[]} />
+    <Shell person={{ name: member.name, role: member.role }} chats={await chatsOf(member.id)}>
+      <Chat initial={[]} firstName={member.name.split(" ")[0] ?? member.name} />
     </Shell>
   );
 }

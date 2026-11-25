@@ -1,0 +1,167 @@
+/* The user menu items, the settings pages and the phone layout. */
+.user-menu-items a,
+.user-menu-items button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: var(--r);
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.user-menu-items a:hover,
+.user-menu-items button:hover {
+  background: var(--surface-2);
+}
+
+.mobile-bar {
+  display: none;
+}
+
+.workspace-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+
+.page {
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.page p {
+  margin: 0;
+}
+
+.settings-head h1 {
+  margin: 0 0 12px;
+  font-size: 24px;
+}
+
+.page-lede {
+  color: var(--fg2);
+}
+
+.notice {
+  padding: 10px 12px;
+  border-radius: var(--r);
+}
+
+.notice-pass {
+  background: var(--passbg);
+  color: var(--pass);
+}
+
+.notice-fail {
+  background: var(--failbg);
+  color: var(--fail);
+}
+
+.empty-note {
+  padding: 24px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-lg);
+  color: var(--muted);
+  text-align: center;
+}
+
+.memory-list,
+.connector-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.memory-row,
+.connector-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+}
+
+.memory-row + .memory-row,
+.connector-list > * + * {
+  border-top: 1px solid var(--line);
+}
+
+.memory-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.memory-meta,
+.connector-url {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.connector-url {
+  font-family: var(--mono);
+}
+
+.memory-edit summary {
+  display: inline-block;
+  margin-top: 6px;
+  color: var(--fg2);
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.memory-edit-form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.memory-edit-form .field {
+  width: 100%;
+  resize: vertical;
+}
+
+.connector-row .status {
+  margin-left: 8px;
+}
+
+.connector-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.add-connector {
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.add-connector h2 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.add-connector .button {
+  align-self: flex-start;
+  margin-top: 8px;
+}

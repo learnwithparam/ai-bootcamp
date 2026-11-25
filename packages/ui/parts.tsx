@@ -2,6 +2,7 @@
 
 import type { ReasoningMessagePartComponent, ToolCallMessagePartComponent } from "@assistant-ui/react";
 import { MarkdownTextPrimitive } from "@assistant-ui/react-markdown";
+import remarkGfm from "remark-gfm";
 
 // Pieces every chat in this repo shares: text, thinking and a plain tool card.
 // A product draws its own card for each of its tools and falls back to ToolCard.
@@ -13,7 +14,9 @@ function NoImage({ alt }: { alt?: string }) {
 }
 
 export function MarkdownText() {
-  return <MarkdownTextPrimitive className="markdown" components={{ img: NoImage }} />;
+  return (
+    <MarkdownTextPrimitive className="markdown" remarkPlugins={[remarkGfm]} components={{ img: NoImage }} />
+  );
 }
 
 export function StatusChip({ running }: { running: boolean }) {

@@ -19,6 +19,14 @@ A tool that may change something waits for that person's approval in the chat.
 Connect the learnwithparam MCP server from [04-mcp-server-and-cli](../04-mcp-server-and-cli/README.md) with your own account.
 Tell the assistant about yourself, start a new chat and see it use what you said. Then approve a save on the MCP server from the chat.
 
+## Who uses it
+
+| Person | What they do | Screens |
+|---|---|---|
+| Team member | Chats, finds old chats by date or search, connects each service with their own account, approves any change a tool wants to make, and reads, edits or forgets what the assistant keeps | Chat with its sidebar, Memory, Connectors |
+| Admin | Everything a member does, and adds or removes the team's connectors | The same, with the form to add a connector |
+| Anyone else with an account | Nothing. Every page answers not found | None |
+
 ## Before you start
 
 Finish [00-setup](../00-setup/README.md). This product needs the OpenRouter key from `.env`.
@@ -44,6 +52,16 @@ bun 04-mcp-server-and-cli/auth/register-app.ts "Team workspace" http://localhost
 
 It prints a client id and a client secret once. Keep them for the Connectors page.
 
+To see a team that has used it for six weeks, load the sample people from the repo root. It makes Maya (a member) and Dev (an admin)
+through the real sign-up path, with real chats from the real model: a checklist, a table, a question in Portuguese,
+and a password the assistant must refuse to keep. Start the product first, because sign-up runs through it.
+
+```bash
+bun run seed team-workspace
+```
+
+Sign in as `maya@team-seed.learnwithparam.test` or `dev@team-seed.learnwithparam.test` with the password `seeded team password`.
+
 A run of the agent test costs about $0.0017.
 
 ## Run it
@@ -56,35 +74,55 @@ The workspace is at [http://localhost:3109](http://localhost:3109).
 
 ## What you will see
 
-On the Connectors page, an admin adds a server with its address and the client id and secret from 04.
+Maya signs in to an empty chat. Her chats sit on the left, grouped by when she last used them.
+
+![A new chat for Maya: "What can I help with, Maya?" with three suggestions, and her chats grouped under Today, Yesterday, Previous 7 days, Previous 30 days and Older.](screenshots/new-chat.png)
+
+Answers are rendered, not raw text. A checklist has real boxes and a comparison is a real table.
+
+![Maya's chat comparing dbt and Dataform, answered as a table.](screenshots/table.png)
+
+She asked it to remember a database password. The assistant said no, and nothing was saved.
+
+![The chat where Maya asks it to remember her database password, and the assistant refuses.](screenshots/secret-refused.png)
+
+The search box filters her chats by title.
+
+![The sidebar filtered by "team", with three chats left.](screenshots/search.png)
+
+The menu under her name opens Memory and Connectors. Memory lists every fact the assistant keeps, where it came from, and a way to change it.
+
+![The Memory page: one fact about Maya, with the date and chat it came from, Edit and Forget.](screenshots/memory.png)
+
+![One memory open for editing, in a text box with Save.](screenshots/memory-edit.png)
+
+Dev is the admin. He adds a connector with its address and the client id and secret from 04.
 The workspace reads who signs people in for that server and pins it, so tokens are only ever asked for there.
 
-![The Connectors page: learnwithparam added, not connected yet, with a Connect button and the form to add another connector.](screenshots/connectors.png)
+![The Connectors page for Dev, the admin, with the form to add a connector for the team.](screenshots/admin-connectors.png)
 
-Press "Connect". The MCP server's own page asks whether the workspace may act for you.
+Maya presses "Connect". The MCP server's own page asks whether the workspace may act for her.
 
-![The learnwithparam consent page: "Team workspace test wants to use your learnwithparam tools", with Allow and Deny.](screenshots/consent.png)
+![The learnwithparam consent page asking whether "Team workspace test" may use Maya's learnwithparam tools, with Allow and Deny.](screenshots/consent.png)
 
-Press "Allow". You are back on the Connectors page, connected with your own account.
+She presses "Allow" and is back on Connectors, connected with her own account.
 
-![The Connectors page with learnwithparam marked connected.](screenshots/connected.png)
+![The Connectors page: learnwithparam connected, with Disconnect.](screenshots/connected.png)
 
-Tell the assistant about yourself in one chat. Then start a new chat and ask for courses.
-The new chat searches the MCP server's catalog for courses that fit what you told it.
+She asks for courses for her team and to save the first. Each search shows as one quiet line with what it looked for.
+Saving changes something on the server, so the chat shows what will be sent and waits.
 
-![A new chat, "Which learnwithparam courses would suit my team?", with four learnwithparam search_catalog calls and three courses about agents.](screenshots/recall.png)
+![Search lines, then "learnwithparam wants to save for later" with the course address, Approve and "Do not do it".](screenshots/approval.png)
 
-Ask it to save the first course for later. Saving changes something on the server, so the chat shows what will be sent and waits.
+She presses "Approve". The save runs with her tokens, and the assistant says what it saved.
 
-![An approval card, "learnwithparam: save for later?", showing the course address, with Approve and "Do not do it".](screenshots/approval.png)
+![The approval marked done, and the courses it found, with the first saved for later.](screenshots/saved.png)
 
-Press "Approve". The save runs with your tokens, and the assistant says what it saved.
+On a phone the sidebar folds behind a menu button.
 
-![The card marked done, and "Saved Build a Mission Control for AI Agents to your learnwithparam list."](screenshots/saved.png)
+![The workspace at phone width, with the menu button at the top.](screenshots/phone.png)
 
-The Memory page lists every fact the assistant keeps about you.
-
-![The Memory page: "Maya leads the data team in Lisbon and prefers short answers", with a Forget button.](screenshots/memory.png)
+![The sidebar open over the page at phone width.](screenshots/phone-menu.png)
 
 ## How it works
 
@@ -143,7 +181,8 @@ Read in this order. Each file is short.
 6. `agent/discover.ts` and `agent/oauth.ts` - finding and pinning each server's sign-in, and each person's tokens.
 7. `agent/mcp.ts` - connecting to each server and turning its tools into the agent's tools.
 8. `app/api/chat/route.ts` - the chat route, guarded by `requireMember` and the chat's owner.
-9. `components/Chat.tsx` and `components/cards.tsx` - the chat, the memory cards and the approval card.
+9. `components/Chat.tsx` and `components/cards.tsx` - the chat, the memory notes, the tool lines and the approval card.
+10. `agent/seed.ts` - the sample team, made through the real sign-up path and the real model.
 
 ## Prove it
 
