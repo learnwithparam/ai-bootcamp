@@ -1,5 +1,6 @@
 import { and, asc, count, desc, eq, ilike, inArray, isNotNull, ne, or, sql } from "drizzle-orm";
 import { type BillRecord, type BillStatus, TABS, type Tab } from "../rules/bill";
+import { plainName } from "../rules/invoice";
 import { db } from "./queries";
 import { billEvents, bills } from "./schema";
 
@@ -42,7 +43,9 @@ type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 // would each miss the other, and both would go on to be paid. With the lock, the second one sees the first.
 export function oneNumberAtATime<T>(invoiceNumber: string, work: (tx: Tx) => Promise<T>): Promise<T> {
   return db.transaction(async (tx) => {
-    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${`invoice-inbox:${invoiceNumber}`}))`);
+    await tx.execute(
+      sql`select pg_advisory_xact_lock(hashtext(${`invoice-inbox:${plainName(invoiceNumber)}`}))`,
+    );
     return work(tx);
   });
 }

@@ -33,7 +33,12 @@ afterAll(async () => {
 test("of two copies saved at the same moment, exactly one is flagged as a duplicate of the other", async () => {
   for (let copy = 0; copy < 2; copy++)
     ids.push(await addBill({ fileName: `race-${number}.pdf`, pdf, uploadedBy: "duplicates test" }));
-  await Promise.all(ids.map((id) => saveChecked(id, pdf, invoice)));
+  // The second copy's number is spaced differently. The check counts it as the same bill, so the lock must too.
+  const [first, second] = ids as [string, string];
+  await Promise.all([
+    saveChecked(first, pdf, invoice),
+    saveChecked(second, pdf, { ...invoice, invoiceNumber: `${number.slice(0, 3)} ${number.slice(3)}` }),
+  ]);
   const saved = await Promise.all(ids.map(findBill));
   const flagged = saved.filter((bill) => bill?.problems.some((problem) => problem.kind === "duplicate"));
   expect(flagged).toHaveLength(1);

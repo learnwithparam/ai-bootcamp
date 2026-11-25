@@ -33,7 +33,11 @@ export function formatCents(cents: number): string {
 }
 
 // "Jack's New England Clam Chowder" and "jacks new england clam chowder" are the same product.
+// Bill numbers compare the same way, so the duplicate check and its lock agree on what "the same" means.
+export function plainName(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
 export function sameName(left: string, right: string): boolean {
-  const plain = (text: string) => text.toLowerCase().replace(/[^a-z0-9]/g, "");
-  return plain(left) === plain(right);
+  return plainName(left) === plainName(right);
 }
