@@ -1,4 +1,4 @@
-import { samePath } from "../session";
+import { samePath } from "../../rules/same-path";
 import { SignIn } from "./SignIn";
 
 type Search = Promise<{ sig?: string; next?: string }>;

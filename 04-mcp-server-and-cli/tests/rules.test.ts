@@ -3,6 +3,7 @@ import { inArray } from "drizzle-orm";
 import { allItems, db, savedItems, saveItem, searchItems } from "../db/queries";
 import { saved } from "../db/schema";
 import { kindOf, parseCatalog, parseLine, upcoming } from "../rules/catalog";
+import { samePath } from "../rules/same-path";
 
 // The rules, with no model. The database tests use the seeded Postgres: run `bun run setup` first.
 
@@ -47,6 +48,18 @@ describe("reading llms.txt", () => {
     const items = parseCatalog(text);
     expect(upcoming(items, "2026-12-10").map((item) => item.title)).toEqual(["Trace AI Agents"]);
     expect(upcoming(items, "2026-12-11")).toEqual([]);
+  });
+});
+
+describe("where sign-in sends you next", () => {
+  test("a path on this site is kept, with its query", () => {
+    expect(samePath("/device?user_code=ABCD1234")).toBe("/device?user_code=ABCD1234");
+  });
+
+  test("anything that could leave the site lands on the home page", () => {
+    for (const next of ["https://evil.com", "//evil.com", "/\\evil.com", "/\\/evil.com", undefined]) {
+      expect(samePath(next)).toBe("/");
+    }
   });
 });
 

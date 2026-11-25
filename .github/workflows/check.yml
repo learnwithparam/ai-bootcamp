@@ -23,7 +23,10 @@ jobs:
         options: --health-cmd "pg_isready -U bootcamp" --health-interval 3s --health-retries 20
     env:
       DATABASE_URL: postgres://bootcamp:bootcamp@localhost:5433/bootcamp
+      MCP_SERVER_URL: http://localhost:3104
     steps:
+      # Sign-in needs a secret. This database is thrown away after the run, so a new random one is enough.
+      - run: echo "BETTER_AUTH_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
       - uses: actions/checkout@v6
       - uses: oven-sh/setup-bun@v2
         with:
