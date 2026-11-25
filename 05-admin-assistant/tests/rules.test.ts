@@ -146,7 +146,14 @@ test("a newsletter may link only to learnwithparam.com, in any link form", () =>
     "[f](javascript:alert)",
     "[g](mailto:someone@evil.test)",
   ];
-  for (const body of sneaky) expect(foreignLinks(body).length).toBe(1);
+  for (const body of sneaky) expect(foreignLinks(body).length).toBeGreaterThan(0);
+  const disguised = [
+    "[h](https://evil&#46;test)",
+    "[i](https:\\/\\/evil.test)",
+    '<a href="https://evil.test">x</a>',
+    "[j][ref]\n\n  [ref]: https://www.learnwithparam.com",
+  ];
+  for (const body of disguised) expect(foreignLinks(body).length).toBeGreaterThan(0);
 });
 
 test("approval holds only for the exact text the owner read, with no change waiting and no outside link", async () => {

@@ -92,6 +92,12 @@ function isSiteLink(text: string): boolean {
   return url?.origin === SITE && url.username === "" && url.password === "";
 }
 
+// Marks outside the small Markdown above that another renderer could turn into a hidden link:
+// raw HTML, entities, backslash escapes and reference definitions. A body with any of them is refused whole.
+const LINK_TRICKS = /[<>\\]|&[#\w]+;|^\s*\[[^\]]*\]:/gm;
+
 export function foreignLinks(markdown: string): string[] {
-  return [...markdown.matchAll(ADDRESS_LIKE)].map((match) => match[0]).filter((text) => !isSiteLink(text));
+  const tricks = [...markdown.matchAll(LINK_TRICKS)].map((match) => match[0].trim());
+  const addresses = [...markdown.matchAll(ADDRESS_LIKE)].map((match) => match[0]);
+  return [...tricks, ...addresses.filter((text) => !isSiteLink(text))];
 }
