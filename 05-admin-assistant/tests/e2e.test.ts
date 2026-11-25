@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, expect, test } from "bun:test";
 import { type ChildProcess, spawn } from "node:child_process";
 import { findProduct } from "@bootcamp/products";
+import { checkPage } from "@bootcamp/ui/check-page";
 import { eq } from "drizzle-orm";
 import { type Browser, chromium, type Page } from "playwright";
 import { codeExists, type MadeCode, removeCode } from "../db/coupons";
@@ -55,7 +56,7 @@ afterAll(async () => {
 });
 
 async function signIn(email: string): Promise<Page> {
-  const page = await browser.newPage();
+  const page = await (await browser.newContext()).newPage();
   await page.goto(`${URL}/sign-in`);
   await page.getByPlaceholder("Email").fill(email);
   await page.getByPlaceholder("Password, at least 10 characters").fill(PASSWORD);
@@ -81,6 +82,7 @@ test("the owner asks for signups and gets a chart", async () => {
   await page.getByRole("button", { name: "How many people signed up in the last 30 days?" }).click();
   await page.locator("svg.chart").waitFor({ timeout: 60_000 });
   expect(await page.locator("svg.chart .bar").count()).toBe(30);
+  await checkPage(page);
 }, 90_000);
 
 test("the owner approves a code in the browser, and it is made in Stripe", async () => {

@@ -2,6 +2,7 @@ import { afterAll, beforeAll, expect, test } from "bun:test";
 import { type ChildProcess, spawn } from "node:child_process";
 import { findProduct } from "@bootcamp/products";
 import { stripe } from "@bootcamp/stripe";
+import { checkPage } from "@bootcamp/ui/check-page";
 import { eq } from "drizzle-orm";
 import { type Browser, chromium, type Page } from "playwright";
 import { myPlan } from "../agent/tools/my-plan";
@@ -69,7 +70,7 @@ async function ask(page: Page, question: string) {
 }
 
 test("a visitor gets a cited answer and can open its sources", async () => {
-  const page = await browser.newPage();
+  const page = await (await browser.newContext()).newPage();
   await page.goto(URL);
   await page.getByRole("button", { name: "How much is Pro, and what does it add?" }).click();
   const answer = page.locator(".message-assistant .markdown", { hasText: "$149" });
@@ -78,6 +79,7 @@ test("a visitor gets a cited answer and can open its sources", async () => {
   expect(await page.locator(".source a").first().getAttribute("href")).toStartWith(
     "https://www.learnwithparam.com",
   );
+  await checkPage(page);
 }, 90_000);
 
 test("a visitor over the per-minute limit gets a 429 before any model call", async () => {
@@ -95,7 +97,7 @@ test("a visitor over the per-minute limit gets a 429 before any model call", asy
 });
 
 test("a signed-in member opens Stripe's billing portal in a new tab", async () => {
-  const page = await browser.newPage();
+  const page = await (await browser.newContext()).newPage();
   const email = `member-${crypto.randomUUID()}@example.com`;
   await signUp(page, email);
   customers.push((await makeMember(email)).customerId);
@@ -111,7 +113,7 @@ test("a signed-in member opens Stripe's billing portal in a new tab", async () =
 test("signing up with a paying customer's email does not reach their plan", async () => {
   const email = `customer-${crypto.randomUUID()}@example.com`;
   customers.push(await payingCustomer(email));
-  await signUp(await browser.newPage(), email);
+  await signUp(await (await browser.newContext()).newPage(), email);
   const account = await accountByEmail(email);
   const plan = await myPlan(account?.id ?? null).execute?.(
     {},

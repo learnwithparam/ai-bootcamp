@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, expect, test } from "bun:test";
 import { findProduct } from "@bootcamp/products";
+import { checkPage } from "@bootcamp/ui/check-page";
 import { type Browser, chromium, type Page } from "playwright";
 import { PORTAL } from "../agent/portal";
 import { INBOX } from "../db/inbox";
@@ -41,7 +42,7 @@ afterAll(async () => {
 });
 
 async function signIn(email: string): Promise<Page> {
-  const page = await browser.newPage();
+  const page = await (await browser.newContext()).newPage();
   await page.goto(`${URL}/sign-in`);
   await page.getByPlaceholder("Email").fill(email);
   await page.getByPlaceholder("Password, at least 10 characters").fill(PASSWORD);
@@ -70,4 +71,5 @@ test("an operator runs the agent, approves it if it waits, and opens the request
   await sent.waitFor({ timeout: 60_000 });
   expect(await sent.getAttribute("href")).toMatch(/\/requests\/[\w-]{32}$/);
   await expect(page.getByText("Sent", { exact: true }).count()).resolves.toBeGreaterThan(0);
+  await checkPage(page);
 }, 240_000);

@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, expect, test } from "bun:test";
 import { pool } from "@bootcamp/db";
+import { checkPage } from "@bootcamp/ui/check-page";
 import { type Browser, chromium, type Page } from "playwright";
 import { discoverSignIn } from "../agent/discover";
 import { APP_URL } from "../agent/oauth";
@@ -43,7 +44,7 @@ afterAll(async () => {
 });
 
 async function signIn(email: string): Promise<Page> {
-  const page = await browser.newPage();
+  const page = await (await browser.newContext()).newPage();
   await page.goto(`${APP_URL}/sign-in`);
   await page.getByPlaceholder("Email").fill(email);
   await page.getByPlaceholder("Password, at least 10 characters").fill(PASSWORD);
@@ -110,6 +111,7 @@ test("a member connects, chats, finds the memory, and approves a save", async ()
   const page = await signIn(member.email);
   await connect(page);
   await approveASave(page, await tellAFact(page));
+  await checkPage(page);
   const saved = await pool.query("select url from mcp_server.saved where user_id = $1", [member.id]);
   expect(saved.rows).toHaveLength(1);
 }, 240_000);

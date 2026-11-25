@@ -1,6 +1,9 @@
 /* The shared look of every product, taken from agentic-ai-buildcamp.
    Every colour comes from tokens.css. Each product adds its own screens in its own components/. */
 @import "./tokens.css";
+@import "./controls.css";
+@import "./shell.css";
+@import "./table.css";
 * {
   box-sizing: border-box;
 }

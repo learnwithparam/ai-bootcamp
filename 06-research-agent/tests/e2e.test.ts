@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, expect, test } from "bun:test";
 import { type ChildProcess, spawn } from "node:child_process";
 import { findProduct } from "@bootcamp/products";
+import { checkPage } from "@bootcamp/ui/check-page";
 import { type Browser, chromium, type Page } from "playwright";
 
 // A person's whole path in a real browser: create an account, research a company, watch the report fill in,
@@ -53,7 +54,7 @@ async function createAccount(page: Page, name: string) {
 }
 
 test("a seller researches a company, gets a score with sources, and a stranger gets a 404", async () => {
-  const page = await browser.newPage();
+  const page = await (await browser.newContext()).newPage();
   await createAccount(page, "Seller");
   await page.getByLabel(/Research a company/).fill("linear.app");
   await page.getByRole("button", { name: "Research" }).click();
@@ -65,9 +66,10 @@ test("a seller researches a company, gets a score with sources, and a stranger g
   await expect(page.getByRole("heading", { name: "Linear" }).count()).resolves.toBe(1);
   const sources = page.locator(".claim-meta a[target=_blank]");
   await expect(sources.count()).resolves.toBeGreaterThanOrEqual(4);
+  await checkPage(page);
 
   // A second account opens the same address and finds nothing there.
-  const stranger = await browser.newPage();
+  const stranger = await (await browser.newContext()).newPage();
   await createAccount(stranger, "Stranger");
   const response = await stranger.goto(reportUrl);
   expect(response?.status()).toBe(404);

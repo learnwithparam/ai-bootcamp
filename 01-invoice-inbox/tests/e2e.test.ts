@@ -2,6 +2,7 @@ import { afterAll, beforeAll, expect, test } from "bun:test";
 import { type ChildProcess, spawn } from "node:child_process";
 import { join } from "node:path";
 import { findProduct } from "@bootcamp/products";
+import { checkPage } from "@bootcamp/ui/check-page";
 import { type Browser, chromium, type Page } from "playwright";
 import { SAMPLE_FOLDER } from "../db/seed";
 
@@ -70,7 +71,7 @@ function rows(page: Page, queue: string, hasText: string) {
 }
 
 test("a clerk uploads invoices, rejects the one with wrong prices, and finds it under Decided", async () => {
-  const page = await browser.newPage();
+  const page = await (await browser.newContext()).newPage();
   await createAccount(page);
   // Order 10250 had a 15% discount the invoice left out. Order 10248 had none.
   const matchedBefore = await rows(page, "Matched, ready to pay", "#10248").count();
@@ -89,4 +90,5 @@ test("a clerk uploads invoices, rejects the one with wrong prices, and finds it 
   await page.waitForURL(`${URL}/`);
 
   await expect(rows(page, "Decided", note).count()).resolves.toBe(1);
+  await checkPage(page);
 }, 120_000);

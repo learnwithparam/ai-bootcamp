@@ -25,6 +25,7 @@ const REQUIRED_FILES = [
   "agent/agent.ts",
   "tests/rules.test.ts",
   "tests/agent.test.ts",
+  "tests/e2e.test.ts",
 ];
 
 function section(readme: string, title: string): string {
@@ -61,11 +62,23 @@ function checkReadme(product: Product): string[] {
   return problems;
 }
 
+// The browser test runs checkPage on the screens it reaches, so raw markdown, a raw tool id
+// or an accessibility problem on a page fails proof.
+function checkE2e(product: Product): string[] {
+  const path = join(product.folder, "tests/e2e.test.ts");
+  if (!existsSync(path) || readFileSync(path, "utf8").includes("await checkPage(")) return [];
+  return [`${path}: call checkPage(page) from @bootcamp/ui/check-page on each screen it reaches.`];
+}
+
 function checkProduct(product: Product): string[] {
   if (!existsSync(product.folder))
     return [`${product.folder}: listed in products.ts but the folder is missing.`];
   const missing = REQUIRED_FILES.filter((file) => !existsSync(join(product.folder, file)));
-  return [...missing.map((file) => `${product.folder}: missing ${file}.`), ...checkReadme(product)];
+  return [
+    ...missing.map((file) => `${product.folder}: missing ${file}.`),
+    ...checkReadme(product),
+    ...checkE2e(product),
+  ];
 }
 
 function unlistedFolders(): string[] {

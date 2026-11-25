@@ -4,6 +4,7 @@ import { mkdtemp, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { findProduct } from "@bootcamp/products";
+import { checkPage } from "@bootcamp/ui/check-page";
 import { $ } from "bun";
 import { type Browser, chromium } from "playwright";
 
@@ -53,7 +54,7 @@ function startLogin(): Promise<{ code: string; done: Promise<number> }> {
 }
 
 async function approveInBrowser(code: string) {
-  const page = await browser.newPage();
+  const page = await (await browser.newContext()).newPage();
   await page.goto(`${URL}/device?user_code=${code}`);
   await page.getByRole("button", { name: "Create an account" }).click();
   await page.getByPlaceholder("Your name").fill("E2E Learner");
@@ -62,6 +63,7 @@ async function approveInBrowser(code: string) {
   await page.getByRole("button", { name: "Create account" }).click();
   await page.getByRole("button", { name: "Approve" }).click();
   await page.getByRole("heading", { name: "The CLI is signed in" }).waitFor();
+  await checkPage(page);
   await page.close();
 }
 

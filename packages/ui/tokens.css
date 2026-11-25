@@ -31,5 +31,16 @@
   --sans: Inter, system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
   --mono: Inconsolata, "Courier New", Courier, monospace;
   --r: 4px;
+  --r-lg: 10px;
+  --surface-2: #f3f3f1;
+  --line-strong: #bdbdbd;
+  --info: #1f5fbf;
+  --infobg: #e3ecf8;
+  --shadow: 0 1px 2px rgba(21, 21, 21, 0.06), 0 8px 24px rgba(21, 21, 21, 0.08);
+  --shadow-sm: 0 1px 2px rgba(21, 21, 21, 0.08);
+  --scrim: rgba(21, 21, 21, 0.32);
   color-scheme: light;
 }
+
+/* Yellow is the agent's mark: anything the agent read, wrote or suggested is drawn on --hl,
+   so a person can always tell its work from their own. */

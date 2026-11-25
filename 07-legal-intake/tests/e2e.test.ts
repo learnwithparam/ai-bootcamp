@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, expect, test } from "bun:test";
 import { type ChildProcess, spawn } from "node:child_process";
 import { findProduct } from "@bootcamp/products";
+import { checkPage } from "@bootcamp/ui/check-page";
 import { type Browser, chromium, type Page } from "playwright";
 import { checkpoints } from "../db/checkpoints";
 import { addLawyer, queue, removeIntakes } from "../db/queries";
@@ -54,7 +55,7 @@ afterAll(async () => {
 });
 
 async function signIn(email: string): Promise<Page> {
-  const page = await browser.newPage();
+  const page = await (await browser.newContext()).newPage();
   await page.goto(`${URL}/sign-in`);
   await page.getByPlaceholder("Email").fill(email);
   await page.getByPlaceholder("Password, at least 10 characters").fill(PASSWORD);
@@ -85,7 +86,7 @@ test("a stranger signed in gets a 404 on the queue", async () => {
 }, 60_000);
 
 test("a client asks, a lawyer accepts and approves, the client reads the letter", async () => {
-  const client = await browser.newPage();
+  const client = await (await browser.newContext()).newPage();
   await sendRequest(client);
   await client.getByText("A lawyer reads every request").waitFor();
 
@@ -100,9 +101,11 @@ test("a client asks, a lawyer accepts and approves, the client reads the letter"
   await letter.fill(`${await letter.inputValue()}\n\nPlease bring your bank statements.`);
   await lawyer.getByRole("button", { name: "Approve and send" }).click();
   await lawyer.getByLabel("Letter sent").waitFor();
+  await checkPage(lawyer);
 
   await client.reload();
   await expect(client.getByLabel("Our reply").textContent()).resolves.toContain(
     "Please bring your bank statements.",
   );
+  await checkPage(client);
 }, 180_000);
