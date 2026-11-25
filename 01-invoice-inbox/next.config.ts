@@ -14,6 +14,8 @@ const config: NextConfig = {
     "@bootcamp/tracing",
     "@bootcamp/ui",
   ],
+  // pdf.js loads its own worker file at run time, so the server uses it from node_modules, unbundled.
+  serverExternalPackages: ["pdfjs-dist"],
   // Invoices are uploaded through a server action. A few PDFs at once fit in 20 MB.
   experimental: { serverActions: { bodySizeLimit: "20mb" } },
 };

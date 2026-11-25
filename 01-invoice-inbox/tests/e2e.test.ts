@@ -3,19 +3,25 @@ import { type ChildProcess, spawn } from "node:child_process";
 import { join } from "node:path";
 import { findProduct } from "@bootcamp/products";
 import { checkPage } from "@bootcamp/ui/check-page";
+import { and, desc, eq, gt, inArray } from "drizzle-orm";
 import { type Browser, chromium, type Page } from "playwright";
+import { db } from "../db/queries";
+import { billEvents, bills } from "../db/schema";
 import { SAMPLE_FOLDER } from "../db/seed";
 
-// A person's whole path in a real browser: create an account, upload two invoices,
-// open the one that needs a person, reject it with a note, and find it under Decided.
-// The model reads both invoices for real, so this runs in `bun run proof`, not in `bun run check`.
+// Both people's paths in a real browser, as the seeded clerk and approver.
+// The clerk uploads two copies of a bill the team already has. The assistant reads them for real and flags each
+// as a duplicate. The clerk accepts the suggestion on one and decides the other; the approver signs it
+// off and records it paid. The model reads both PDFs, so this runs in `bun run proof`, not in `bun run check`.
 
 const URL = `http://localhost:${findProduct("invoice-inbox").port}`;
+const FILE = "invoice_10251.pdf";
+const started = new Date();
 let server: ChildProcess | undefined;
 let browser: Browser;
 
 async function isUp(): Promise<boolean> {
-  const response = await fetch(`${URL}/sign-in`, { signal: AbortSignal.timeout(2_000) }).catch(
+  const response = await fetch(`${URL}/sign-in`, { signal: AbortSignal.timeout(15_000) }).catch(
     () => undefined,
   );
   return response?.ok ?? false;
@@ -36,59 +42,100 @@ async function startServer() {
   throw new Error(`The invoice inbox did not start on ${URL}.`);
 }
 
+// The copies this test uploaded, newest first.
+const uploaded = () =>
+  db
+    .select({ id: bills.id, status: bills.status })
+    .from(bills)
+    .where(and(eq(bills.fileName, FILE), gt(bills.receivedAt, started)))
+    .orderBy(desc(bills.receivedAt));
+
 beforeAll(async () => {
   await startServer();
   browser = await chromium.launch();
 }, 90_000);
 
+// The seeded queues stay as they were, so screenshots and the next run see the same bills.
 afterAll(async () => {
   await browser?.close();
-  if (server?.pid) process.kill(-server.pid);
+  const ids = (await uploaded()).map((bill) => bill.id);
+  if (ids.length) {
+    await db.delete(billEvents).where(inArray(billEvents.billId, ids));
+    await db.delete(bills).where(inArray(bills.id, ids));
+  }
+  // Only a server this test started and that is still running.
+  if (server?.pid && server.exitCode === null) process.kill(-server.pid);
 });
 
-async function createAccount(page: Page) {
-  await page.goto(`${URL}/sign-in`);
-  await page.getByRole("button", { name: "Create an account" }).click();
-  await page.getByLabel("Your name").fill("Test Clerk");
-  await page.getByLabel("Email").fill(`clerk-${crypto.randomUUID()}@example.com`);
-  await page.getByLabel("Password").fill("a long test password");
-  await page.getByRole("button", { name: "Create account" }).click();
-  await page.waitForURL(`${URL}/`);
-}
-
-async function upload(page: Page, orderNumbers: number[]) {
-  const files = orderNumbers.map((orderNumber) => join(SAMPLE_FOLDER, `invoice_${orderNumber}.pdf`));
-  await page.setInputFiles("#invoices", files);
-  await page.getByRole("button", { name: "Read and check" }).click();
-  await page.getByText(`Read ${files.length} invoices.`).waitFor({ timeout: 60_000 });
-}
-
-// The rows of one queue. Earlier runs may have left older copies of the same invoice.
-function rows(page: Page, queue: string, hasText: string) {
-  return page
-    .locator("section.queue", { has: page.getByRole("heading", { name: queue }) })
-    .locator(".row", { hasText });
-}
-
-test("a clerk uploads invoices, rejects the one with wrong prices, and finds it under Decided", async () => {
+async function signIn(who: "ana" | "hanna"): Promise<Page> {
   const page = await (await browser.newContext()).newPage();
-  await createAccount(page);
-  // Order 10250 had a 15% discount the invoice left out. Order 10248 had none.
-  const matchedBefore = await rows(page, "Matched, ready to pay", "#10248").count();
-  await upload(page, [10250, 10248]);
-  await expect(rows(page, "Matched, ready to pay", "#10248").count()).resolves.toBe(matchedBefore + 1);
+  await page.goto(`${URL}/sign-in`);
+  await page.getByLabel("Email").fill(`${who}@bills-seed.learnwithparam.test`);
+  await page.getByLabel("Password").fill("seeded bills password");
+  await page.getByRole("button", { name: "Sign in", exact: true }).click();
+  await page.waitForURL(/\/bills/);
+  return page;
+}
 
-  // Oldest first, so the copy just uploaded is the last one.
-  await rows(page, "Needs a person", "#10250").last().click();
-  await page.getByRole("heading", { name: "Invoice 10250" }).waitFor();
-  await expect(page.locator("mark").filter({ hasText: "$42.40" }).count()).resolves.toBe(1);
-  await expect(page.locator("mark").filter({ hasText: "$16.80" }).count()).resolves.toBe(1);
+// Waits until the assistant has read every copy, then returns them.
+async function readCopies(count: number) {
+  for (let attempt = 0; attempt < 90; attempt++) {
+    const copies = await uploaded();
+    if (copies.length === count && copies.every((copy) => copy.status !== "reading")) return copies;
+    await Bun.sleep(1_000);
+  }
+  throw new Error(`The assistant did not finish reading ${count} copies of ${FILE}.`);
+}
 
-  const note = `Asked the supplier for the 15% discount (${crypto.randomUUID()}).`;
-  await page.getByLabel("Why? This note is saved with the invoice.").fill(note);
-  await page.getByRole("button", { name: "Reject to supplier" }).click();
-  await page.waitForURL(`${URL}/`);
+async function clerkAcceptsTheFix(clerk: Page, id: string) {
+  // The assistant names the duplicate and suggests rejecting it. One click accepts.
+  await clerk.goto(`${URL}/bills/${id}`);
+  await clerk
+    .getByRole("region", { name: "What does not match" })
+    .getByText("Bill 10251 was already received.")
+    .waitFor();
+  await clerk.getByRole("button", { name: "Accept" }).click();
+  await clerk.locator("h1").getByText("Rejected").waitFor();
+  await checkPage(clerk);
+}
 
-  await expect(rows(page, "Decided", note).count()).resolves.toBe(1);
-  await checkPage(page);
-}, 120_000);
+async function clerkDecides(clerk: Page, id: string, note: string) {
+  // On the other copy the clerk decides, and the amount needs a note.
+  await clerk.goto(`${URL}/bills/${id}`);
+  await clerk.getByLabel("Pay a different amount").check();
+  await clerk.getByLabel("Amount to pay").fill("654.06");
+  await clerk.getByRole("button", { name: "Save decision" }).click();
+  await clerk.getByText("Write a note that says why this amount.").waitFor();
+  await clerk.getByLabel("Note").fill(note);
+  await clerk.getByRole("button", { name: "Save decision" }).click();
+  await clerk.getByText("Waiting for a finance approver").waitFor();
+  expect(await clerk.getByRole("button", { name: "Approve for payment" }).count()).toBe(0);
+}
+
+async function approverPays(id: string, note: string) {
+  // The approver signs it off, then records the payment. Each step lands in the activity log.
+  const approver = await signIn("hanna");
+  await approver.goto(`${URL}/bills/${id}`);
+  await approver.getByRole("region", { name: "Activity" }).getByText(note, { exact: false }).waitFor();
+  await approver.getByRole("button", { name: "Approve for payment" }).click();
+  await approver.getByRole("button", { name: "Record as paid" }).click();
+  await approver.locator("h1").getByText("Paid").waitFor();
+  await checkPage(approver);
+}
+
+test("a clerk clears two duplicates, and an approver pays the one the clerk let through", async () => {
+  const clerk = await signIn("ana");
+  await clerk
+    .locator("input[name=bills]")
+    .setInputFiles([join(SAMPLE_FOLDER, FILE), join(SAMPLE_FOLDER, FILE)]);
+  await clerk.getByText("2 bills uploaded.").waitFor({ timeout: 30_000 });
+  const [second, first] = await readCopies(2);
+  if (!first || !second) throw new Error("Expected two copies.");
+  expect([first.status, second.status]).toEqual(["review", "review"]);
+
+  const note = `The supplier voided the first copy (${crypto.randomUUID()}).`;
+  await clerkAcceptsTheFix(clerk, first.id);
+  await clerkDecides(clerk, second.id, note);
+  await approverPays(second.id, note);
+  expect((await readCopies(2)).map((copy) => copy.status)).toEqual(["paid", "rejected"]);
+}, 180_000);

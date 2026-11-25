@@ -1,49 +1,97 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import { processInvoice } from "../agent/agent";
-import type { DecisionState } from "../components/DecisionForm";
-import type { UploadState } from "../components/UploadBox";
-import { recordDecision } from "../db/queries";
-import { requireUser } from "./session";
+import { after } from "next/server";
+import { processBill } from "../agent/agent";
+import { addBill, findBill, moveBills } from "../db/bills";
+import { type BillRecord, parseAmount } from "../rules/bill";
+import { formatCents, toCents } from "../rules/invoice";
+import { requireMember } from "./session";
 
-// Reads the uploaded PDFs at the same time. A file the model cannot read is named on screen,
-// and the reason goes to the server log.
-export async function uploadInvoices(_previous: UploadState, form: FormData): Promise<UploadState> {
-  const user = await requireUser();
+export type FormState = { error?: string; done?: string };
+
+const LIMIT = 10 * 1024 * 1024;
+
+// Saves each PDF as "reading" and answers at once. The assistant reads them after the response is sent,
+// and the worklist refreshes while any bill is still being read.
+export async function uploadBills(_previous: FormState, form: FormData): Promise<FormState> {
+  const member = await requireMember();
   const files = form
-    .getAll("invoices")
+    .getAll("bills")
     .filter((value): value is File => value instanceof File && value.size > 0);
-  const failures = await Promise.all(files.map((file) => readOne(file, user.name)));
-  revalidatePath("/");
-  const failed = failures.filter((failure) => failure !== "");
-  return { read: files.length - failed.length, failed };
-}
-
-// Returns why the file failed, or an empty string when it was read and saved.
-async function readOne(file: File, uploadedBy: string): Promise<string> {
-  if (file.type !== "application/pdf") return `${file.name} is not a PDF.`;
-  try {
-    await processInvoice(Buffer.from(await file.arrayBuffer()), file.name, uploadedBy);
-    return "";
-  } catch (error) {
-    console.error(`Reading ${file.name} failed:`, error);
-    return `${file.name} could not be read. The server log has the reason.`;
+  if (files.length === 0) return { error: "Choose at least one PDF." };
+  const wrong = files.find((file) => file.type !== "application/pdf" || file.size > LIMIT);
+  if (wrong) return { error: `${wrong.name} is not a PDF under 10 MB. Nothing was uploaded.` };
+  const ids: string[] = [];
+  for (const file of files) {
+    ids.push(
+      await addBill({
+        fileName: file.name,
+        pdf: Buffer.from(await file.arrayBuffer()),
+        uploadedBy: member.name,
+      }),
+    );
   }
+  after(() => Promise.all(ids.map(processBill)));
+  revalidatePath("/bills");
+  return {
+    done: `${files.length} bill${files.length === 1 ? "" : "s"} uploaded. The assistant is reading them.`,
+  };
 }
 
-// A person clears an exception. The note says why, and is kept with the decision.
-export async function decideInvoice(_previous: DecisionState, form: FormData): Promise<DecisionState> {
-  const user = await requireUser();
-  const id = String(form.get("id"));
-  const decision = form.get("decision");
+const OPEN = ["review", "hold", "unreadable"] as const;
+
+function payFrom(bill: BillRecord, form: FormData): number | string {
+  const billed = toCents(bill.extracted?.total ?? 0);
+  const cents = parseAmount(String(form.get("amount") ?? ""), billed);
+  return cents ?? `Enter an amount between $0.01 and ${formatCents(billed)}.`;
+}
+
+// A clerk decides a bill that needs review. Each choice is logged with the note, and only a bill
+// that still needs review moves, so two people deciding at once never overwrite each other.
+export async function reviewBill(_previous: FormState, form: FormData): Promise<FormState> {
+  const member = await requireMember();
+  const bill = await findBill(String(form.get("id")));
+  if (!bill) return { error: "This bill no longer exists." };
+  const choice = String(form.get("choice"));
   const note = String(form.get("note") ?? "").trim();
-  if (decision !== "approved" && decision !== "rejected") return { error: "Choose approve or reject." };
-  if (!note) return { error: "Write a note that says why." };
-  if (!(await recordDecision(id, decision, user.name, note))) {
-    return { error: "This invoice is no longer waiting. Someone may have decided it already." };
-  }
-  revalidatePath("/");
-  redirect("/");
+  const move = { from: [...OPEN], actor: member.name };
+  let moved = 0;
+  if (choice === "accept" && bill.fix?.kind === "pay") {
+    const text = `Accepted the suggestion: pay ${formatCents(bill.fix.payCents)}. Sent for approval.`;
+    moved = await moveBills([bill.id], { ...move, to: "approval", payCents: bill.fix.payCents, text });
+  } else if (choice === "pay") {
+    const cents = payFrom(bill, form);
+    if (typeof cents === "string") return { error: cents };
+    if (!note) return { error: "Write a note that says why this amount." };
+    moved = await moveBills([bill.id], {
+      ...move,
+      to: "approval",
+      payCents: cents,
+      text: `Pay ${formatCents(cents)}: ${note}`,
+    });
+  } else if (choice === "hold" || choice === "reject") {
+    const reason = note || (bill.fix?.kind === choice ? bill.fix.reason : "");
+    if (!reason) return { error: "Write a note that says why." };
+    const to = choice === "hold" ? "hold" : "rejected";
+    moved = await moveBills([bill.id], {
+      ...move,
+      to,
+      payCents: null,
+      text: `${choice === "hold" ? "Held" : "Rejected"}: ${reason}`,
+    });
+  } else return { error: "Choose what to do with this bill." };
+  if (!moved) return { error: "Someone else decided this bill first. Reload to see what they did." };
+  revalidatePath("/bills");
+  return { done: "Saved." };
+}
+
+// Reads a held or unreadable bill again, for example once the delivery has arrived.
+export async function readAgain(form: FormData): Promise<void> {
+  const member = await requireMember();
+  const id = String(form.get("id"));
+  const text = "Asked the assistant to read and check it again.";
+  if (await moveBills([id], { from: [...OPEN], to: "reading", actor: member.name, text }))
+    after(() => processBill(id));
+  revalidatePath("/bills");
 }

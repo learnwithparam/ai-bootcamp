@@ -1,11 +1,11 @@
 import { connect } from "@bootcamp/db";
-import { and, asc, desc, eq, inArray } from "drizzle-orm";
-import type { Invoice } from "../rules/invoice";
-import type { InvoiceRecord, Problem, PurchaseOrder } from "../rules/match";
+import { asc, eq, inArray, sql } from "drizzle-orm";
+import type { Role } from "../rules/bill";
+import type { PurchaseOrder } from "../rules/match";
 import * as schema from "./schema";
 
-const db = connect(schema);
-const { invoices, orderLines, purchaseOrders } = schema;
+export const db = connect(schema);
+const { members, orderLines, purchaseOrders } = schema;
 
 // The purchase order with its lines, or undefined when there is no such order.
 export async function findOrder(orderNumber: number): Promise<PurchaseOrder | undefined> {
@@ -27,7 +27,10 @@ export async function saveOrders(orders: PurchaseOrder[]): Promise<void> {
     await tx
       .insert(purchaseOrders)
       .values(orders.map(({ lines, ...order }) => order))
-      .onConflictDoNothing();
+      .onConflictDoUpdate({
+        target: purchaseOrders.orderNumber,
+        set: { shippedOn: sql`excluded.shipped_on` },
+      });
     const lines = orders.flatMap((order) =>
       order.lines.map((line) => ({ ...line, orderNumber: order.orderNumber })),
     );
@@ -37,59 +40,25 @@ export async function saveOrders(orders: PurchaseOrder[]): Promise<void> {
   });
 }
 
-type NewInvoice = {
-  fileName: string;
-  pdf: Buffer;
-  uploadedBy: string;
-  extracted: Invoice;
-  problems: Problem[];
-};
-
-export async function saveInvoice(invoice: NewInvoice): Promise<string> {
-  const status = invoice.problems.length ? "exception" : "matched";
-  const [row] = await db
-    .insert(invoices)
-    .values({ ...invoice, status })
-    .returning({ id: invoices.id });
-  if (!row) throw new Error("Saving the invoice returned no row.");
-  return row.id;
+// The person's role on the team. A signed-in account that is not on the team yet joins as a clerk.
+export async function roleOf(userId: string): Promise<Role> {
+  await db.insert(members).values({ userId }).onConflictDoNothing();
+  const [row] = await db.select({ role: members.role }).from(members).where(eq(members.userId, userId));
+  return row?.role ?? "clerk";
 }
 
-const summaryColumns = {
-  id: invoices.id,
-  fileName: invoices.fileName,
-  uploadedBy: invoices.uploadedBy,
-  uploadedAt: invoices.uploadedAt,
-  extracted: invoices.extracted,
-  problems: invoices.problems,
-  status: invoices.status,
-  decidedBy: invoices.decidedBy,
-  decidedAt: invoices.decidedAt,
-  note: invoices.note,
-};
-
-export async function listInvoices(): Promise<InvoiceRecord[]> {
-  return db.select(summaryColumns).from(invoices).orderBy(desc(invoices.uploadedAt));
+export async function setRole(userId: string, role: Role) {
+  await db
+    .insert(members)
+    .values({ userId, role })
+    .onConflictDoUpdate({ target: members.userId, set: { role } });
 }
 
-export async function findInvoice(id: string): Promise<InvoiceRecord | undefined> {
-  const [row] = await db.select(summaryColumns).from(invoices).where(eq(invoices.id, id));
-  return row;
-}
+type Account = { id: string; name: string; email: string; createdAt: Date };
 
-export async function invoicePdf(id: string): Promise<Buffer | undefined> {
-  const [row] = await db.select({ pdf: invoices.pdf }).from(invoices).where(eq(invoices.id, id));
-  return row?.pdf;
-}
-
-// A person clears an exception: approve to pay it anyway, or reject it back to the supplier.
-// Only an invoice still waiting changes, so a second click never overwrites someone else's decision.
-// Returns false when nothing changed.
-export async function recordDecision(id: string, status: "approved" | "rejected", by: string, note: string) {
-  const changed = await db
-    .update(invoices)
-    .set({ status, decidedBy: by, decidedAt: new Date(), note })
-    .where(and(eq(invoices.id, id), eq(invoices.status, "exception")))
-    .returning({ id: invoices.id });
-  return changed.length > 0;
+export async function accountByEmail(email: string): Promise<Account | null> {
+  const found = await db.execute<Account>(
+    sql`select id, name, email, "createdAt" from "user" where email = ${email.toLowerCase()}`,
+  );
+  return found.rows[0] ?? null;
 }

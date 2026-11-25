@@ -39,13 +39,16 @@ export function parseOrders(script: string): PurchaseOrder[] {
   const customers = parseNames(script, "Customers", "'(\\w+)'");
   const products = parseNames(script, "Products", "(\\d+)");
   const orders = new Map<number, PurchaseOrder>();
-  for (const [, number, customerId, date] of script.matchAll(/VALUES \((\d+),N'(\w+)',\d+,'([\d/]+)'/g)) {
+  // Orders are (id, customer, employee, ordered, required, shipped, ...). shipped is NULL for 21 orders.
+  const order = /VALUES \((\d+),N'(\w+)',\d+,'([\d/]+)','[\d/]+',(?:'([\d/]+)'|NULL)/g;
+  for (const [, number, customerId, date, shipped] of script.matchAll(order)) {
     const customer = customers.get(customerId ?? "");
     if (!customer) throw new Error(`Order ${number} names an unknown customer ${customerId}.`);
     orders.set(Number(number), {
       orderNumber: Number(number),
       customer,
       orderedOn: isoDate(date ?? ""),
+      shippedOn: shipped ? isoDate(shipped) : null,
       lines: [],
     });
   }

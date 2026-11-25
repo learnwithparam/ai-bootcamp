@@ -1,11 +1,89 @@
 {
-  "id": "a2de7933-7019-4ddc-a025-0036e33487e3",
+  "id": "c55fc5d6-6e45-4c46-bda9-8044d8288cea",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "invoice_inbox.invoices": {
-      "name": "invoices",
+    "invoice_inbox.bill_events": {
+      "name": "bill_events",
+      "schema": "invoice_inbox",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "bill_id": {
+          "name": "bill_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "at": {
+          "name": "at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "actor": {
+          "name": "actor",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "text": {
+          "name": "text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "bill_events_bill": {
+          "name": "bill_events_bill",
+          "columns": [
+            {
+              "expression": "bill_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "bill_events_bill_id_bills_id_fk": {
+          "name": "bill_events_bill_id_bills_id_fk",
+          "tableFrom": "bill_events",
+          "tableTo": "bills",
+          "schemaTo": "invoice_inbox",
+          "columnsFrom": ["bill_id"],
+          "columnsTo": ["id"],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "invoice_inbox.bills": {
+      "name": "bills",
       "schema": "invoice_inbox",
       "columns": {
         "id": {
@@ -33,54 +111,63 @@
           "primaryKey": false,
           "notNull": true
         },
-        "uploaded_at": {
-          "name": "uploaded_at",
+        "received_at": {
+          "name": "received_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
         },
+        "status": {
+          "name": "status",
+          "type": "bill_status",
+          "typeSchema": "invoice_inbox",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'reading'"
+        },
         "extracted": {
           "name": "extracted",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
+        },
+        "fields": {
+          "name": "fields",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'[]'::jsonb"
         },
         "problems": {
           "name": "problems",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "'[]'::jsonb"
         },
-        "status": {
-          "name": "status",
-          "type": "invoice_status",
-          "typeSchema": "invoice_inbox",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "decided_by": {
-          "name": "decided_by",
-          "type": "text",
+        "fix": {
+          "name": "fix",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
-        "decided_at": {
-          "name": "decided_at",
-          "type": "timestamp with time zone",
+        "pay_cents": {
+          "name": "pay_cents",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false
         },
-        "note": {
-          "name": "note",
-          "type": "text",
+        "duplicate_of": {
+          "name": "duplicate_of",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": false
         }
       },
       "indexes": {
-        "invoices_status": {
-          "name": "invoices_status",
+        "bills_status": {
+          "name": "bills_status",
           "columns": [
             {
               "expression": "status",
@@ -89,7 +176,7 @@
               "nulls": "last"
             },
             {
-              "expression": "uploaded_at",
+              "expression": "received_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -101,6 +188,39 @@
           "with": {}
         }
       },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "invoice_inbox.members": {
+      "name": "members",
+      "schema": "invoice_inbox",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'clerk'"
+        },
+        "added_at": {
+          "name": "added_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
@@ -188,6 +308,12 @@
           "type": "date",
           "primaryKey": false,
           "notNull": true
+        },
+        "shipped_on": {
+          "name": "shipped_on",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
@@ -200,10 +326,10 @@
     }
   },
   "enums": {
-    "invoice_inbox.invoice_status": {
-      "name": "invoice_status",
+    "invoice_inbox.bill_status": {
+      "name": "bill_status",
       "schema": "invoice_inbox",
-      "values": ["matched", "exception", "approved", "rejected"]
+      "values": ["reading", "unreadable", "review", "hold", "approval", "payment", "paid", "rejected"]
     }
   },
   "schemas": {

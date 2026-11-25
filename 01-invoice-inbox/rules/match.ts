@@ -1,7 +1,8 @@
 import { formatCents, type Invoice, type InvoiceLine, sameName, toCents } from "./invoice";
 
 // The three-way check an accounts payable clerk does by hand:
-// does the invoice add up, does it match the purchase order, and is the price the one we agreed?
+// does the invoice add up, does it match the purchase order, is the price the one we agreed,
+// and did the goods arrive?
 // No AI here. The model only reads the PDF. These rules decide.
 
 export type OrderLine = {
@@ -10,7 +11,14 @@ export type OrderLine = {
   quantity: number;
   discountPercent: number;
 };
-export type PurchaseOrder = { orderNumber: number; customer: string; orderedOn: string; lines: OrderLine[] };
+// shippedOn is null while the order has not been delivered. A bill for it is held until it arrives.
+export type PurchaseOrder = {
+  orderNumber: number;
+  customer: string;
+  orderedOn: string;
+  shippedOn: string | null;
+  lines: OrderLine[];
+};
 
 export type ProblemKind =
   | "no-order"
@@ -21,7 +29,9 @@ export type ProblemKind =
   | "quantity"
   | "price"
   | "line-total"
-  | "total";
+  | "total"
+  | "not-received"
+  | "duplicate";
 
 export type Problem = { kind: ProblemKind; message: string };
 
@@ -99,6 +109,10 @@ function checkHeader(invoice: Invoice, order: PurchaseOrder): Problem[] {
     const message = `Dated ${invoice.invoiceDate}, before the order was placed on ${order.orderedOn}.`;
     problems.push({ kind: "date", message });
   }
+  if (!order.shippedOn) {
+    const message = `Order ${order.orderNumber} has not been delivered yet. Nothing was received to pay for.`;
+    problems.push({ kind: "not-received", message });
+  }
   return problems;
 }
 
@@ -111,21 +125,3 @@ export function matchInvoiceToOrder(invoice: Invoice, order: PurchaseOrder | und
   }
   return [...arithmetic, ...checkHeader(invoice, order), ...checkLines(invoice, order)];
 }
-
-// Where an invoice stands. matched and exception come from the rules above. approved and rejected come from a person.
-export const INVOICE_STATUSES = ["matched", "exception", "approved", "rejected"] as const;
-export type InvoiceStatus = (typeof INVOICE_STATUSES)[number];
-
-// What the inbox knows about one invoice, without the PDF itself.
-export type InvoiceRecord = {
-  id: string;
-  fileName: string;
-  uploadedBy: string;
-  uploadedAt: Date;
-  extracted: Invoice;
-  problems: Problem[];
-  status: InvoiceStatus;
-  decidedBy: string | null;
-  decidedAt: Date | null;
-  note: string | null;
-};
