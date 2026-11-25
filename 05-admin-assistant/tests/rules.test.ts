@@ -132,10 +132,21 @@ test("an account is on the team only after the team script adds it, and its role
   expect(await roleOf(account.id)).toBe("owner");
 });
 
-test("a newsletter may link only to learnwithparam.com", () => {
-  const body =
-    "[a](https://www.learnwithparam.com/live) [b](https://www.learnwithparam.com.evil.test/x) [c](https://evil.test)";
-  expect(foreignLinks(body)).toEqual(["https://www.learnwithparam.com.evil.test/x", "https://evil.test"]);
+test("a newsletter may link only to learnwithparam.com, in any link form", () => {
+  const allowed = "[a](https://www.learnwithparam.com/live) and https://www.learnwithparam.com/blog";
+  expect(foreignLinks(allowed)).toEqual([]);
+  const sneaky = [
+    "[b](https://www.learnwithparam.com.evil.test/x)",
+    "[c](https://www.learnwithparam.com@evil.test/)",
+    "visit https://evil.test today",
+    "<https://evil.test>",
+    "[d]: https://evil.test",
+    "go to www.evil.test",
+    "[e](//evil.test)",
+    "[f](javascript:alert)",
+    "[g](mailto:someone@evil.test)",
+  ];
+  for (const body of sneaky) expect(foreignLinks(body).length).toBe(1);
 });
 
 test("approval holds only for the exact text the owner read, with no change waiting and no outside link", async () => {

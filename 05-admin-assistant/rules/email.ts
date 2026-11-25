@@ -79,8 +79,23 @@ export function plainLine(line: string): string {
 }
 
 // A newsletter may link only to the school's own site. The tools refuse other links, and so does approval.
+// The mail tool may link more than this preview does (bare addresses, <autolinks>, reference links),
+// so the check reads every address-like piece of the body, not only [text](url), and parses each one.
 export const SITE = "https://www.learnwithparam.com";
 
+const ADDRESS_LIKE =
+  /(?:\b(?:https?|ftp|file|data|javascript|vbscript|mailto|tel|sms):|\bwww\.|(?<![\w:])\/\/)[^\s)\]>"'<]*/gi;
+
+function isSiteLink(text: string): boolean {
+  const candidate = text.toLowerCase().startsWith("www.") ? "https://" + text : text;
+  try {
+    const url = new URL(candidate.startsWith("//") ? "https:" + candidate : candidate);
+    return url.origin === SITE && url.username === "" && url.password === "";
+  } catch {
+    return false;
+  }
+}
+
 export function foreignLinks(markdown: string): string[] {
-  return linksIn(markdown).filter((link) => link !== SITE && !link.startsWith(`${SITE}/`));
+  return [...markdown.matchAll(ADDRESS_LIKE)].map((match) => match[0]).filter((text) => !isSiteLink(text));
 }
