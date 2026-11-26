@@ -25,6 +25,7 @@
     "seed": "bun scripts/seed.ts",
     "proof": "bun scripts/proof.ts",
     "check": "bun scripts/check.ts",
+    "syllabus": "bun scripts/emit-syllabus.ts",
     "cli": "bun 04-mcp-server-and-cli/cli/learnwithparam.ts",
     "code": "bun 10-coding-agent/cli/code.ts",
     "terminal": "bun 12-coding-agent-terminal/tui/main.tsx"

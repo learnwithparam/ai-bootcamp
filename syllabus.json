@@ -1,0 +1,452 @@
+{
+  "source": {
+    "repo": "learnwithparam/ai-bootcamp",
+    "ref": "main",
+    "sha": "7192a243981a05905132ea5bc0e6044fe81691ec"
+  },
+  "tree": {
+    "modules": [
+      {
+        "key": "w00",
+        "title": "Set up once",
+        "units": [
+          {
+            "key": "setup-build",
+            "title": "Set up your machine",
+            "items": [
+              {
+                "key": "setup-build-reading",
+                "kind": "reading",
+                "title": "The problem and the goal: Set up once",
+                "minutes": 5,
+                "body_md": "## Why\n\nEach product calls a real model, saves to a real Postgres and records every run in Langfuse.\nSetup starts those services on your machine and creates the tables."
+              },
+              {
+                "key": "setup-build-lab",
+                "kind": "lab",
+                "title": "Run setup",
+                "minutes": 30,
+                "lab": {
+                  "slug": "setup",
+                  "repo_path": "00-setup"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "w01",
+        "title": "Invoice inbox",
+        "units": [
+          {
+            "key": "invoice-inbox-build",
+            "title": "Build the invoice inbox",
+            "items": [
+              {
+                "key": "invoice-inbox-build-reading",
+                "kind": "reading",
+                "title": "The problem and the goal: Invoice inbox",
+                "minutes": 5,
+                "body_md": "## Why\n\nAn accounts payable clerk checks every supplier bill against the purchase order before it is paid.\nA model can read a PDF in a second, but it cannot be trusted to say whether the bill is right.\nIt may \"fix\" a wrong total, or agree with a price nobody agreed to.\n\nSo the model does one job here: it copies what is printed on the page.\nPlain code then checks that reading three ways: against the page itself, against the order in Postgres,\nand against the bills already received. The model wrote none of them.\n\nThere is no chat box. The assistant works in the background, the way Ramp Bills does.\nIt shows up inline: a yellow mark on each field it read, a list of what does not match,\na suggested fix the clerk can take in one click, and a line in each bill's activity log.\n\n## Goal\n\nOpen a queue of real supplier bills that the assistant has already read.\nFind the bill with the wrong prices, the one sent twice and the one for goods not yet delivered.\nClear one as the clerk, then approve and pay it as the finance approver."
+              },
+              {
+                "key": "invoice-inbox-build-lab",
+                "kind": "lab",
+                "title": "Run and read the invoice inbox",
+                "minutes": 130,
+                "lab": {
+                  "slug": "invoice-inbox",
+                  "repo_path": "01-invoice-inbox"
+                },
+                "proof": {
+                  "kind": "github-check",
+                  "check_name": "check"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "w02",
+        "title": "Site assistant",
+        "units": [
+          {
+            "key": "site-assistant-build",
+            "title": "Build the site assistant",
+            "items": [
+              {
+                "key": "site-assistant-build-reading",
+                "kind": "reading",
+                "title": "The problem and the goal: Site assistant",
+                "minutes": 5,
+                "body_md": "## Why\n\nA school's website gets the same questions every day: how much is Pro, which workshop comes first, can I change my card.\nA chatbot that answers from the model's memory will make up a price or a course that does not exist.\nA chatbot that does whatever a visitor types will promise a refund nobody approved.\n\nSo this assistant answers only from the pages of learnwithparam.com, and cites the page for every fact.\nBefore it writes a word, a separate decision model picks one of four actions: answer, ask a follow-up, hand off to a person, or decline.\nIt can show a member their plan and open the Stripe billing portal, but it can never refund, cancel or change a price.\nPlain code, not the model, enforces the limits on how much it is used.\n\n## Goal\n\nAsk about Pro and get \"$149 a year\" with the page it came from.\nSign in as a member and see your real Stripe plan, with a button that opens billing in a new tab.\nAsk for a refund and watch the conversation move to the team's inbox, where a teammate picks it up and replies in the same messenger."
+              },
+              {
+                "key": "site-assistant-build-lab",
+                "kind": "lab",
+                "title": "Run and read the site assistant",
+                "minutes": 130,
+                "lab": {
+                  "slug": "site-assistant",
+                  "repo_path": "02-site-assistant"
+                },
+                "proof": {
+                  "kind": "github-check",
+                  "check_name": "check"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "w03",
+        "title": "Voice assistant",
+        "units": [
+          {
+            "key": "voice-assistant-build",
+            "title": "Build the voice assistant",
+            "items": [
+              {
+                "key": "voice-assistant-build-reading",
+                "kind": "reading",
+                "title": "The problem and the goal: Voice assistant",
+                "minutes": 5,
+                "body_md": "## Why\n\nA small clinic misses calls while the receptionist is with a patient, and every missed call is a booking that goes elsewhere.\nA voice bot that books from one sentence will book the wrong day when it mishears \"Tuesday\" as \"Thursday\".\nA voice bot that decides the hours itself will book a Sunday the clinic is closed.\n\nSo this phone line holds a slot and reads it back before anything is booked, and books only after the caller says yes.\nThe clinic's hours, the diary and the limits on cost live in code and Postgres, and the agent asks them every time.\nEvery call leaves a transcript, a cost and any call back on the front desk, so a person sees what the phone did.\n\n## Goal\n\nPress **Call the clinic**, ask for Tuesday at ten, and hear the time, your name and your number read back.\nSay yes, and the appointment appears in the front desk's diary, booked by the phone.\nAsk for a Sunday and hear that the clinic is closed, with nothing booked."
+              },
+              {
+                "key": "voice-assistant-build-lab",
+                "kind": "lab",
+                "title": "Run and read the voice assistant",
+                "minutes": 120,
+                "lab": {
+                  "slug": "voice-assistant",
+                  "repo_path": "03-voice-assistant"
+                },
+                "proof": {
+                  "kind": "github-check",
+                  "check_name": "check"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "w04",
+        "title": "MCP server and CLI",
+        "units": [
+          {
+            "key": "mcp-server-and-cli-build",
+            "title": "Build the mcp server and cli",
+            "items": [
+              {
+                "key": "mcp-server-and-cli-build-reading",
+                "kind": "reading",
+                "title": "The problem and the goal: MCP server and CLI",
+                "minutes": 5,
+                "body_md": "## Why\n\nPeople want to ask about courses where they already work: in Claude or Cursor, in a terminal, or on the site.\nWriting the same feature three times means three sets of bugs, and three places where a personal tool might forget to check who is asking.\n\nSo this product writes each tool once. The web page, the MCP server and the CLI all call the same four tools.\nTwo tools are public: anyone can search the catalog and see what is coming up.\nTwo are personal: saving an item and reading your saved list. They only run for a signed-in account, and only on that account's list.\nSigning in from Claude, Cursor or the CLI uses OAuth, so none of them ever sees your password.\n\nThe web page is built like a developer settings page, not a chat. Each tool is a form you can run, with the same call\nshown for the terminal and for Claude. Connected apps lists every app you let in, with a revoke button.\nActivity lists every call made as you, from every way in, including the ones that failed.\n\n## Goal\n\nRun every tool from the web page, and watch a personal tool refuse until you sign in.\nSign the CLI in by typing a short code in the browser, then save a lab from the terminal and see it in your list.\nConnect the same address to an MCP client and get the same answers.\nSee every call in Activity, and revoke an app so its next call is refused."
+              },
+              {
+                "key": "mcp-server-and-cli-build-lab",
+                "kind": "lab",
+                "title": "Run and read the mcp server and cli",
+                "minutes": 140,
+                "lab": {
+                  "slug": "mcp-server-and-cli",
+                  "repo_path": "04-mcp-server-and-cli"
+                },
+                "proof": {
+                  "kind": "github-check",
+                  "check_name": "check"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "w05",
+        "title": "Admin assistant",
+        "units": [
+          {
+            "key": "admin-assistant-build",
+            "title": "Build the admin assistant",
+            "items": [
+              {
+                "key": "admin-assistant-build-reading",
+                "kind": "reading",
+                "title": "The problem and the goal: Admin assistant",
+                "minutes": 5,
+                "body_md": "## Why\n\nAn owner checks the same few things every week: signups, live discount codes, and the newsletter.\nA chat window that does all three is the easy build, but its work then lives in a transcript, far from the page where it matters.\n\nShopify's Sidekick shows a better shape. The admin stays the admin.\nA small prompt waits at the bottom of every page and opens a side panel for longer work.\nWhat the assistant makes lands on the object itself: a code is a draft row on the Discounts page, and an edit is a diff in the newsletter editor.\n\nSo this product shows four ideas.\n**Skills:** the assistant starts with one tool, `load_skill`, and gets a skill's tools only after it loads that skill.\n**UI the agent draws:** a tool's result is a card, such as a bar chart, never a paragraph of numbers.\n**Drafts, not actions:** the assistant cannot reach Stripe's write calls or send mail. It saves drafts, and the server makes a code only when an owner approves it.\n**The page as context:** the panel tells the assistant which page is open, so \"make the subject shorter\" edits the newsletter on screen.\n\n## Goal\n\nOpen Home and read what needs you: drafts waiting, the signup trend, and ideas for the next lab.\nAsk for a 20% code and see it appear as a draft on the Discounts page, then approve it and see it in Stripe's test mode.\nAsk the assistant to edit a newsletter and read its change as a diff before you keep it.\nSign in as staff and see the same pages, with every approval left to an owner."
+              },
+              {
+                "key": "admin-assistant-build-lab",
+                "kind": "lab",
+                "title": "Run and read the admin assistant",
+                "minutes": 120,
+                "lab": {
+                  "slug": "admin-assistant",
+                  "repo_path": "05-admin-assistant"
+                },
+                "proof": {
+                  "kind": "github-check",
+                  "check_name": "check"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "w06",
+        "title": "Research agent",
+        "units": [
+          {
+            "key": "research-agent-build",
+            "title": "Build the research agent",
+            "items": [
+              {
+                "key": "research-agent-build-reading",
+                "kind": "reading",
+                "title": "The problem and the goal: Research agent",
+                "minutes": 5,
+                "body_md": "## Why\n\nBefore a sales call, someone spends half an hour reading a company's site, its job board and its funding news.\nA model with web search does it in a minute. But a model also writes sentences no page ever said, and a seller who repeats one loses the deal.\n\nSo this product shows two ideas.\n**A graph:** the work is split into steps, and four researchers run at the same time, one per topic.\n**Checking each claim:** the model must copy a quote from the page it cites. The server opens that page itself and looks for the quote.\nA claim whose quote is not there never reaches the table, the report or the score.\n\nThere is no chat box. The agents meet people the way Clay does: as a table.\nEach row is a company and each column is a research question. Cells fill in as their agent finishes,\nand every answer opens its sources in place.\n\n## Goal\n\nRead a team's accounts table where every cell was researched from the live web.\nOpen a cell's sources and find the quoted words on the page.\nAdd a company as an account executive and watch its cells fill in. Assign it to someone else as the sales lead."
+              },
+              {
+                "key": "research-agent-build-lab",
+                "kind": "lab",
+                "title": "Run and read the research agent",
+                "minutes": 140,
+                "lab": {
+                  "slug": "research-agent",
+                  "repo_path": "06-research-agent"
+                },
+                "proof": {
+                  "kind": "github-check",
+                  "check_name": "check"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "w07",
+        "title": "Legal intake",
+        "units": [
+          {
+            "key": "legal-intake-build",
+            "title": "Build the legal intake",
+            "items": [
+              {
+                "key": "legal-intake-build-reading",
+                "kind": "reading",
+                "title": "The problem and the goal: Legal intake",
+                "minutes": 5,
+                "body_md": "## Why\n\nA small firm gets dozens of requests a week. Most people do not know what a lawyer needs to hear, so a blank form gets half filled or abandoned.\nSomeone at the firm then reads each request, works out the area of law, spots any deadline, and checks the firm has not acted for the other side.\nThat last check matters most: a firm that takes a case against its own client breaks its professional rules.\n\nThis product shows three ideas.\n**Collecting data by talking, not by form:** the agent reads each message, fills in what it can, and asks only for what is still missing.\nThe client sees every field and can change any of them before sending.\n**A graph that pauses for a human:** the work is a series of steps, and two of them wait for a lawyer.\nThe place it stopped is saved in Postgres, so a restart loses nothing.\n**Limits the model cannot cross:** the conflict check is plain code over the firm's records.\nA lawyer can never accept a request with an exact conflict, whatever the model said.\n\n## Goal\n\nTell the assistant about a problem as a client, check the form it filled, and send it.\nSign in as a lawyer, accept the request, edit the letter the model drafted and approve it.\nThen open the client's private link and read the approved letter.\nSign in as a paralegal and see that only a lawyer can decide."
+              },
+              {
+                "key": "legal-intake-build-lab",
+                "kind": "lab",
+                "title": "Run and read the legal intake",
+                "minutes": 140,
+                "lab": {
+                  "slug": "legal-intake",
+                  "repo_path": "07-legal-intake"
+                },
+                "proof": {
+                  "kind": "github-check",
+                  "check_name": "check"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "w08",
+        "title": "Browser agent",
+        "units": [
+          {
+            "key": "browser-agent-build",
+            "title": "Build the browser agent",
+            "items": [
+              {
+                "key": "browser-agent-build-reading",
+                "kind": "reading",
+                "title": "The problem and the goal: Browser agent",
+                "minutes": 5,
+                "body_md": "## Why\n\nMany firms still copy emails into web forms by hand. The portal has no API, so the only way in is the page a person would use.\nA browser agent can do that job, but a form sent by mistake is hard to take back. It reaches a lawyer's queue with someone's name on it.\n\nSo this product shows two ideas.\n**Browser automation:** Stagehand drives a real Chrome. The model finds each field by what the page shows, and code types the answer.\n**A decision made outside the agent:** before the send button, code reads the form back, then a separate decision model returns\n`submit`, `stop` or `ask_human` with a confidence. Code decides what happens next, and a doubtful case waits for the intake lead.\n\nThere is no chat box. The agent meets people the way a supervised operator does: a shared inbox like Front,\nand for each run the live browser beside an activity panel, a checkpoint before the send, and Stop and Take over at every step.\n\n## Goal\n\nRun the agent on a client email and watch it fill in the portal. Approve a run that waits, as the lead.\nTake a run over as the assistant and send it by hand. See a sales pitch, an email that gives the agent orders, and a one-line email stopped."
+              },
+              {
+                "key": "browser-agent-build-lab",
+                "kind": "lab",
+                "title": "Run and read the browser agent",
+                "minutes": 140,
+                "lab": {
+                  "slug": "browser-agent",
+                  "repo_path": "08-browser-agent"
+                },
+                "proof": {
+                  "kind": "github-check",
+                  "check_name": "check"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "w09",
+        "title": "Team workspace",
+        "units": [
+          {
+            "key": "team-workspace-build",
+            "title": "Build the team workspace",
+            "items": [
+              {
+                "key": "team-workspace-build-reading",
+                "kind": "reading",
+                "title": "The problem and the goal: Team workspace",
+                "minutes": 5,
+                "body_md": "## Why\n\nA team that shares one chat tool wants three things a plain chat box does not give.\nThe assistant should not ask the same questions in every new chat. It should reach the team's own services. And one person's access must never serve another.\n\nSo this product shows two ideas.\n**Memory:** the assistant saves short facts about a person with a `remember` tool. They show on a Memory page, where the person can forget any of them.\nCode decides what may be kept: never a password or a key, and never a fact planted by a tool result.\n**An MCP client:** the workspace connects to remote MCP servers over OAuth, with each person's own tokens.\nA tool that may change something waits for that person's approval in the chat.\n\n## Goal\n\nConnect the learnwithparam MCP server from [04-mcp-server-and-cli](../04-mcp-server-and-cli/README.md) with your own account.\nTell the assistant about yourself, start a new chat and see it use what you said. Then approve a save on the MCP server from the chat."
+              },
+              {
+                "key": "team-workspace-build-lab",
+                "kind": "lab",
+                "title": "Run and read the team workspace",
+                "minutes": 120,
+                "lab": {
+                  "slug": "team-workspace",
+                  "repo_path": "09-team-workspace"
+                },
+                "proof": {
+                  "kind": "github-check",
+                  "check_name": "check"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "w10",
+        "title": "Coding agent",
+        "units": [
+          {
+            "key": "coding-agent-build",
+            "title": "Build the coding agent",
+            "items": [
+              {
+                "key": "coding-agent-build-reading",
+                "kind": "reading",
+                "title": "The problem and the goal: Coding agent",
+                "minutes": 5,
+                "body_md": "## Why\n\nA coding agent is only as safe as the harness around it. The model proposes; the harness decides what may run, what may change and when the work counts as done.\nClaude Code is closed, and the open agents are big to read. Pi showed that a whole harness can be small, so we built one the same size, and you can read every line of its loop.\n\nSo this product shows two ideas.\n**The harness:** a loop with six tools, a list of programs the agent may run, paths it may not leave, extensions that refuse a call before it runs,\nand a check that decides \"done\". The agent's word is never enough: done runs the tests, and the run ends only when they pass.\n**Review by replay:** the session file is the record. The review site plays it back one step at a time, beside the diff and the tests before and after,\nso a person approves what the agent did, not what it said it did.\n\nThere is no chat box. The developer talks to the agent in the terminal, where the code is. The reviewer meets it the way a pull request is met: a list of runs waiting, and a page per run.\n\n## Goal\n\nRun the agent on a real task in a fresh copy of `vercel/ms` and watch the tests go from red to green. Send the run for review.\nAs the reviewer, replay it, read the change, and approve it or send it back. See a task the harness refuses, and a run that runs out of steps."
+              },
+              {
+                "key": "coding-agent-build-lab",
+                "kind": "lab",
+                "title": "Run and read the coding agent",
+                "minutes": 140,
+                "lab": {
+                  "slug": "coding-agent",
+                  "repo_path": "10-coding-agent"
+                },
+                "proof": {
+                  "kind": "github-check",
+                  "check_name": "check"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "w11",
+        "title": "Personal storefront",
+        "units": [
+          {
+            "key": "personal-storefront-build",
+            "title": "Build the personal storefront",
+            "items": [
+              {
+                "key": "personal-storefront-build-reading",
+                "kind": "reading",
+                "title": "The problem and the goal: Personal storefront",
+                "minutes": 5,
+                "body_md": "## Why\n\nMost shops show everyone the same page, then bolt a chat box on the side.\nThe shopper has to ask the chat box, read its answer, then go and find the products themselves.\nHere there is no chat page. The page itself is the answer: tell it how you shop and it changes.\n\nSo this product shows three ideas.\n**Shared state over AG-UI.** The page and the agent share one state: what the shop knows about the shopper, and the sections on the page.\nThe agent streams changes into it one at a time, and the shopper changes it too, by taking a chip away or adding an allergy.\n**UI the agent draws, from a list.** The agent may only ask for five kinds of section, naming products by their code.\nIt never writes a product, a price or an allergen. Code checks every section before it is drawn, and has the last word.\n**A person in the loop for the basket.** \"Fill my basket\" makes a basket card. Nothing is added until the shopper presses Add all.\n\nThe agent is ours, on AI SDK, speaking the AG-UI protocol from one route. CopilotKit carries the state, the messages and the basket card in the browser.\n\n## Goal\n\nAsk for a nut-free week as a guest. Watch the chips fill in, then the banner and the shelves change, and check no product mentions nuts.\nPress Add all and see the basket fill. Then sign in as the merchandiser, read what the agent did and what the rules took out, and turn the banner off for every shopper."
+              },
+              {
+                "key": "personal-storefront-build-lab",
+                "kind": "lab",
+                "title": "Run and read the personal storefront",
+                "minutes": 130,
+                "lab": {
+                  "slug": "personal-storefront",
+                  "repo_path": "11-personal-storefront"
+                },
+                "proof": {
+                  "kind": "github-check",
+                  "check_name": "check"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "w12",
+        "title": "Coding agent terminal",
+        "units": [
+          {
+            "key": "coding-agent-terminal-build",
+            "title": "Build the coding agent terminal",
+            "items": [
+              {
+                "key": "coding-agent-terminal-build-reading",
+                "kind": "reading",
+                "title": "The problem and the goal: Coding agent terminal",
+                "minutes": 5,
+                "body_md": "## Why\n\n10 runs the agent as one command: it prints what happened, then the run is over.\nThat is right for a job you hand off, and wrong for a job you do together.\nWhen you sit with the agent, you want to read each change before it lands, say no to the one that looks wrong, and stop it when it wanders.\n\nSo this product shows two ideas.\n**A terminal UI is a real UI.** It has components, state and a keyboard handler, written in React with OpenTUI, the library OpenCode runs on.\nIt is tested the way a web page is: frames rendered in a test, and the real app driven in a real pseudo-terminal.\n**A person in the loop, at the right moments.** Reading never waits. Changing a file or running a program waits for a yes.\nThe harness rules still come first: what they refuse is refused, and no answer from you can allow it. You can only say no to what they would allow.\n\nThe agent, its tools and its rules are the same code as 10's, in `packages/coding-harness`. Only the screens and the questions are new.\n\n## Goal\n\nRun `/practice months` and watch the tests go from 11 failing to all passing. Read the first edit's diff in the prompt, and allow edits until you quit.\nThen run it again and say no: the agent tries another way, and nothing changes. Press Esc to stop it. Send a run to 10's review site with `/upload`."
+              },
+              {
+                "key": "coding-agent-terminal-build-lab",
+                "kind": "lab",
+                "title": "Run and read the coding agent terminal",
+                "minutes": 140,
+                "lab": {
+                  "slug": "coding-agent-terminal",
+                  "repo_path": "12-coding-agent-terminal"
+                },
+                "proof": {
+                  "kind": "github-check",
+                  "check_name": "check"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
