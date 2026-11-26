@@ -1,10 +1,13 @@
-import { z } from "zod";
+import type { z } from "zod";
+import { inputProblem } from "../../rules/plain";
 
 // One tool, written once and offered three ways: in the web chat, over MCP, and in the CLI.
 // Each way in passes the caller's account id from its own sign-in, never from the tool's input.
 
 export type CatalogTool = {
   name: string;
+  // What a person reads: on the tools page, and in Claude's and Cursor's tool lists.
+  title: string;
   description: string;
   input: z.ZodObject;
   // A personal tool reads or changes one account's data, so it needs a signed-in caller.
@@ -16,15 +19,16 @@ export type CatalogTool = {
 
 export class SignInNeeded extends Error {}
 
-// A wrong argument reads as a sentence ("query: Too small..."), the same in chat, MCP and the CLI.
+// A wrong argument reads as a sentence ("query needs at least 2 characters."), the same on every way in.
 function check<Input extends z.ZodObject>(schema: Input, input: unknown): z.infer<Input> {
   const result = schema.safeParse(input);
-  if (!result.success) throw new Error(z.prettifyError(result.error));
+  if (!result.success) throw new Error(inputProblem(result.error.issues));
   return result.data;
 }
 
 type Spec<Input extends z.ZodObject> = {
   name: string;
+  title: string;
   description: string;
   input: Input;
   changesData?: boolean;

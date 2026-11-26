@@ -3,6 +3,16 @@ import { kindOf, parseCatalog, parseLine, upcoming } from "@bootcamp/catalog";
 import { inArray } from "drizzle-orm";
 import { allItems, db, savedItems, saveItem, searchItems } from "../db/queries";
 import { saved } from "../db/schema";
+import {
+  cliCommand,
+  dateWords,
+  inputProblem,
+  inputWords,
+  mcpCall,
+  scopeWords,
+  viaWords,
+  whenWords,
+} from "../rules/plain";
 import { samePath } from "../rules/same-path";
 
 // The rules, with no model. The database tests use the seeded Postgres: run `bun run setup` first.
@@ -93,5 +103,73 @@ describe("the database", () => {
     await saveItem(RAVI, second.url);
     expect((await savedItems(ASHA)).map((item) => item.url)).toEqual([first.url]);
     expect((await savedItems(RAVI)).map((item) => item.url)).toEqual([second.url]);
+  });
+});
+
+describe("the developer pages in plain words", () => {
+  test("scopes read as what the app may do, and an unknown scope is shown as it is", () => {
+    expect(scopeWords(["openid", "offline_access", "billing"])).toEqual([
+      "Know it is you",
+      "Stay signed in",
+      "billing",
+    ]);
+  });
+
+  test("each way in is named, and an app is named by its own name", () => {
+    expect(viaWords("page", "Claude")).toBe("This page");
+    expect(viaWords("ask", null)).toBe("Ask in plain words");
+    expect(viaWords("app", "Study planner")).toBe("Study planner");
+    expect(viaWords("app", null)).toBe("A connected app");
+  });
+
+  test("an input reads as names and values, and no input says so", () => {
+    expect(inputWords({ query: "evals", kind: "lab" })).toBe('query "evals", kind "lab"');
+    expect(inputWords({})).toBe("No input");
+  });
+
+  test("the terminal command puts the first required value bare and quotes what needs it", () => {
+    expect(cliCommand("search_catalog", { query: "coding agents", kind: "lab" }, "query")).toBe(
+      'bun run cli search-catalog "coding agents" --kind lab',
+    );
+    expect(cliCommand("my_saved_list", {})).toBe("bun run cli my-saved-list");
+    expect(cliCommand("search_catalog", { query: 'say "hi"' }, "query")).toBe(
+      'bun run cli search-catalog "say \\"hi\\""',
+    );
+  });
+
+  test("the MCP message carries only the fields that were filled in", () => {
+    const message = JSON.parse(mcpCall("search_catalog", { query: "evals", kind: "" }));
+    expect(message).toMatchObject({
+      method: "tools/call",
+      params: { name: "search_catalog", arguments: { query: "evals" } },
+    });
+    expect(message.params.arguments).not.toHaveProperty("kind");
+  });
+});
+
+describe("inputs, errors and times in plain words", () => {
+  test("a wrong argument reads as a sentence that names the field", () => {
+    expect(inputProblem([{ code: "too_small", path: ["query"], message: "", minimum: 2 }])).toBe(
+      "query needs at least 2 characters.",
+    );
+    expect(inputProblem([{ code: "invalid_type", path: ["url"], message: "" }])).toBe("url is required.");
+    expect(
+      inputProblem([{ code: "invalid_value", path: ["kind"], message: "", values: ["lab", "post"] }]),
+    ).toBe("kind must be one of: lab, post.");
+  });
+
+  test("a catalog date reads as a day, a month and a year", () => {
+    expect(dateWords("2026-11-05")).toBe("5 Nov 2026");
+    expect(dateWords("next week")).toBe("next week");
+  });
+
+  test("times read at a glance, and older ones as a date", () => {
+    const now = new Date("2026-11-26T12:00:00Z");
+    const ago = (minutes: number) => new Date(now.getTime() - minutes * 60_000);
+    expect(whenWords(ago(0), now)).toBe("Just now");
+    expect(whenWords(ago(5), now)).toBe("5 min ago");
+    expect(whenWords(ago(180), now)).toBe("3 h ago");
+    expect(whenWords(ago(30 * 60), now)).toBe("Yesterday");
+    expect(whenWords(ago(5 * 24 * 60), now)).toBe("21 Nov 2026");
   });
 });

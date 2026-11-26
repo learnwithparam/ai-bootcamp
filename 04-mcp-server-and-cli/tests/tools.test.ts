@@ -21,7 +21,7 @@ afterAll(async () => {
 
 // The real MCP server, called in this process with the real client: no network and no sign-in step.
 async function mcpClient(userId: string | null): Promise<Client> {
-  const handler = createMcpHandler(() => mcpServer(userId), { legacy: "reject" });
+  const handler = createMcpHandler(() => mcpServer({ userId, via: "app" }), { legacy: "reject" });
   const client = new Client(
     { name: "test", version: "1.0.0" },
     { versionNegotiation: { mode: { pin: "2026-07-28" } } },

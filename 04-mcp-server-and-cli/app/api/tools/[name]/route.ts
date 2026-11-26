@@ -1,4 +1,5 @@
 import { findTool } from "../../../../agent/tools/all";
+import { callTool } from "../../../../agent/tools/call";
 import { SignInNeeded } from "../../../../agent/tools/tool";
 import { auth } from "../../../../auth/auth";
 
@@ -8,7 +9,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ nam
   if (!tool) return Response.json({ error: "No tool with that name." }, { status: 404 });
   const session = await auth.api.getSession({ headers: request.headers });
   try {
-    return Response.json(await tool.run(await request.json(), session?.user.id ?? null));
+    const caller = { userId: session?.user.id ?? null, via: "page" as const };
+    return Response.json(await callTool(tool, await request.json(), caller));
   } catch (error) {
     if (error instanceof SignInNeeded) return Response.json({ error: error.message }, { status: 401 });
     console.error(`tool ${tool.name} failed`, error);

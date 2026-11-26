@@ -5,6 +5,7 @@ import { publicTool } from "./tool";
 
 export const searchCatalog = publicTool({
   name: "search_catalog",
+  title: "Search the catalog",
   description:
     "Search learnwithparam's labs, courses, posts, newsletter issues, playbooks and ebooks by words. " +
     "Returns up to five items with their title, link, kind, date and summary.",

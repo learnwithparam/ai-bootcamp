@@ -1,4 +1,4 @@
-import { pgSchema, primaryKey, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { index, integer, jsonb, pgSchema, primaryKey, serial, text, timestamp } from "drizzle-orm/pg-core";
 
 // The catalog the tools search, and each account's saved list. Accounts live in the shared sign-in tables.
 export const mcp = pgSchema("mcp_server");
@@ -30,3 +30,22 @@ export const cliClient = mcp.table("cli_client", {
   clientId: text("client_id").primaryKey(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+// Every tool call made with an account, from every way in: the account's activity page reads it, and so does "Last used" on its apps.
+// via: "page" is the tools page, "ask" is a plain-words question, "app" is an MCP client such as the CLI.
+export const toolCalls = mcp.table(
+  "tool_calls",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    via: text("via", { enum: ["page", "ask", "app"] }).notNull(),
+    clientId: text("client_id"),
+    tool: text("tool").notNull(),
+    input: jsonb("input").notNull(),
+    outcome: text("outcome", { enum: ["done", "failed"] }).notNull(),
+    message: text("message"),
+    ms: integer("ms").notNull(),
+    calledAt: timestamp("called_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("tool_calls_user").on(table.userId, table.calledAt)],
+);

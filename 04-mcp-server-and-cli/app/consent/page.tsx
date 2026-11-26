@@ -2,6 +2,7 @@ import { verifyOAuthQueryParams } from "@better-auth/oauth-provider";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "../../auth/auth";
+import { GrantCard } from "../../components/GrantCard";
 import { Decide } from "./Decide";
 
 type Search = Promise<Record<string, string | string[]>>;
@@ -21,17 +22,20 @@ export default async function ConsentPage({ searchParams }: { searchParams: Sear
   const query = signedQuery(await searchParams);
   if (!(await verifyOAuthQueryParams(query.toString(), (await auth.$context).secret))) notFound();
   const requestHeaders = await headers();
-  if (!(await auth.api.getSession({ headers: requestHeaders }))) redirect("/sign-in");
+  const session = await auth.api.getSession({ headers: requestHeaders });
+  if (!session) redirect("/sign-in");
   const client = await auth.api.getOAuthClientPublic({
     query: { client_id: query.get("client_id") ?? "" },
     headers: requestHeaders,
   });
   return (
-    <main className="sign-in">
-      <h1>{client.client_name ?? "An app"} wants to use your learnwithparam tools</h1>
-      <p>It will be able to search the catalog, read your saved list and add to it, as you.</p>
-      <p className="label">Asked for: {query.get("scope")}</p>
+    <GrantCard
+      appName={client.client_name ?? "this app"}
+      from="app"
+      email={session.user.email}
+      scopes={(query.get("scope") ?? "").split(" ").filter(Boolean)}
+    >
       <Decide />
-    </main>
+    </GrantCard>
   );
 }

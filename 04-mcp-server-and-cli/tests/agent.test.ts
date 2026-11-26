@@ -1,11 +1,10 @@
 import { afterAll, expect, test } from "bun:test";
-import type { UIMessage } from "ai";
 import { inArray } from "drizzle-orm";
-import { answer } from "../agent/agent";
+import { ask as askModel } from "../agent/agent";
 import { db, savedItems } from "../db/queries";
-import { saved } from "../db/schema";
+import { saved, toolCalls } from "../db/schema";
 
-// Real questions to the real model. The metric on the learner page: the chat picks the right tool for every
+// Real questions to the real model. The metric on the learner page: the answer uses the right tool for every
 // question, and every link it gives came from a tool. Costs well under one US cent per run on the default model.
 
 const USER = `test-${crypto.randomUUID()}`;
@@ -13,22 +12,17 @@ let costUsd = 0;
 
 afterAll(async () => {
   await db.delete(saved).where(inArray(saved.userId, [USER]));
+  await db.delete(toolCalls).where(inArray(toolCalls.userId, [USER]));
   console.log(`Model cost for these questions: $${costUsd.toFixed(4)} (from OpenRouter's usage report).`);
 });
 
 type Run = { tools: string[]; text: string; toolText: string };
 
 async function ask(question: string, userId: string | null): Promise<Run> {
-  const message: UIMessage = { id: "1", role: "user", parts: [{ type: "text", text: question }] };
-  const result = await answer([message], userId);
-  const steps = await result.steps;
-  costUsd += steps.reduce(
-    (sum, step) => sum + ((step.usage.raw as { cost?: number } | undefined)?.cost ?? 0),
-    0,
-  );
-  const calls = steps.flatMap((step) => step.toolCalls.map((call) => call.toolName));
-  const outputs = steps.flatMap((step) => step.toolResults.map((each) => JSON.stringify(each.output)));
-  return { tools: calls, text: await result.text, toolText: outputs.join("\n") };
+  const result = await askModel(question, userId);
+  costUsd += result.costUsd;
+  const outputs = result.calls.map((call) => JSON.stringify(call.output));
+  return { tools: result.calls.map((call) => call.tool), text: result.text, toolText: outputs.join("\n") };
 }
 
 // Every link in the answer must appear in what the tools returned: the model may not invent a page.

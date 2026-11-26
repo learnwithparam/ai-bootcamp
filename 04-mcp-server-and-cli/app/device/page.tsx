@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth } from "../../auth/auth";
+import { auth, SCOPES } from "../../auth/auth";
+import { GrantCard } from "../../components/GrantCard";
 import { cliClientId } from "../../db/queries";
 import { approve, deny } from "./actions";
 
@@ -13,7 +14,8 @@ export default async function DevicePage({ searchParams }: { searchParams: Searc
   if (done) return <Finished approved={done === "approved"} />;
   if (!userCode) return <EnterCode />;
   const requestHeaders = await headers();
-  if (!(await auth.api.getSession({ headers: requestHeaders }))) {
+  const session = await auth.api.getSession({ headers: requestHeaders });
+  if (!session) {
     redirect(`/sign-in?next=${encodeURIComponent(`/device?user_code=${userCode}`)}`);
   }
   const request = await auth.api
@@ -23,10 +25,12 @@ export default async function DevicePage({ searchParams }: { searchParams: Searc
       return null;
     });
   if (!request)
-    return <EnterCode error="That code is wrong or has expired. Run `learnwithparam login` again." />;
+    return (
+      <EnterCode error="That code is wrong or has expired. Run the login command in your terminal again for a new one." />
+    );
   if (request.client_id !== (await cliClientId()))
     return <EnterCode error="That code is not from our CLI." />;
-  return <Approve userCode={userCode} />;
+  return <Approve userCode={userCode} email={session.user.email} />;
 }
 
 function EnterCode({ error }: { error?: string }) {
@@ -49,25 +53,24 @@ function EnterCode({ error }: { error?: string }) {
   );
 }
 
-function Approve({ userCode }: { userCode: string }) {
+// The CLI asks for the scopes the server hands it at login (SCOPES), so the page can name them.
+function Approve({ userCode, email }: { userCode: string; email: string }) {
   return (
-    <main className="sign-in">
-      <h1>Let the learnwithparam CLI act as you?</h1>
-      <p>
-        It can search the catalog, read your saved list and add to it. Approve only if you just ran{" "}
-        <code>bun run cli login</code> and it printed this code:
-      </p>
-      <p className="device-code">{userCode}</p>
-      <form className="approval-actions">
+    <GrantCard appName="the learnwithparam CLI" from="terminal" email={email} scopes={SCOPES.split(" ")}>
+      <div className="grant-code">
+        <span>Check this matches the code in your terminal</span>
+        <output className="device-code">{userCode}</output>
+      </div>
+      <form className="grant-actions">
         <input type="hidden" name="userCode" value={userCode} />
         <button type="submit" formAction={approve} className="button button-primary">
           Approve
         </button>
-        <button type="submit" formAction={deny} className="button">
+        <button type="submit" formAction={deny} className="button button-quiet">
           Deny
         </button>
       </form>
-    </main>
+    </GrantCard>
   );
 }
 

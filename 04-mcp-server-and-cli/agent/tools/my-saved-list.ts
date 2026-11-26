@@ -4,6 +4,7 @@ import { personalTool } from "./tool";
 
 export const mySavedList = personalTool({
   name: "my_saved_list",
+  title: "My saved list",
   description: "The items the signed-in person saved for later, newest first.",
   input: z.object({}),
   run: async (_input, userId) => ({ items: await savedItems(userId) }),

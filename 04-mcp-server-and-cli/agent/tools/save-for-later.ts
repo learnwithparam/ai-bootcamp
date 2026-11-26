@@ -4,6 +4,7 @@ import { personalTool } from "./tool";
 
 export const saveForLater = personalTool({
   name: "save_for_later",
+  title: "Save for later",
   description:
     "Save one catalog item to the signed-in person's list. Use the url that search_catalog returned.",
   changesData: true,

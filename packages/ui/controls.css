@@ -180,11 +180,12 @@ input[type="radio"] {
   height: 16px;
 }
 
-.button-quiet {
+/* Doubled class: base.css sets .button after this file loads, so a single class would lose. */
+.button.button-quiet {
   border-color: var(--line);
 }
 
-.button-danger {
+.button.button-danger {
   border-color: var(--fail);
   color: var(--fail);
 }

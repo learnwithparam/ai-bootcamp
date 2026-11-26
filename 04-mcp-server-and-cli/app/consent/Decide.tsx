@@ -11,11 +11,11 @@ export function Decide() {
     if (result.error) setError(result.error.message ?? "That did not work. Start again from the app.");
   }
   return (
-    <div className="approval-actions">
+    <div className="grant-actions">
       <button type="button" className="button button-primary" onClick={() => decide(true)}>
         Allow
       </button>
-      <button type="button" className="button" onClick={() => decide(false)}>
+      <button type="button" className="button button-quiet" onClick={() => decide(false)}>
         Deny
       </button>
       {error ? (
