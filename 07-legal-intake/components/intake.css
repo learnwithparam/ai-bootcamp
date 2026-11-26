@@ -1,0 +1,247 @@
+/* The parts both sides share (chips, the tracker, the letter) and the firm's staff screens.
+   Every colour comes from packages/ui/tokens.css. */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chips .chip {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  font-family: var(--sans);
+}
+
+.chips button {
+  display: grid;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.chips svg {
+  width: 14px;
+  height: 14px;
+}
+
+.chip-add {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.client-status {
+  display: grid;
+  gap: 24px;
+}
+
+.tracker {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 20px 0 0;
+  padding: 0;
+  color: var(--muted);
+  font-size: 14px;
+  list-style: none;
+}
+
+.tracker li {
+  display: grid;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 4px solid var(--line);
+}
+
+.tracker .done,
+.tracker .now {
+  border-color: var(--firm);
+  color: var(--fg);
+}
+
+.tracker .now {
+  font-weight: 700;
+}
+
+.tracker-dot {
+  display: none;
+}
+
+.letter {
+  padding: 40px 44px;
+  border: 1px solid var(--line);
+  border-top: 6px solid var(--firm);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.letter-date {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 14px;
+}
+
+.letter-body {
+  max-width: 64ch;
+  white-space: pre-wrap;
+}
+
+.letter-field {
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1.6;
+}
+
+.review-form {
+  display: grid;
+  gap: 14px;
+}
+
+.review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.check-line {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.board-filter {
+  display: flex;
+  gap: 8px;
+}
+
+.board-deadline .pill {
+  margin-left: 8px;
+}
+
+.row-link {
+  color: var(--fg);
+  font-weight: 700;
+}
+
+.matter-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 24px;
+  align-items: start;
+}
+
+.matter-summary {
+  display: grid;
+  gap: 18px;
+}
+
+.matter-actions {
+  position: sticky;
+  top: 16px;
+}
+
+.agent-reading {
+  background: var(--hl);
+}
+
+.agent-reading p {
+  margin-top: 0;
+}
+
+.deadline-quote {
+  margin: 6px 0 0;
+  padding-left: 10px;
+  border-left: 3px solid var(--wait);
+  color: var(--fg2);
+  font-style: italic;
+}
+
+.deadline-quote svg,
+.conflict-clear svg,
+.workflow svg {
+  width: 16px;
+  height: 16px;
+  vertical-align: -3px;
+}
+
+.conflict-clear {
+  color: var(--pass);
+  font-weight: 700;
+}
+
+.workflow {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.workflow-step {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.workflow-done {
+  border-color: var(--pass);
+  background: var(--passbg);
+  color: var(--fg);
+}
+
+.workflow-now {
+  border-color: var(--wait);
+  background: var(--waitbg);
+  color: var(--fg);
+  font-weight: 700;
+}
+
+.workflow-failed {
+  border-color: var(--fail);
+  background: var(--failbg);
+  color: var(--fg);
+}
+
+.turns-record {
+  max-width: 760px;
+}
+
+@media (max-width: 860px) {
+  .intake-desk,
+  .matter-grid,
+  .workflow {
+    grid-template-columns: 1fr;
+  }
+
+  .request-panel,
+  .matter-actions {
+    position: static;
+  }
+
+  .letter {
+    padding: 24px 20px;
+  }
+}
+
+.review-form .field-label > span {
+  display: block;
+  margin: 2px 0 8px;
+  color: var(--muted);
+  font-size: 13px;
+}

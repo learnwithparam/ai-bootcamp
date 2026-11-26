@@ -1,0 +1,12 @@
+{
+  "name": "@bootcamp/stripe",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./stripe.ts"
+  },
+  "dependencies": {
+    "stripe": "20.4.1"
+  }
+}

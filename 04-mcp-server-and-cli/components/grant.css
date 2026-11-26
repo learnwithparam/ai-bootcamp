@@ -1,0 +1,143 @@
+/* Handing an account to an app: the CLI's code page and an app's consent page. */
+.grant {
+  width: min(440px, 100% - 32px);
+  margin: 8vh auto 48px;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.grant-marks {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.grant-mark {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface-2);
+  font-weight: 700;
+}
+
+.grant-mark svg {
+  width: 22px;
+  height: 22px;
+}
+
+.grant-mark-ours {
+  border-color: var(--fg);
+  background: var(--fg);
+  color: var(--accent);
+}
+
+.grant-link {
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+}
+
+.grant h1 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.grant h2 {
+  margin: 20px 0 8px;
+  color: var(--fg2);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.grant-who {
+  margin: 6px 0 0;
+  color: var(--fg2);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.grant-list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  list-style: none;
+}
+
+.grant-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  font-size: 14px;
+}
+
+.grant-list li + li {
+  border-top: 1px solid var(--line);
+}
+
+.grant-list svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  color: var(--fg2);
+}
+
+.grant-list li span {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.grant-scopes {
+  margin: 0;
+  font-size: 14px;
+}
+
+.grant-code {
+  display: grid;
+  gap: 6px;
+  margin-top: 20px;
+  padding: 14px;
+  border-radius: var(--r);
+  background: var(--surface-2);
+  color: var(--fg2);
+  font-size: 13px;
+  text-align: center;
+}
+
+.grant-code .device-code {
+  color: var(--fg);
+}
+
+.grant-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.grant-actions .button {
+  justify-content: center;
+  padding-block: 10px;
+}
+
+.grant-actions .form-error {
+  grid-column: 1 / -1;
+}
+
+.grant-foot {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: center;
+}

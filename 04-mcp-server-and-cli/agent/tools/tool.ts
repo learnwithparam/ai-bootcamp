@@ -1,0 +1,62 @@
+import type { z } from "zod";
+import { inputProblem } from "../../rules/plain";
+
+// One tool, written once and offered three ways: in the web chat, over MCP, and in the CLI.
+// Each way in passes the caller's account id from its own sign-in, never from the tool's input.
+
+export type CatalogTool = {
+  name: string;
+  // What a person reads: on the tools page, and in Claude's and Cursor's tool lists.
+  title: string;
+  description: string;
+  input: z.ZodObject;
+  // A personal tool reads or changes one account's data, so it needs a signed-in caller.
+  personal: boolean;
+  // A tool that writes something. MCP clients see the others marked read-only, so they can run them without asking.
+  changesData: boolean;
+  run: (input: unknown, userId: string | null) => Promise<unknown>;
+};
+
+export class SignInNeeded extends Error {}
+
+// A wrong argument reads as a sentence ("query needs at least 2 characters."), the same on every way in.
+function check<Input extends z.ZodObject>(schema: Input, input: unknown): z.infer<Input> {
+  const result = schema.safeParse(input);
+  if (!result.success) throw new Error(inputProblem(result.error.issues));
+  return result.data;
+}
+
+type Spec<Input extends z.ZodObject> = {
+  name: string;
+  title: string;
+  description: string;
+  input: Input;
+  changesData?: boolean;
+};
+
+// The input is checked against its schema here, so a bad argument fails the same way in all three.
+export function publicTool<Input extends z.ZodObject>(
+  spec: Spec<Input> & { run: (input: z.infer<Input>) => Promise<unknown> },
+): CatalogTool {
+  return {
+    ...spec,
+    personal: false,
+    changesData: spec.changesData ?? false,
+    run: (input) => spec.run(check(spec.input, input)),
+  };
+}
+
+// The caller check lives here, in the only way to make a personal tool, so no tool can forget it.
+export function personalTool<Input extends z.ZodObject>(
+  spec: Spec<Input> & { run: (input: z.infer<Input>, userId: string) => Promise<unknown> },
+): CatalogTool {
+  return {
+    ...spec,
+    personal: true,
+    changesData: spec.changesData ?? false,
+    run: async (input, userId) => {
+      if (!userId) throw new SignInNeeded(`${spec.name} works only when you are signed in.`);
+      return spec.run(check(spec.input, input), userId);
+    },
+  };
+}

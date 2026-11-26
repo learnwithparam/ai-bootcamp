@@ -1,0 +1,44 @@
+name: check
+
+# Every pull request runs the gate: types, lint, structure, products, prose and the rules tests
+# against a real Postgres. Tests that call the real model run nightly in proof.yml.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.1-pg17
+        env:
+          POSTGRES_USER: bootcamp
+          POSTGRES_PASSWORD: bootcamp
+          POSTGRES_DB: bootcamp
+        ports: ["5433:5432"]
+        options: --health-cmd "pg_isready -U bootcamp" --health-interval 3s --health-retries 20
+    env:
+      DATABASE_URL: postgres://bootcamp:bootcamp@localhost:5433/bootcamp
+      MCP_SERVER_URL: http://localhost:3104
+    steps:
+      # Sign-in needs a secret. This database is thrown away after the run, so a new random one is enough.
+      - run: echo "BETTER_AUTH_SECRET=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+      - uses: actions/checkout@v6
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.4
+      - run: bun install --frozen-lockfile
+      - run: bun scripts/migrate.ts
+      # The rules tests read real seeded data: the Northwind orders, the live catalog, the registered CLI and the legal intake checkpoint tables.
+      # Only the parts of each seed with no model run here. The parts that call a model run in proof.yml.
+      - run: bun db/seed.ts
+        working-directory: 01-invoice-inbox
+      - run: bun db/seed.ts && bun auth/register-cli.ts
+        working-directory: 04-mcp-server-and-cli
+      - run: bun db/setup.ts
+        working-directory: 07-legal-intake
+      - run: bun run check

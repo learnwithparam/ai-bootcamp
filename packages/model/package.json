@@ -1,0 +1,16 @@
+{
+  "name": "@bootcamp/model",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./model.ts",
+    "./decide": "./decide.ts"
+  },
+  "dependencies": {
+    "@ai-sdk/anthropic": "4.0.108",
+    "@openrouter/ai-sdk-provider": "3.1.0",
+    "ai": "7.0.181",
+    "zod": "4.6.7"
+  }
+}

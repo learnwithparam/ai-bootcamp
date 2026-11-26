@@ -1,0 +1,272 @@
+/* Inside the messenger: the welcome, the messages, the cards the tools draw and the composer. */
+
+.messenger-viewport {
+  flex: 1;
+  min-height: 0;
+  padding: 16px;
+  overflow-y: auto;
+  background: var(--bg);
+}
+
+.messenger-welcome h2 {
+  margin: 8px 0 6px;
+  font-size: 22px;
+  line-height: 1.2;
+}
+
+.messenger-welcome p {
+  margin: 0 0 16px;
+  color: var(--fg2);
+}
+
+.reply-options {
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+}
+
+.reply-option {
+  max-width: 90%;
+  padding: 8px 12px;
+  border: 1px solid var(--fg);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--fg);
+  font: inherit;
+  font-size: 14px;
+  text-align: right;
+  cursor: pointer;
+}
+
+.reply-option:hover {
+  background: var(--accent);
+}
+
+.bubble-row {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+
+.bubble-row-user {
+  justify-items: end;
+}
+
+.bubble {
+  max-width: 88%;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.bubble-user {
+  border-bottom-right-radius: 4px;
+  background: var(--fg);
+  color: var(--surface);
+}
+
+.bubble-reply {
+  border: 1px solid var(--line);
+  border-bottom-left-radius: 4px;
+  background: var(--surface);
+}
+
+.bubble-reply .markdown > :first-child {
+  margin-top: 0;
+}
+
+.bubble-reply .markdown > :last-child {
+  margin-bottom: 0;
+}
+
+.bubble-author {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--fg2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.author-role {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.looking {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* The search runs before the answer is written, but the pages read belong under it, as in Fin. */
+.bubble-reply {
+  display: flex;
+  flex-direction: column;
+}
+
+.sources-fold {
+  order: 1;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.sources-fold summary {
+  color: var(--fg2);
+  cursor: pointer;
+}
+
+.source-chips {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.source-chip {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.source-chip:hover {
+  border-color: var(--fg);
+}
+
+.source-number {
+  grid-row: span 2;
+  display: grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: var(--r);
+  background: var(--hl);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.source-title,
+.source-path {
+  grid-column: -2;
+}
+
+.source-title {
+  font-weight: 600;
+}
+
+.source-path {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.handed-off {
+  display: grid;
+  gap: 2px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--info);
+  border-radius: var(--r);
+  background: var(--infobg);
+}
+
+.chat-error {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: var(--r);
+  background: var(--failbg);
+  color: var(--fail);
+}
+
+.messenger-composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.messenger-input {
+  flex: 1;
+  max-height: 140px;
+  padding: 8px 4px;
+  border: 0;
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  font-size: 15px;
+  resize: none;
+  outline: none;
+}
+
+.messenger-composer:focus-within {
+  box-shadow: inset 0 2px 0 var(--fg);
+}
+
+.send-button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+  cursor: pointer;
+}
+
+.send-button:disabled {
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: default;
+}
+
+.send-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.bubble-user p {
+  margin: 0;
+}
+
+/* A member's plan and the billing button, drawn by the tools inside the reply. */
+.member-card {
+  margin: 4px 0 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.member-card header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.member-action {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  margin: 0 0 10px;
+}
+
+.member-action span,
+.member-note {
+  color: var(--muted);
+  font-size: 13px;
+}

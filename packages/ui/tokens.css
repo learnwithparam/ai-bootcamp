@@ -1,0 +1,49 @@
+/* The one place a colour is written. These are the lwp-canvas light tokens.
+   scripts/check-structure.ts fails on a colour written anywhere else. */
+
+@font-face {
+  font-family: Inconsolata;
+  src: url(./fonts/Inconsolata-Regular.ttf);
+  font-weight: 400;
+}
+@font-face {
+  font-family: Inconsolata;
+  src: url(./fonts/Inconsolata-Bold.ttf);
+  font-weight: 700;
+}
+
+:root {
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --fg: #151515;
+  --fg2: #414141;
+  --muted: #606060;
+  --line: #dfdfdf;
+  --accent: #faff69;
+  --on-accent: #151515;
+  --pass: #00722f;
+  --fail: #bf000f;
+  --wait: #a04600;
+  --passbg: #dcebe3;
+  --failbg: #f3dcde;
+  --waitbg: #f2e6dc;
+  --hl: #f4f5c8;
+  --sans: Inter, system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono: Inconsolata, "Courier New", Courier, monospace;
+  --r: 4px;
+  --r-lg: 10px;
+  --surface-2: #f3f3f1;
+  --line-strong: #bdbdbd;
+  --info: #1f5fbf;
+  --infobg: #e3ecf8;
+  --shadow: 0 1px 2px rgba(21, 21, 21, 0.06), 0 8px 24px rgba(21, 21, 21, 0.08);
+  --shadow-sm: 0 1px 2px rgba(21, 21, 21, 0.08);
+  --scrim: rgba(21, 21, 21, 0.32);
+  --firm: #1e4d3f;
+  --firm-soft: #e6efe9;
+  --on-firm: #ffffff;
+  color-scheme: light;
+}
+
+/* Yellow is the agent's mark: anything the agent read, wrote or suggested is drawn on --hl,
+   so a person can always tell its work from their own. */

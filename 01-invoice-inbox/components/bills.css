@@ -1,0 +1,425 @@
+/* Larder Group's bills app. Colours come from packages/ui/tokens.css.
+   The one memorable thing is the bill itself, with the assistant's reading marked on it in yellow. */
+
+.bills-brand-mark {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spin {
+    animation: none;
+  }
+}
+
+.form-error {
+  color: var(--fail);
+  font-size: 14px;
+}
+
+.form-done {
+  color: var(--pass);
+  font-size: 14px;
+}
+
+/* The worklist */
+
+.upload {
+  display: grid;
+  gap: 4px;
+  justify-items: end;
+}
+
+.upload-drop {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-width: 250px;
+  padding: 10px 14px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.upload-drop svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+.upload-drop:hover,
+.upload-drop[data-over] {
+  border-color: var(--fg);
+  background: var(--surface-2);
+}
+
+.upload-drop:has(input:focus-visible) {
+  outline: 2px solid var(--fg);
+  outline-offset: 2px;
+}
+
+.upload-drop strong,
+.upload-drop .cell-sub {
+  display: block;
+}
+
+.upload-status {
+  min-height: 20px;
+  margin: 0;
+  text-align: right;
+}
+
+.bills-search {
+  position: relative;
+  max-width: 420px;
+  margin: 0 0 16px;
+}
+
+.bills-search svg {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.bills-search form {
+  position: relative;
+}
+
+.bills-search .field {
+  width: 100%;
+  padding-left: 36px;
+}
+
+.bulk-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  color: var(--fg2);
+  font-size: 14px;
+}
+
+.bulk-bar .button {
+  margin-left: auto;
+}
+
+.select-cell {
+  width: 40px;
+}
+
+.bill-note {
+  max-width: 46ch;
+  color: var(--wait);
+}
+
+.due-overdue {
+  color: var(--fail);
+  font-weight: 600;
+}
+
+/* One bill: the PDF on the left, the assistant's reading and the decision on the right */
+
+.bill-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.bill-document {
+  position: sticky;
+  top: 24px;
+}
+
+.bill-side {
+  display: grid;
+  gap: 16px;
+}
+
+.pdf-page {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  aspect-ratio: 612 / 792;
+}
+
+.pdf-page canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.pdf-failed {
+  position: absolute;
+  inset: 40% 24px auto;
+  text-align: center;
+}
+
+.pdf-mark {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: var(--hl);
+  mix-blend-mode: multiply;
+  cursor: pointer;
+}
+
+.pdf-mark[data-active] {
+  outline: 2px solid var(--fg);
+  outline-offset: 1px;
+  background: var(--accent);
+}
+
+.panel-head h2 {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0;
+  font-size: 16px;
+}
+
+.panel-head .cell-sub {
+  margin: 4px 0 0;
+}
+
+.panel-note {
+  margin: 0;
+  padding: 0 16px 16px;
+  color: var(--fg2);
+  font-size: 14px;
+}
+
+.read-fields {
+  display: grid;
+  gap: 6px;
+}
+
+.read-panel .panel-head {
+  display: grid;
+  gap: 4px;
+}
+
+.read-head {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.read-line {
+  display: grid;
+  grid-template-columns: 2fr 1fr 0.7fr 1fr;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+}
+
+.read-field {
+  display: grid;
+  gap: 2px;
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: var(--r);
+  background: var(--hl);
+  color: var(--fg);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.read-field:hover {
+  border-color: var(--line-strong);
+}
+
+.read-field[aria-pressed="true"] {
+  border-color: var(--fg);
+  background: var(--accent);
+}
+
+.read-field[data-missing] {
+  border-color: var(--fail);
+  background: var(--failbg);
+}
+
+.read-label {
+  color: var(--fg2);
+  font-size: 12px;
+}
+
+.read-value {
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.read-missing {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  color: var(--fail);
+  font-size: 12px;
+}
+
+.read-missing svg {
+  width: 13px;
+  height: 13px;
+}
+
+.problem-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 16px 16px 16px 34px;
+  color: var(--fg2);
+  font-size: 14px;
+}
+
+.problem-list li::marker {
+  color: var(--wait);
+}
+
+.match-panel {
+  overflow: hidden;
+}
+
+.match-wrap {
+  border: 0;
+  border-radius: 0;
+}
+
+.match-table td,
+.match-table th {
+  font-size: 14px;
+}
+
+.match-ok svg,
+.match-off svg {
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+}
+
+.match-ok {
+  color: var(--pass);
+}
+
+.match-off {
+  color: var(--fail);
+}
+
+.decide {
+  display: grid;
+  gap: 14px;
+}
+
+.decide legend {
+  margin-bottom: 8px;
+  color: var(--fg2);
+  font-size: 14px;
+}
+
+.decide fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.decide p {
+  margin: 0;
+}
+
+.suggestion {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border-radius: var(--r-lg);
+  background: var(--hl);
+}
+
+.suggestion .button {
+  justify-self: start;
+}
+
+.approve-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.send-back {
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.timeline li strong {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  margin-right: 6px;
+}
+
+.timeline li[data-agent] strong {
+  padding: 0 4px;
+  border-radius: 3px;
+  background: var(--hl);
+}
+
+.panel-head h2 svg {
+  width: 18px;
+  height: 18px;
+}
+
+.suggestion p svg {
+  width: 16px;
+  height: 16px;
+  vertical-align: -3px;
+}
+
+.timeline li strong svg {
+  width: 13px;
+  height: 13px;
+}
+
+@media (max-width: 900px) {
+  .bill-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .bill-document {
+    position: static;
+  }
+
+  .upload {
+    justify-items: stretch;
+  }
+
+  .read-line {
+    grid-template-columns: 1fr 1fr;
+  }
+}

@@ -1,43 +1,40 @@
 {
-  "name": "ai-engineering-demos",
-  "version": "1.0.0",
-  "description": "AI Engineering by Param Harrison - Production-ready API and frontend implementations",
+  "name": "ai-bootcamp",
+  "version": "2.0.0",
   "private": true,
-  "scripts": {
-    "dev": "docker compose up --build",
-    "build": "docker compose build",
-    "start": "docker compose up -d",
-    "stop": "docker compose down",
-    "clean": "docker compose down -v --remove-orphans && docker system prune -f",
-    "logs": "docker compose logs -f",
-    "ports": "docker compose ps"
-  },
-  "keywords": [
-    "ai",
-    "ai-engineering",
-    "demos",
-    "api",
-    "frontend",
-    "fastapi",
-    "nextjs",
-    "llm",
-    "rag"
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "gallery",
+    "01-invoice-inbox",
+    "02-site-assistant",
+    "04-mcp-server-and-cli",
+    "05-admin-assistant",
+    "06-research-agent",
+    "07-legal-intake",
+    "08-browser-agent",
+    "09-team-workspace",
+    "10-coding-agent"
   ],
-  "author": "Param Harrison",
-  "license": "PROPRIETARY",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/learnwithparam/ai-engineering-demos.git"
-  },
-  "bugs": {
-    "url": "https://github.com/learnwithparam/ai-engineering-demos/issues"
-  },
-  "homepage": "https://learnwithparam.com/ai-engineering",
-  "engines": {
-    "node": ">=18.0.0",
-    "python": ">=3.8.0"
+  "scripts": {
+    "setup": "bun scripts/setup.ts",
+    "dev": "bun scripts/dev.ts",
+    "seed": "bun scripts/seed.ts",
+    "proof": "bun scripts/proof.ts",
+    "check": "bun scripts/check.ts",
+    "cli": "bun 04-mcp-server-and-cli/cli/learnwithparam.ts",
+    "code": "bun 10-coding-agent/cli/code.ts"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "@biomejs/biome": "2.6.9",
+    "@types/bun": "1.4.5",
+    "@types/node": "26.6.10",
+    "@types/react": "19.3.2",
+    "@types/react-dom": "19.3.0",
+    "playwright": "1.63.0",
+    "typescript": "5.9.3"
+  },
+  "dependencies": {
+    "@bootcamp/products": "workspace:*"
   }
 }

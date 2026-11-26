@@ -1,0 +1,33 @@
+{
+  "name": "@bootcamp/legal-intake",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "bun db/setup.ts && bun db/seed.ts && bun agent/seed-requests.ts",
+    "seed": "bun db/seed.ts && bun agent/seed-requests.ts"
+  },
+  "dependencies": {
+    "@bootcamp/auth": "workspace:*",
+    "@bootcamp/db": "workspace:*",
+    "@bootcamp/model": "workspace:*",
+    "@bootcamp/products": "workspace:*",
+    "@bootcamp/tracing": "workspace:*",
+    "@bootcamp/ui": "workspace:*",
+    "@langchain/core": "1.5.1",
+    "@langchain/langgraph": "1.7.5",
+    "@langchain/langgraph-checkpoint-postgres": "1.1.4",
+    "ai": "7.0.181",
+    "better-auth": "1.7.23",
+    "drizzle-orm": "0.45.4",
+    "lucide-react": "1.80.0",
+    "next": "16.4.6",
+    "pg": "8.23.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "zod": "4.6.7"
+  },
+  "devDependencies": {
+    "drizzle-kit": "0.31.11"
+  }
+}

@@ -1,0 +1,140 @@
+/* The shared inbox: a list pane and a reading pane, like Front. Every colour comes from packages/ui/tokens.css. */
+.mail {
+  display: grid;
+  grid-template-columns: minmax(260px, 2fr) minmax(0, 3fr);
+  min-height: 560px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.mail-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-right: 1px solid var(--line);
+  overflow-y: auto;
+  max-height: 76vh;
+}
+
+.mail-row {
+  display: grid;
+  gap: 3px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  border-left: 3px solid transparent;
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.mail-row:hover {
+  background: var(--surface-2);
+}
+
+.mail-row[aria-current="true"] {
+  border-left-color: var(--fg);
+  background: var(--hl);
+}
+
+.mail-row-top,
+.mail-row-bottom {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.mail-from {
+  font-weight: 600;
+}
+
+.mail-time {
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.mail-subject {
+  font-size: 14px;
+}
+
+.mail-snippet {
+  min-width: 0;
+  color: var(--muted);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mail-open {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-width: 0;
+}
+
+.mail-open-head {
+  padding: 18px 24px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.mail-open-head h2 {
+  margin: 0 0 6px;
+  font-size: 20px;
+}
+
+.mail-open-head p {
+  margin: 0;
+  color: var(--fg2);
+  font-size: 14px;
+}
+
+.mail-body {
+  padding: 20px 24px;
+  max-width: 68ch;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.mail-next {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 24px;
+  border-top: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+.mail-next-hint {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.action {
+  display: grid;
+  gap: 6px;
+}
+
+@media (max-width: 860px) {
+  .mail {
+    grid-template-columns: 1fr;
+  }
+
+  .mail-list {
+    max-height: 320px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .mail-open-head,
+  .mail-body,
+  .mail-next {
+    padding-inline: 16px;
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@bootcamp/tracing",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./tracing.ts"
+  },
+  "dependencies": {
+    "@langfuse/otel": "6.1.1",
+    "@opentelemetry/api": "1.10.0",
+    "@opentelemetry/sdk-trace-node": "2.12.1",
+    "@bootcamp/model": "workspace:*"
+  }
+}

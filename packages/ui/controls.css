@@ -1,0 +1,240 @@
+/* Form controls. Every select, checkbox and radio in every product gets this look,
+   so none can fall back to the browser's own arrow touching the edge. */
+
+select,
+select.field {
+  appearance: none;
+  width: 100%;
+  padding: 8px 36px 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background-color: var(--surface);
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 55%,
+    calc(100% - 13px) 55%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  color: var(--fg);
+  font: inherit;
+  cursor: pointer;
+}
+
+select:focus {
+  border-color: var(--fg);
+  outline: none;
+}
+
+/* A text box with no class still gets the shared look. :where keeps it weak, so .field and
+   product rules such as the composer win. */
+:where(
+  input:not([type]),
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="url"],
+  input[type="number"],
+  input[type="date"],
+  input[type="tel"],
+  textarea
+) {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--fg);
+  font: inherit;
+}
+
+:where(
+  input:not([type]),
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="search"],
+  input[type="url"],
+  input[type="number"],
+  input[type="date"],
+  input[type="tel"],
+  textarea
+):focus-visible {
+  border-color: var(--fg);
+}
+
+:where(textarea) {
+  min-height: 96px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.field::placeholder,
+:where(input, textarea)::placeholder {
+  color: var(--muted);
+}
+
+input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px dashed var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--fg2);
+  font: inherit;
+}
+
+input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface-2);
+  color: var(--fg);
+  font: inherit;
+  cursor: pointer;
+}
+
+textarea.field {
+  min-height: 96px;
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.field:disabled,
+select:disabled {
+  background-color: var(--surface-2);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.field[aria-invalid="true"] {
+  border-color: var(--fail);
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--fg);
+}
+
+.form-row {
+  display: grid;
+  gap: 6px;
+}
+
+.form-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.form-grid .form-row-wide {
+  grid-column: 1 / -1;
+}
+
+.choice-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.choice:has(input:checked) {
+  border-color: var(--fg);
+  background: var(--surface-2);
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Doubled class: base.css sets .button after this file loads, so a single class would lose. */
+.button.button-quiet {
+  border-color: var(--line);
+}
+
+.button.button-danger {
+  border-color: var(--fail);
+  color: var(--fail);
+}
+
+/* What the agent filled in: the person sees it is the agent's, and can change it. */
+.agent-filled {
+  background: var(--hl);
+  border-color: var(--line-strong);
+}
+
+@media (max-width: 700px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.tool-source {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.tool-detail {
+  display: grid;
+  gap: 6px;
+}
+
+.tool-detail pre {
+  max-height: 240px;
+  margin: 0 0 8px;
+  padding: 10px;
+  border-radius: var(--r);
+  background: var(--surface-2);
+  font-family: var(--mono);
+  font-size: 13px;
+  white-space: pre-wrap;
+  overflow: auto;
+}
+
+/* Read by screen readers, not drawn. For a label the layout already makes clear. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* A form's button is as wide as its words, not as wide as the grid column it sits in. */
+.form-grid > .button {
+  justify-self: start;
+}

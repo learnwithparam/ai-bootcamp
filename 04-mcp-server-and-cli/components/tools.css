@@ -1,0 +1,426 @@
+/* The developer pages: a tool list beside the open tool, the apps table and the activity log. */
+
+.tool-tags svg,
+.result-error svg,
+.result-saved svg,
+.result-item .cell-sub svg,
+.ask-panel .panel-head svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+
+.tools-split {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 16px;
+}
+
+.tool-list {
+  display: grid;
+  gap: 4px;
+}
+
+.tool-list-item {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--r);
+  color: var(--fg);
+  text-decoration: none;
+}
+
+.tool-list-item:hover {
+  background: var(--surface-2);
+}
+
+.tool-list-item[aria-current="page"] {
+  border-color: var(--line);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.tool-list-item code {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+.tool-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+  color: var(--fg2);
+  font-size: 12px;
+}
+
+.tool-tags > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tool-detail-panel h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.tool-description {
+  max-width: 68ch;
+  margin: 4px 0 16px;
+  color: var(--fg2);
+}
+
+.tool-form {
+  display: grid;
+  gap: 14px;
+  max-width: 460px;
+}
+
+.tool-form > .button {
+  justify-self: start;
+}
+
+.form-hint-inline {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.tool-outcome,
+.call-it-from {
+  border-top: 1px solid var(--line);
+}
+
+.tool-outcome-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.tool-outcome-head h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.tool-outcome-head > :last-child {
+  margin-left: auto;
+}
+
+.snippet {
+  margin: 0;
+  padding: 12px;
+  max-height: 320px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface-2);
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.segmented {
+  display: inline-flex;
+  margin: 0;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface-2);
+}
+
+.segmented button {
+  padding: 4px 10px;
+  border: 0;
+  border-radius: calc(var(--r) - 2px);
+  background: transparent;
+  color: var(--fg2);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.segmented button[aria-pressed="true"] {
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  color: var(--fg);
+  font-weight: 600;
+}
+
+.call-it-from .form-hint {
+  margin-top: 8px;
+}
+
+.result-items {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.result-item {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+}
+
+.result-item a {
+  font-weight: 600;
+}
+
+.result-item p {
+  margin: 0;
+  color: var(--fg2);
+  font-size: 14px;
+}
+
+.result-item .cell-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.result-empty {
+  margin: 0;
+  color: var(--muted);
+}
+
+.result-error,
+.result-saved {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--r);
+}
+
+.result-error {
+  background: var(--failbg);
+  color: var(--fail);
+}
+
+.result-saved {
+  background: var(--passbg);
+  color: var(--pass);
+}
+
+.ask-form {
+  display: flex;
+  gap: 8px;
+  max-width: 640px;
+}
+
+.ask-form .field {
+  flex: 1;
+}
+
+.ask-panel .panel-body {
+  display: grid;
+  gap: 12px;
+}
+
+.ask-panel .panel-body > .button {
+  justify-self: start;
+}
+
+.ask-calls {
+  display: grid;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.ask-calls li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.ask-answer {
+  max-width: 72ch;
+}
+
+.scope-list {
+  margin: 0;
+  white-space: nowrap;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+
+.cell-actions {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.cell-number {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.activity-table td:first-child,
+.activity-table th[scope="row"],
+.activity-table td:nth-child(3) {
+  white-space: nowrap;
+}
+
+.cell-input {
+  max-width: 260px;
+  color: var(--fg2);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+/* A failure's reason wraps under its pill, so the table keeps its last column on screen. */
+.activity-table .cell-sub {
+  display: block;
+  max-width: 240px;
+  margin-top: 4px;
+  white-space: normal;
+}
+
+/* The question on its own line, the two answers side by side under it. */
+.revoke-confirm {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: end;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.revoke-confirm > span:first-child {
+  grid-column: 1 / -1;
+  text-align: right;
+  white-space: normal;
+}
+
+.connect-steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.connect-steps h3 {
+  margin: 0 0 4px;
+  font-size: 14px;
+}
+
+.connect-steps p {
+  margin: 0 0 8px;
+  color: var(--fg2);
+}
+
+.empty-state + .panel,
+.table-wrap + .panel {
+  margin-top: 20px;
+}
+
+.device-code {
+  font-family: var(--mono);
+  font-size: 1.5rem;
+  letter-spacing: 0.2em;
+}
+
+@media (max-width: 860px) {
+  .tools-split,
+  .connect-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .tool-list {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(180px, 1fr);
+    overflow-x: auto;
+  }
+
+  .ask-form {
+    flex-direction: column;
+  }
+}
+
+.revoke-confirm .result-error {
+  grid-column: 1 / -1;
+}
+
+/* On a phone each call is a small card: the tool and its outcome, then where and when, then the input. */
+@media (max-width: 640px) {
+  .activity-table thead {
+    display: none;
+  }
+
+  .activity-table,
+  .activity-table tbody {
+    display: block;
+  }
+
+  .activity-table tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 2px 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .table.activity-table tr > th,
+  .table.activity-table tr > td {
+    padding: 0;
+    border: 0;
+  }
+
+  .activity-table th[scope="row"] {
+    grid-area: 1 / 1;
+    font-weight: 600;
+  }
+
+  /* The outcome cell lets its pill and its reason sit in the card's grid on their own. */
+  .table.activity-table td:nth-child(5) {
+    display: contents;
+  }
+
+  .table.activity-table td:nth-child(5) .pill {
+    grid-area: 1 / 2;
+    justify-self: end;
+  }
+
+  .table.activity-table td:nth-child(5) .cell-sub {
+    grid-area: 5 / 1 / 6 / 3;
+    max-width: none;
+    color: var(--fail);
+  }
+
+  .table.activity-table td:first-child {
+    grid-area: 2 / 1;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .table.activity-table td:nth-child(3) {
+    grid-area: 3 / 1;
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  .table.activity-table td:nth-child(4) {
+    grid-area: 4 / 1 / 5 / 3;
+    max-width: none;
+  }
+
+  .table.activity-table td:nth-child(6) {
+    display: none;
+  }
+}

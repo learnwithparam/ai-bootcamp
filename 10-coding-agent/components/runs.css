@@ -1,0 +1,156 @@
+/* The runs list and the run page layout. Every colour comes from packages/ui/tokens.css. */
+
+.check-move {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.check-count {
+  color: var(--fg2);
+  font-variant-numeric: tabular-nums;
+}
+
+.check-count.check-fail {
+  color: var(--fail);
+  font-weight: 600;
+}
+
+.check-count.check-pass {
+  color: var(--pass);
+  font-weight: 600;
+}
+
+.run-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 24px;
+  align-items: start;
+}
+
+.run-main {
+  min-width: 0;
+}
+
+.run-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  margin-bottom: 20px;
+}
+
+.run-fact dt {
+  font-size: 12px;
+}
+
+.run-fact dd {
+  font-variant-numeric: tabular-nums;
+}
+
+.review-panel {
+  position: sticky;
+  top: 16px;
+}
+
+.review-panel h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.review-form {
+  display: grid;
+  gap: 14px;
+}
+
+.review-form .choice-group {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.review-note {
+  margin: 6px 0 0;
+  color: var(--fg2);
+  white-space: pre-wrap;
+}
+
+.terminal-steps {
+  display: grid;
+  gap: 16px;
+  max-width: 760px;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.terminal-step {
+  padding: 16px 20px;
+}
+
+.terminal-step h2 {
+  margin: 0 0 10px;
+  font-size: 16px;
+}
+
+.terminal-step p {
+  margin: 10px 0 0;
+  color: var(--fg2);
+}
+
+.terminal-command {
+  margin: 0;
+  padding: 12px 14px;
+  overflow-x: auto;
+  border-radius: var(--r);
+  background: var(--fg);
+  color: var(--surface);
+  font-family: var(--mono);
+  font-size: 15px;
+}
+
+@media (max-width: 1100px) {
+  .run-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .review-panel {
+    position: static;
+  }
+}
+
+/* On a phone each run becomes a card: the task on top, then each value with its column name. */
+@media (max-width: 640px) {
+  .runs-table thead {
+    display: none;
+  }
+
+  .runs-table tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .runs-table th[scope="row"] {
+    grid-column: 1 / -1;
+  }
+
+  .runs-table th,
+  .runs-table td,
+  .runs-table td.num {
+    padding: 0;
+    border: 0;
+    text-align: left;
+  }
+
+  .runs-table td::before {
+    content: attr(data-label);
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+  }
+}

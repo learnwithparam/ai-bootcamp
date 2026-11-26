@@ -1,0 +1,185 @@
+/* The account page, on the shared buildcamp theme. Every colour comes from packages/ui/tokens.css.
+   One loud thing only: the lead score. */
+
+.report {
+  display: grid;
+  gap: 28px;
+}
+
+.report-head {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
+.report-title {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.report-title .status {
+  margin-left: 0;
+}
+
+.report-head h1 {
+  margin: 0;
+}
+
+.report-head p {
+  margin: 0;
+  color: var(--fg2);
+}
+
+.report-owner {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.report-owner .owner-select {
+  width: auto;
+}
+
+.report-cost {
+  font-family: var(--mono);
+  font-size: 14px;
+}
+
+.score-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 24px;
+  align-items: start;
+  padding: 20px;
+  border: 1px solid var(--fg);
+  border-radius: var(--r);
+  background: var(--surface);
+}
+
+.score-total {
+  margin: 0;
+  color: var(--fg2);
+}
+
+.score-total strong {
+  display: block;
+  padding: 0 8px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--mono);
+  font-size: 56px;
+  line-height: 1.1;
+}
+
+.score-reasons {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.score-reasons li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.claim-refs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.score-points {
+  min-width: 64px;
+  font-family: var(--mono);
+  font-weight: 700;
+}
+
+.claim-ref,
+.claim-id {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.topic h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.claims {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.claim {
+  padding: 12px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+}
+
+.claim:target {
+  border-color: var(--fg);
+  background: var(--hl);
+}
+
+.claim-text {
+  margin: 0 0 8px;
+}
+
+.claim-quote {
+  margin: 0 0 8px;
+  padding-left: 12px;
+  border-left: 3px solid var(--line);
+  color: var(--fg2);
+  font-size: 14px;
+}
+
+.claim-meta {
+  display: flex;
+  gap: 12px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.dropped summary {
+  cursor: pointer;
+  color: var(--fg2);
+}
+
+.dropped .claims {
+  margin-top: 12px;
+}
+
+@media (max-width: 560px) {
+  .score-card {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .score-total strong {
+    display: inline-block;
+    font-size: 44px;
+  }
+
+  .score-reasons li {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 2px 8px;
+  }
+
+  .score-reasons .claim-refs {
+    grid-column: 2;
+  }
+}

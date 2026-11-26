@@ -1,0 +1,26 @@
+# Changes to the official Langfuse file for running next to the products on one laptop.
+
+# Langfuse reads DATABASE_URL from your settings file, which points at the products' Postgres.
+# Pin Langfuse to its own Postgres instead.
+x-langfuse-database: &langfuse-database
+  DATABASE_URL: postgresql://postgres:postgres@postgres:5432/postgres
+
+# The official file opens its database, cache and storage ports on your machine.
+# A learner who already runs Postgres on 5432 or Redis on 6379 would then fail on the first command.
+# Only the Langfuse web app needs a port on your machine. The rest talk over the Docker network.
+services:
+  langfuse-web:
+    environment: *langfuse-database
+  langfuse-worker:
+    ports: !reset []
+    environment: *langfuse-database
+  langfuse-ai-gateway:
+    ports: !reset []
+  clickhouse:
+    ports: !reset []
+  minio:
+    ports: !reset []
+  redis:
+    ports: !reset []
+  postgres:
+    ports: !reset []

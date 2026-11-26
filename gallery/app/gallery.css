@@ -1,0 +1,115 @@
+/* The gallery's own layout. Colours come from packages/ui/tokens.css. */
+
+.gallery {
+  width: min(1040px, 100% - 40px);
+  margin: 0 auto;
+  padding: 56px 0 80px;
+}
+
+.gallery-head {
+  max-width: 62ch;
+}
+
+.gallery-head h1 {
+  margin: 0 0 8px;
+  font-size: 36px;
+  line-height: 1.1;
+}
+
+.gallery-head p {
+  margin: 0;
+  color: var(--fg2);
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.gallery-list {
+  display: grid;
+  gap: 28px;
+  margin: 40px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gallery-item {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  border: 1px solid var(--fg);
+  border-radius: var(--r);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.gallery-shot {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-right: 1px solid var(--line);
+}
+
+.gallery-text {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  padding: 24px;
+}
+
+.gallery-text h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.gallery-step {
+  padding: 0 4px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--mono);
+}
+
+.gallery-text p {
+  margin: 0;
+  color: var(--fg2);
+  line-height: 1.5;
+}
+
+.gallery-ideas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.gallery-open {
+  justify-self: start;
+  text-decoration: none;
+}
+
+.gallery-start {
+  font-size: 14px;
+}
+
+.gallery-start code {
+  display: block;
+  margin-top: 6px;
+  padding: 8px 10px;
+  border-radius: var(--r);
+  background: var(--fg);
+  color: var(--bg);
+  font-family: var(--mono);
+  font-size: 15px;
+}
+
+.gallery-readme {
+  color: var(--fg2);
+  font-size: 14px;
+}
+
+@media (max-width: 800px) {
+  .gallery-item {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery-shot {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+}

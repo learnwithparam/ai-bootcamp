@@ -1,0 +1,193 @@
+/* Lists of work: a table with status chips, an empty state, and the small facts beside a record. */
+
+.table-wrap {
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table thead th {
+  position: sticky;
+  top: 0;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+}
+
+/* A row's own heading, such as the record's name, reads like a cell, not like a column heading. */
+.table td,
+.table tbody th {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--line);
+  font-weight: 400;
+  text-align: left;
+  vertical-align: top;
+}
+
+.table tr:last-child td,
+.table tr:last-child th {
+  border-bottom: 0;
+}
+
+.table tbody tr:hover {
+  background: var(--bg);
+}
+
+.table .num {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.table .row-link {
+  color: var(--fg);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.table .row-link:hover {
+  text-decoration: underline;
+}
+
+.cell-sub {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--fg2);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.pill svg {
+  width: 12px;
+  height: 12px;
+}
+
+.pill-pass {
+  background: var(--passbg);
+  color: var(--pass);
+}
+
+.pill-fail {
+  background: var(--failbg);
+  color: var(--fail);
+}
+
+.pill-wait {
+  background: var(--waitbg);
+  color: var(--wait);
+}
+
+.pill-info {
+  background: var(--infobg);
+  color: var(--info);
+}
+
+.pill-agent {
+  background: var(--hl);
+  color: var(--fg);
+}
+
+.empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 48px 16px;
+  color: var(--fg2);
+  text-align: center;
+}
+
+.empty-state svg {
+  width: 28px;
+  height: 28px;
+  color: var(--muted);
+}
+
+.empty-state strong {
+  color: var(--fg);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 8px 16px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.facts dt {
+  color: var(--muted);
+}
+
+.facts dd {
+  margin: 0;
+}
+
+.timeline {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.timeline li {
+  position: relative;
+  padding: 0 0 16px 22px;
+  font-size: 14px;
+}
+
+.timeline li::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line-strong);
+}
+
+.timeline li::after {
+  content: "";
+  position: absolute;
+  top: 18px;
+  bottom: 0;
+  left: 7px;
+  width: 2px;
+  background: var(--line);
+}
+
+.timeline li:last-child::after {
+  display: none;
+}
+
+.timeline time {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}

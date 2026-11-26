@@ -1,0 +1,233 @@
+/* The team's accounts table, shaped like Clay: a row per company, a column per research question.
+   The company column stays put while the questions scroll sideways. */
+
+.add-accounts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 12px;
+  align-items: end;
+  max-width: 720px;
+  margin-bottom: 20px;
+}
+
+.add-accounts label {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 2px;
+  font-weight: 600;
+}
+
+.add-accounts textarea {
+  min-height: 72px;
+  resize: vertical;
+}
+
+.add-accounts p {
+  grid-column: 1 / -1;
+  min-height: 1.4em;
+}
+
+.accounts-wrap {
+  max-height: calc(100vh - 260px);
+  overflow: auto;
+}
+
+.accounts {
+  min-width: 1080px;
+  table-layout: fixed;
+}
+
+.accounts th:nth-child(1) {
+  width: 190px;
+}
+
+.accounts th:nth-child(2) {
+  width: 176px;
+}
+
+.accounts th:last-child {
+  width: 104px;
+}
+
+.accounts .company-cell {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--surface);
+  border-right: 1px solid var(--line);
+  font-weight: 600;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.accounts thead .company-cell {
+  z-index: 2;
+}
+
+.accounts tbody tr:hover .company-cell {
+  background: var(--bg);
+}
+
+.cell-error {
+  color: var(--fail);
+}
+
+.cell-claim p {
+  display: -webkit-box;
+  margin: 0 0 6px;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+.cell-none {
+  color: var(--muted);
+}
+
+.cell-running {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--hl);
+  font-size: 13px;
+}
+
+.cell-running::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--fg);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell-running::before {
+    animation: none;
+  }
+}
+
+.sources-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--info);
+  font: inherit;
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.source-card {
+  width: min(520px, 100vw - 32px);
+  max-height: min(70vh, 640px);
+  padding: 20px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  color: var(--fg);
+  overflow: auto;
+}
+
+.source-card::backdrop {
+  background: var(--scrim);
+}
+
+.source-card h2 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.source-card ul {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.source-card p {
+  margin: 0 0 6px;
+}
+
+.source-card blockquote {
+  margin: 0 0 6px;
+  padding-left: 12px;
+  border-left: 3px solid var(--accent);
+  color: var(--fg2);
+  font-size: 14px;
+}
+
+.source-card a {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  font-size: 13px;
+}
+
+.source-card a svg {
+  width: 12px;
+  height: 12px;
+}
+
+.owner {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.avatar-sm {
+  width: 22px;
+  height: 22px;
+  font-size: 10px;
+}
+
+.owner-select {
+  width: 100%;
+}
+
+.score-cell {
+  display: inline-grid;
+  justify-items: end;
+  gap: 4px;
+}
+
+.score-cell strong {
+  padding: 0 6px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 720px) {
+  .add-accounts {
+    grid-template-columns: 1fr;
+  }
+
+  .accounts-wrap {
+    max-height: none;
+  }
+
+  .accounts .company-cell {
+    width: 140px;
+  }
+}
+
+.cell-sub {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+}

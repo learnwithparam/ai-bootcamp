@@ -1,0 +1,163 @@
+/* The messenger: a launcher in the corner and the panel it opens. Colours come from the shared tokens.
+   The site's own colours, near black and yellow, mark the assistant; a person on the team gets a plain mark. */
+
+.launcher {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--fg);
+  color: var(--accent);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+
+.launcher svg {
+  width: 26px;
+  height: 26px;
+}
+
+.messenger {
+  position: fixed;
+  right: 24px;
+  bottom: 92px;
+  z-index: 20;
+  display: flex;
+  width: 384px;
+  height: min(640px, calc(100vh - 120px));
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  animation: messenger-open 160ms ease-out;
+}
+
+@keyframes messenger-open {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .messenger {
+    animation: none;
+  }
+}
+
+.messenger-loading {
+  margin: auto;
+  color: var(--muted);
+}
+
+.messenger-thread {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+}
+
+.messenger-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 12px 14px 16px;
+  background: var(--fg);
+  color: var(--surface);
+}
+
+.messenger-owner {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.messenger-owner span {
+  color: var(--line-strong);
+  font-size: 12px;
+}
+
+.icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--r);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.icon-button:hover {
+  background: color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.icon-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.launcher:focus-visible,
+.icon-button:focus-visible,
+.reply-option:focus-visible,
+.send-button:focus-visible {
+  outline: 2px solid var(--info);
+  outline-offset: 2px;
+}
+
+.owner-mark {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.owner-mark svg {
+  width: 16px;
+  height: 16px;
+}
+
+.owner-mark.owner-person {
+  background: var(--infobg);
+  color: var(--info);
+}
+
+.owner-mark.small {
+  width: 22px;
+  height: 22px;
+  font-size: 10px;
+}
+
+.owner-mark.small svg {
+  width: 12px;
+  height: 12px;
+}
+
+@media (max-width: 520px) {
+  .messenger {
+    inset: 0;
+    width: auto;
+    height: auto;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .messenger:not([hidden]) ~ .launcher {
+    display: none;
+  }
+}

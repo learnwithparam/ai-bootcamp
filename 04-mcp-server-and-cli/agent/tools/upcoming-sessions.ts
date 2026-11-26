@@ -1,0 +1,12 @@
+import { upcoming } from "@bootcamp/catalog";
+import { z } from "zod";
+import { allItems } from "../../db/queries";
+import { publicTool } from "./tool";
+
+export const upcomingSessions = publicTool({
+  name: "upcoming_sessions",
+  title: "Upcoming live sessions",
+  description: "The live labs and workshops that have not happened yet, soonest first, with date and length.",
+  input: z.object({}),
+  run: async () => ({ sessions: upcoming(await allItems(), new Date().toISOString().slice(0, 10)) }),
+});

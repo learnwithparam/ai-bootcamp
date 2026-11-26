@@ -1,0 +1,37 @@
+import { stripe } from "@bootcamp/stripe";
+import type { Plan } from "../rules/price";
+
+export type { Plan };
+
+// Stripe is the record of who pays for what. The assistant reads it and never changes it:
+// a member changes their own plan in Stripe's billing portal.
+
+const CURRENT = new Set(["active", "trialing", "past_due"]);
+
+// The customer's current plan. Null when they have none.
+export async function findPlan(customerId: string): Promise<Plan | null> {
+  const subscriptions = await stripe().subscriptions.list({ customer: customerId, status: "all" });
+  const subscription = subscriptions.data.find((each) => CURRENT.has(each.status));
+  const item = subscription?.items.data[0];
+  if (!subscription || !item) return null;
+  // Stripe expands at most four levels deep, so the product is a second call.
+  const product = await stripe().products.retrieve(item.price.product as string);
+  return {
+    name: product.name,
+    status: subscription.status,
+    amountCents: item.price.unit_amount ?? 0,
+    currency: item.price.currency,
+    interval: item.price.recurring?.interval ?? "once",
+    renewsOn: new Date(item.current_period_end * 1000).toISOString().slice(0, 10),
+    endsAtRenewal: subscription.cancel_at_period_end,
+  };
+}
+
+// A one-time link into Stripe's billing portal, where the member changes their card, plan or cancels.
+export async function billingPortalLink(customerId: string, returnUrl: string): Promise<string> {
+  const session = await stripe().billingPortal.sessions.create({
+    customer: customerId,
+    return_url: returnUrl,
+  });
+  return session.url;
+}
