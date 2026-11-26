@@ -10,6 +10,7 @@ const steps: [string, () => Promise<unknown>][] = [
   ["Structure", () => $`bun scripts/check-structure.ts`],
   ["Products", () => $`bun scripts/check-products.ts`],
   ["Prose", () => $`bun scripts/check-prose.ts`],
+  ["Syllabus", () => $`bun scripts/check-syllabus.ts`],
   [
     "Tests",
     () => $`bun test --path-ignore-patterns '**/agent.test.ts' --path-ignore-patterns '**/e2e.test.ts'`,
