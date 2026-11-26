@@ -33,8 +33,10 @@ jobs:
           bun-version: 1.4.4
       - run: bun install --frozen-lockfile
       - run: bun scripts/migrate.ts
-      # The rules tests read real seeded data: the Northwind orders and the live catalog.
-      # The site assistant's seed calls the embedding model, so it runs nightly in proof.yml instead.
-      - run: bun run seed invoice-inbox
-      - run: bun run seed mcp-server-and-cli
+      # The rules tests read real seeded data: the Northwind orders, the live catalog and the registered CLI.
+      # Only the parts of each seed with no model run here. The parts that call a model run in proof.yml.
+      - run: bun db/seed.ts
+        working-directory: 01-invoice-inbox
+      - run: bun db/seed.ts && bun auth/register-cli.ts
+        working-directory: 04-mcp-server-and-cli
       - run: bun run check

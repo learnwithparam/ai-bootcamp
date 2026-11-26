@@ -20,8 +20,8 @@ const ALLOWED: Record<string, string[] | null> = {
 const SHELL_SIGNS = /[;&|<>$`\\\n]/;
 // Flags that would let an allowed program run or write something else.
 // find writes a file with -fprint, -fprint0, -fprintf and -fls. git accepts a long flag cut short,
-// so --ou, --out and --outp all mean --output, and every one of them is refused.
-const RISKY_FLAGS = /^(-exec|-execdir|-delete|-ok|-okdir|-fprint\w*|-fls|--ext-diff|-c)(=|$)|^--ou/;
+// so --ou means --output and --ext means --ext-diff, and every such prefix is refused.
+const RISKY_FLAGS = /^(-exec|-execdir|-delete|-ok|-okdir|-fprint\w*|-fls|-c)(=|$)|^--ou|^--ext/;
 
 // Splits a line into words. Quotes group words and are removed; anything shell-like outside quotes is refused.
 export function splitWords(line: string): string[] | null {
@@ -36,7 +36,7 @@ export function splitWords(line: string): string[] | null {
 // A path outside the repo, written as /etc, ~/ or ../, or into .git, is refused for every program.
 function leavesRepo(word: string): boolean {
   const path = word.includes("=") && word.startsWith("-") ? word.slice(word.indexOf("=") + 1) : word;
-  const parts = path.split("/");
+  const parts = path.toLowerCase().split("/");
   return path.startsWith("/") || path.startsWith("~") || parts.includes("..") || parts.includes(".git");
 }
 

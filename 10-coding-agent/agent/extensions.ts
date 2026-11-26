@@ -14,6 +14,7 @@ export function pathOf(input: Record<string, unknown>): string {
   return posix
     .normalize(String(input.path ?? "").replaceAll("\\", "/"))
     .replace(/^\.\//, "")
+    .replace(/\/+$/, "")
     .toLowerCase();
 }
 

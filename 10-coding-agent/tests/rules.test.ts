@@ -33,6 +33,8 @@ describe("commands the agent may run", () => {
     ["find . -fls out", "would let find"],
     ["git diff --out=src/index.ts", "would let git"],
     ["cat .git/config", "inside the repo"],
+    ["cat .GIT/config", "inside the repo"],
+    ["git diff --ext", "would let git"],
   ])("%s is refused", (line, words) => {
     const verdict = checkCommand(line);
     expect(verdict.ok).toBe(false);
@@ -48,7 +50,7 @@ describe("paths the agent may touch", () => {
       inRepo: "src/index.ts",
     });
   });
-  test.each(["../other/a.ts", "/etc/hosts", "src/../../x", ".git/config", ".git", " "])(
+  test.each(["../other/a.ts", "/etc/hosts", "src/../../x", ".git/config", ".git", ".GIT/config", " "])(
     "%s is refused",
     (path) => {
       expect(checkPath("/work/ms", path).ok).toBe(false);
@@ -145,6 +147,7 @@ describe("extensions", () => {
     ["./src/../src/index.test.ts", "Protect tests"],
     ["src\\index.spec.ts", "Protect tests"],
     ["./Package.JSON", "No new packages"],
+    ["src/index.test.ts/", "Protect tests"],
   ])("writing %s is refused by %s", (path, by) => {
     expect(refusal({ tool: "write", input: { path } })?.by).toBe(by);
   });

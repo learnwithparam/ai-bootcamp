@@ -12,7 +12,8 @@ export function checkPath(repo: string, path: string): PathVerdict {
   if (inRepo.startsWith("..") || isAbsolute(inRepo)) {
     return { ok: false, reason: `${path} is outside the repo. Use a path inside it, such as src/index.ts.` };
   }
-  if (inRepo === ".git" || inRepo.startsWith(".git/")) {
+  const top = inRepo.split("/")[0]?.toLowerCase();
+  if (top === ".git") {
     return { ok: false, reason: "The .git folder holds the repo's history. Leave it alone." };
   }
   return { ok: true, full, inRepo: inRepo || "." };
