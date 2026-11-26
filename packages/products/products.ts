@@ -18,7 +18,9 @@ export type Idea =
   | "ui the agent draws"
   | "memory"
   | "structured output"
-  | "terminal ui";
+  | "terminal ui"
+  | "shared state"
+  | "adaptive ui";
 
 export type Product = {
   folder: string;
@@ -109,6 +111,14 @@ export const PRODUCTS: Product[] = [
     port: 3110,
     ideas: ["harness", "loop", "verification", "boundary", "skills", "cli", "human in the loop"],
     agent: "../packages/coding-harness/agent/agent.ts",
+  },
+  {
+    folder: "11-personal-storefront",
+    slug: "personal-storefront",
+    title: "Personal storefront",
+    job: "Lay out a grocery shop for each shopper from what they say, and never show a product their allergies or diet rule out.",
+    port: 3111,
+    ideas: ["adaptive ui", "shared state", "ui the agent draws", "human in the loop", "boundary"],
   },
   {
     folder: "12-coding-agent-terminal",

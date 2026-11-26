@@ -1,0 +1,126 @@
+/* The basket card and page, and the Merchandising pages. Colours come only from tokens.css. */
+
+.basket-link {
+  margin-left: auto;
+  padding: 6px 12px;
+  border-radius: var(--r);
+  background: var(--firm);
+  color: var(--on-firm);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.basket-card {
+  padding: 16px;
+  background: var(--surface);
+  border: 2px solid var(--firm);
+  border-radius: var(--r-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.basket-card h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.basket-card-lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.basket-card-lines li {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.9rem;
+}
+
+.basket-card-lines img {
+  object-fit: contain;
+}
+
+.basket-total {
+  margin: 0;
+}
+
+.left-out {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.basket-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.basket-buttons .button:first-child {
+  background: var(--firm);
+  color: var(--on-firm);
+  border-color: var(--firm);
+}
+
+.basket-answer {
+  margin: 0;
+  color: var(--fg2);
+}
+
+.basket-page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.basket-lines {
+  margin: 16px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.basket-lines li {
+  display: grid;
+  grid-template-columns: 56px 1fr auto auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.basket-lines img {
+  object-fit: contain;
+}
+
+.types {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.types h2 {
+  width: 100%;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.beliefs {
+  color: var(--fg2);
+}
+
+.laid-out li,
+.taken-out li {
+  margin-bottom: 8px;
+}
+
+.laid-out p {
+  margin: 2px 0 0;
+  color: var(--fg2);
+  font-size: 0.9rem;
+}
