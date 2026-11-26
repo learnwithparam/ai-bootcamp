@@ -204,7 +204,7 @@ The release task never ends as passed, and never changes `package.json`.
 The reviewer replays a run, opens a change and asks for changes. The developer then reads the note with no review form.
 A signed-in account that is not on the team gets a 404.
 
-Last run (26 Nov 2026): weeks passed in 6 steps for $0.0017, months in 11 steps for $0.0037, and release ended with no change and 1 refused action for $0.0073. All 55 proof tests passed.
+Last run (26 Nov 2026): weeks passed in 5 steps for $0.0016, months in 12 steps for $0.0043, and release ended with no change and 1 refused action for $0.0072. All 63 proof tests passed.
 
 ## Learn the idea in depth
 

@@ -75,6 +75,9 @@ function checkImports(path: string, source: ts.SourceFile, product: string): Pro
     for (const rule of FORBIDDEN_IMPORTS[part] ?? []) {
       if (rule.test(resolved)) problems.push(`${path}: ${part}/ must not import "${target}".`);
     }
+    // AI SDK's test module holds the mock model. A product always calls the real one.
+    if (target === "ai/test")
+      problems.push(`${path}: imports "ai/test". Products call the real model, never a mock.`);
     const other = PRODUCTS.find((each) => each.folder !== product && target.includes(each.folder));
     if (other) problems.push(`${path}: imports ${other.folder}. Products never import each other.`);
   }

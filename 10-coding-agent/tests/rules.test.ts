@@ -29,6 +29,10 @@ describe("commands the agent may run", () => {
     ["cat ../secrets", "inside the repo"],
     ["cat /etc/passwd", "inside the repo"],
     ["grep --file=~/x a", "inside the repo"],
+    ["find . -fprint src/index.ts", "would let find"],
+    ["find . -fls out", "would let find"],
+    ["git diff --out=src/index.ts", "would let git"],
+    ["cat .git/config", "inside the repo"],
   ])("%s is refused", (line, words) => {
     const verdict = checkCommand(line);
     expect(verdict.ok).toBe(false);
@@ -137,6 +141,10 @@ describe("extensions", () => {
     ["src/__tests__/a.ts", "Protect tests"],
     ["package.json", "No new packages"],
     ["bun.lock", "No new packages"],
+    ["SRC/Index.TEST.ts", "Protect tests"],
+    ["./src/../src/index.test.ts", "Protect tests"],
+    ["src\\index.spec.ts", "Protect tests"],
+    ["./Package.JSON", "No new packages"],
   ])("writing %s is refused by %s", (path, by) => {
     expect(refusal({ tool: "write", input: { path } })?.by).toBe(by);
   });

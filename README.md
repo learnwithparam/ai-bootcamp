@@ -16,14 +16,16 @@ This repo is where you see those ideas working together in a product.
 |---|---|---|---|
 | 1 | [Invoice inbox](01-invoice-inbox/README.md) | Read supplier invoices and match each one to its purchase order. | structured output, verification, human in the loop |
 | 2 | [Site assistant](02-site-assistant/README.md) | Answer visitors from the site's own pages, show members their plan, and hand off to a person. | loop, context, decision model, boundary, verification, human in the loop |
-| 3 | [MCP server and CLI](04-mcp-server-and-cli/README.md) | Offer the school's catalog as one set of tools, used from chat, from Claude or Cursor, and from a terminal. | mcp, cli, boundary |
-| 4 | [Admin assistant](05-admin-assistant/README.md) | Answer the owner's questions about signups, make Stripe coupons after approval, and draft the newsletter. | skills, ui the agent draws, human in the loop, boundary |
-| 5 | [Research agent](06-research-agent/README.md) | Research a company on the live web, check every claim against its page, and score it as a lead. | graph, verification, structured output |
-| 6 | [Legal intake](07-legal-intake/README.md) | Take a client's request, check it for conflicts, and wait for a lawyer to decide, even across a restart. | graph, human in the loop, boundary, verification |
-| 7 | [Browser agent](08-browser-agent/README.md) | Turn client emails into requests on the firm's intake portal, and let a decision model say when to send. | browser automation, decision model, boundary, verification, human in the loop |
-| 8 | [Team workspace](09-team-workspace/README.md) | Give a team one chat with saved history, memory across chats, and the tools of the MCP servers it connects. | mcp, memory, context, boundary, human in the loop |
-| 9 | [Coding agent](10-coding-agent/README.md) | Fix a bug in a real repo from the terminal, with a check that must pass before it stops, then let a teammate review the run. | harness, loop, verification, boundary, skills, cli, human in the loop |
+| 4 | [MCP server and CLI](04-mcp-server-and-cli/README.md) | Offer the school's catalog as one set of tools, used from chat, from Claude or Cursor, and from a terminal. | mcp, cli, boundary |
+| 5 | [Admin assistant](05-admin-assistant/README.md) | Answer the owner's questions about signups, make Stripe coupons after approval, and draft the newsletter. | skills, ui the agent draws, human in the loop, boundary |
+| 6 | [Research agent](06-research-agent/README.md) | Research a company on the live web, check every claim against its page, and score it as a lead. | graph, verification, structured output |
+| 7 | [Legal intake](07-legal-intake/README.md) | Take a client's request, check it for conflicts, and wait for a lawyer to decide, even across a restart. | graph, human in the loop, boundary, verification |
+| 8 | [Browser agent](08-browser-agent/README.md) | Turn client emails into requests on the firm's intake portal, and let a decision model say when to send. | browser automation, decision model, boundary, verification, human in the loop |
+| 9 | [Team workspace](09-team-workspace/README.md) | Give a team one chat with saved history, memory across chats, and the tools of the MCP servers it connects. | mcp, memory, context, boundary, human in the loop |
+| 10 | [Coding agent](10-coding-agent/README.md) | Fix a bug in a real repo from the terminal, with a check that must pass before it stops, then let a teammate review the run. | harness, loop, verification, boundary, skills, cli, human in the loop |
 <!-- products:end -->
+
+Product 3, a voice assistant for the site assistant, is not built yet, so the numbers skip from 2 to 4.
 
 ## How each product folder is laid out
 

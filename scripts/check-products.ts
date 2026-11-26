@@ -9,6 +9,7 @@ import { PRODUCTS, type Product } from "@bootcamp/products";
 export const SECTIONS = [
   "Why",
   "Goal",
+  "Who uses it",
   "Before you start",
   "Run it",
   "What you will see",
@@ -93,8 +94,8 @@ const TABLE_END = "<!-- products:end -->";
 
 export function productTable(): string {
   const rows = PRODUCTS.map(
-    (product, index) =>
-      `| ${index + 1} | [${product.title}](${product.folder}/README.md) | ${product.job} | ${product.ideas.join(", ")} |`,
+    (product) =>
+      `| ${Number(product.folder.slice(0, 2))} | [${product.title}](${product.folder}/README.md) | ${product.job} | ${product.ideas.join(", ")} |`,
   );
   return [
     TABLE_START,

@@ -1,3 +1,4 @@
+import { posix } from "node:path";
 import { noNewPackages } from "../extensions/no-new-packages";
 import { protectTests } from "../extensions/protect-tests";
 import { spendCap } from "../extensions/spend-cap";
@@ -6,6 +7,15 @@ import { spendCap } from "../extensions/spend-cap";
 // beforeTool can refuse one tool call. afterStep can end the run.
 // Each one returns a reason in plain words, or null to say nothing. The reason is what the model reads,
 // and what the review page shows next to the refused call.
+
+// The path a write or edit names, spelled the one way the extensions compare: normalized, forward slashes,
+// lower case. The disk may ignore case, so SRC/Index.TEST.ts must count as a test file too.
+export function pathOf(input: Record<string, unknown>): string {
+  return posix
+    .normalize(String(input.path ?? "").replaceAll("\\", "/"))
+    .replace(/^\.\//, "")
+    .toLowerCase();
+}
 
 export type ToolCall = { tool: string; input: Record<string, unknown> };
 export type RunSoFar = { step: number; cost: number };
