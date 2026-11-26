@@ -8,9 +8,9 @@ import { type History, move, NEW_HISTORY, remember } from "../rules/history";
 
 export type Key = { name: string; sequence: string; ctrl: boolean; meta: boolean };
 
-type Line = { text: string; cursor: number; history: History };
+export type Line = { text: string; cursor: number; history: History };
 
-export type Editor = { text: string; cursor: number; handle: (key: Key) => string | null };
+export type Editor = { text: string; cursor: number; handle: (key: Key, secret?: boolean) => string | null };
 
 const printable = (key: Key) =>
   !key.ctrl && !key.meta && key.sequence.length > 0 && [...key.sequence].every((char) => char >= " ");
@@ -33,14 +33,20 @@ export function edit(line: Line, key: Key): Line {
   return line;
 }
 
+// The line after Enter: empty, with the sent text kept for Up. A secret line, the password for /login,
+// is sent but never kept, so Up can never bring it back.
+export function send(line: Line, secret: boolean): Line {
+  return { text: "", cursor: 0, history: secret ? line.history : remember(line.history, line.text) };
+}
+
 export function useEditor(): Editor {
   const line = useRef<Line>({ text: "", cursor: 0, history: NEW_HISTORY });
   const [, redraw] = useReducer((count: number) => count + 1, 0);
   // Returns the line when Enter sends it, and null for every other key.
-  const handle = (key: Key): string | null => {
+  const handle = (key: Key, secret = false): string | null => {
     const before = line.current;
     if (key.name === "return") {
-      line.current = { text: "", cursor: 0, history: remember(before.history, before.text) };
+      line.current = send(before, secret);
       redraw();
       return before.text;
     }

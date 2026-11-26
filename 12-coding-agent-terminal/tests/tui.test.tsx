@@ -5,7 +5,9 @@ import { CHECK_COMMAND } from "@bootcamp/coding-harness/rules/tasks";
 import { testRender } from "@opentui/react/test-utils";
 import { act } from "react";
 import { Terminal } from "../agent/agent";
+import { NEW_HISTORY } from "../rules/history";
 import { App } from "../tui/App";
+import { edit, type Line, send } from "../tui/editor";
 import { checkScreen } from "./screen";
 
 // The real screens in OpenTUI's test renderer, with no model: the permission prompt is opened by calling
@@ -144,4 +146,13 @@ test("the transcript shows events in words, and Ctrl+O shows a tool's output", a
   expect(quiet).toContain("4k tokens");
   await step(() => view.mockInput.pressKey("o", { ctrl: true }));
   expect(await frame()).toContain("README.md");
+});
+
+test("the /login password is sent but never kept, so Up cannot bring it back", () => {
+  const typed = (text: string, history = NEW_HISTORY): Line => ({ text, cursor: text.length, history });
+  const afterEmail = send(typed("maya@example.com"), false);
+  const afterPassword = send(typed("hunter2-secret", afterEmail.history), true);
+  const up = edit(afterPassword, { name: "up", sequence: "", ctrl: false, meta: false });
+  expect(up.text).toBe("maya@example.com");
+  expect(JSON.stringify(afterPassword.history)).not.toContain("hunter2-secret");
 });

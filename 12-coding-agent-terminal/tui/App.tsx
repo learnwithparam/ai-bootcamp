@@ -48,7 +48,7 @@ function useKeys({ terminal, start, quit }: AppProps, screen: ReturnType<Termina
     if (key.name === "escape") return terminal.stop();
     if (key.ctrl && key.name === "o") return terminal.set({ showDetail: !screen.showDetail });
     if (screen.asking) return answerKey(key);
-    const line = editor.handle(key);
+    const line = editor.handle(key, screen.prompt?.hidden ?? false);
     if (line !== null) void submit(terminal, line, start, quit);
   });
   return { editor, selected };
