@@ -23,6 +23,7 @@ This repo is where you see those ideas working together in a product.
 | 8 | [Browser agent](08-browser-agent/README.md) | Turn client emails into requests on the firm's intake portal, and let a decision model say when to send. | browser automation, decision model, boundary, verification, human in the loop |
 | 9 | [Team workspace](09-team-workspace/README.md) | Give a team one chat with saved history, memory across chats, and the tools of the MCP servers it connects. | mcp, memory, context, boundary, human in the loop |
 | 10 | [Coding agent](10-coding-agent/README.md) | Fix a bug in a real repo from the terminal, with a check that must pass before it stops, then let a teammate review the run. | harness, loop, verification, boundary, skills, cli, human in the loop |
+| 12 | [Coding agent terminal](12-coding-agent-terminal/README.md) | Work with the coding agent in a terminal app: watch it think, read each change before it lands, say yes or no, and stop it with Esc. | terminal ui, human in the loop, harness, loop |
 <!-- products:end -->
 
 Product 3, a voice assistant for the site assistant, is not built yet, so the numbers skip from 2 to 4.

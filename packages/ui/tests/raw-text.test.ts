@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
-import { rawTextProblem } from "../check-page";
 import { toolLabel } from "../parts";
+import { rawTextProblem } from "../raw-text";
 
 test("raw markdown and raw tool ids are caught", () => {
   expect(rawTextProblem("## Upcoming live labs")).toContain("raw markdown");

@@ -6,7 +6,7 @@ import {
   type OAuthClientProvider,
   type OAuthTokens,
 } from "@ai-sdk/mcp";
-import { findProduct } from "@bootcamp/products";
+import { portOf } from "@bootcamp/products";
 import { type ConnectorSecrets, connectionOf, connectorSecrets, saveConnection } from "../db/connectors";
 import { connectorInState, stateFor } from "../rules/connectors";
 
@@ -14,8 +14,7 @@ import { connectorInState, stateFor } from "../rules/connectors";
 // Every value the flow needs (tokens, the PKCE verifier, the state) is saved sealed, per person and connector,
 // so the flow survives the trip through the browser and a server restart.
 
-export const APP_URL =
-  process.env.TEAM_WORKSPACE_URL ?? `http://localhost:${findProduct("team-workspace").port}`;
+export const APP_URL = process.env.TEAM_WORKSPACE_URL ?? `http://localhost:${portOf("team-workspace")}`;
 export const CALLBACK = `${APP_URL}/api/connectors/callback`;
 const SCOPES = "openid profile email offline_access";
 

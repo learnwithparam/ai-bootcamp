@@ -7,7 +7,8 @@
     "./base.css": "./base.css",
     "./parts": "./parts.tsx",
     "./check-page": "./check-page.ts",
-    "./markdown": "./markdown.tsx"
+    "./markdown": "./markdown.tsx",
+    "./raw-text": "./raw-text.ts"
   },
   "peerDependencies": {
     "react": "19.3.1"

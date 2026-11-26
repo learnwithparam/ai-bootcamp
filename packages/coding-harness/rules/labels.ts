@@ -8,6 +8,7 @@ export function toolLabel(tool: string, input: Record<string, unknown>): string 
   if (tool === "write") return `Wrote ${field(input, "path")}`;
   if (tool === "edit") return `Edited ${field(input, "path")}`;
   if (tool === "bash") return `Ran ${field(input, "command")}`;
+  if (tool === "skill") return `Read the ${field(input, "name")} skill`;
   if (tool === "done") return "Said it was done";
   return "Used a tool";
 }

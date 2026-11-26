@@ -63,10 +63,13 @@ function checkReadme(product: Product): string[] {
 }
 
 // The browser test runs checkPage on the screens it reaches, so raw markdown, a raw tool id
-// or an accessibility problem on a page fails proof.
+// or an accessibility problem on a page fails proof. A terminal product has no page: its test runs
+// checkScreen on each screen of the real app in a pseudo-terminal instead.
 function checkE2e(product: Product): string[] {
   const path = join(product.folder, "tests/e2e.test.ts");
-  if (!existsSync(path) || readFileSync(path, "utf8").includes("await checkPage(")) return [];
+  const call = product.command ? "checkScreen(" : "await checkPage(";
+  if (!existsSync(path) || readFileSync(path, "utf8").includes(call)) return [];
+  if (product.command) return [`${path}: call checkScreen(screen) on each screen the terminal reaches.`];
   return [`${path}: call checkPage(page) from @bootcamp/ui/check-page on each screen it reaches.`];
 }
 

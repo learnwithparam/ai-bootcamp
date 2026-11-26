@@ -29,7 +29,7 @@ const DEPRECATED =
 export type Problem = string;
 
 // What may sit at the top of a product folder: the shared shape, then the few parts one product adds
-// (auth and cli in 04, sample-invoices in 01, extensions in 10). A stray script here is a leftover, not a lesson.
+// (auth and cli in 04, sample-invoices in 01, extensions in 10, tui in 12). A stray script here is a leftover, not a lesson.
 const TOP_LEVEL = new Set([
   ...["README.md", "package.json", "tsconfig.json", "next.config.ts", "next-env.d.ts", "drizzle.config.ts"],
   ...[
@@ -43,7 +43,7 @@ const TOP_LEVEL = new Set([
     "screenshots",
     "node_modules",
   ],
-  ...["auth", "cli", "sample-invoices", "extensions"],
+  ...["auth", "cli", "sample-invoices", "extensions", "tui"],
 ]);
 
 function checkTopLevel(folder: string): Problem[] {

@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, expect, test } from "bun:test";
 import { type ChildProcess, spawn } from "node:child_process";
-import { findProduct } from "@bootcamp/products";
+import { portOf } from "@bootcamp/products";
 import { checkPage } from "@bootcamp/ui/check-page";
 import { eq } from "drizzle-orm";
 import { type Browser, chromium, type Page } from "playwright";
@@ -15,7 +15,7 @@ import { makeAccount, PASSWORD, removeAccounts } from "./accounts";
 // a stranger sees nothing, staff can draft but not approve, and the owner approves on the Discounts page
 // and keeps or undoes the assistant's edit to a newsletter.
 
-const URL = `http://localhost:${findProduct("admin-assistant").port}`;
+const URL = `http://localhost:${portOf("admin-assistant")}`;
 let server: ChildProcess | undefined;
 let browser: Browser;
 const accounts: { id: string; email: string }[] = [];

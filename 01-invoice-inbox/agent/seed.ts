@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { auth } from "@bootcamp/auth";
 import { pool } from "@bootcamp/db";
-import { findProduct } from "@bootcamp/products";
+import { portOf } from "@bootcamp/products";
 import { sql } from "drizzle-orm";
 import { addBill, moveBills } from "../db/bills";
 import { db, setRole } from "../db/queries";
@@ -28,7 +28,7 @@ const PEOPLE = [
 async function freshPeople() {
   await db.delete(bills);
   await db.execute(sql`delete from "user" where email like ${`%@${SEED_DOMAIN}`}`);
-  const headers = new Headers({ host: `localhost:${findProduct("invoice-inbox").port}` });
+  const headers = new Headers({ host: `localhost:${portOf("invoice-inbox")}` });
   const made = [];
   for (const person of PEOPLE) {
     const { user } = await auth.api.signUpEmail({

@@ -1,10 +1,10 @@
 import { type ChildProcess, spawn } from "node:child_process";
-import { findProduct } from "@bootcamp/products";
+import { portOf } from "@bootcamp/products";
 import type { Page } from "playwright";
 
 // What the browser test needs to reach the product: a running server, an account, and the messenger.
 
-export const URL = `http://localhost:${findProduct("site-assistant").port}`;
+export const URL = `http://localhost:${portOf("site-assistant")}`;
 let server: ChildProcess | undefined;
 
 async function isUp(): Promise<boolean> {

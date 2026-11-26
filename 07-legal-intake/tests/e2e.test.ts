@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, expect, test } from "bun:test";
 import { type ChildProcess, spawn } from "node:child_process";
-import { findProduct } from "@bootcamp/products";
+import { portOf } from "@bootcamp/products";
 import { checkPage } from "@bootcamp/ui/check-page";
 import { type Browser, chromium, type Page } from "playwright";
 import { checkpoints } from "../db/checkpoints";
@@ -11,7 +11,7 @@ import { makeAccount, PASSWORD, removeAccounts } from "./accounts";
 // A lawyer decides and approves the letter, a paralegal sees the same matter but cannot decide,
 // and the client reads the letter on their private link. A signed-in account that is not staff gets a 404.
 
-const URL = `http://localhost:${findProduct("legal-intake").port}`;
+const URL = `http://localhost:${portOf("legal-intake")}`;
 const EMAIL = `client-${crypto.randomUUID()}@example.com`;
 // A plain name the model will copy as written, and one no other request on the board has, so the test can click it.
 const FIRST = ["Lena", "Priya", "Owen", "Nadia", "Felix", "Ruth"];

@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, expect, test } from "bun:test";
 import { type ChildProcess, spawn } from "node:child_process";
 import { join } from "node:path";
-import { findProduct } from "@bootcamp/products";
+import { portOf } from "@bootcamp/products";
 import { checkPage } from "@bootcamp/ui/check-page";
 import { and, desc, eq, gt, inArray } from "drizzle-orm";
 import { type Browser, chromium, type Page } from "playwright";
@@ -14,7 +14,7 @@ import { SAMPLE_FOLDER } from "../db/seed";
 // as a duplicate. The clerk accepts the suggestion on one and decides the other; the approver signs it
 // off and records it paid. The model reads both PDFs, so this runs in `bun run proof`, not in `bun run check`.
 
-const URL = `http://localhost:${findProduct("invoice-inbox").port}`;
+const URL = `http://localhost:${portOf("invoice-inbox")}`;
 const FILE = "invoice_10251.pdf";
 const started = new Date();
 let server: ChildProcess | undefined;

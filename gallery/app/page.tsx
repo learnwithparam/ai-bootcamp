@@ -8,7 +8,9 @@ export const dynamic = "force-dynamic";
 const REPO = "https://github.com/learnwithparam/ai-bootcamp/tree/main";
 
 export default async function Gallery() {
-  const running = await Promise.all(PRODUCTS.map((product) => isRunning(product.port)));
+  const running = await Promise.all(
+    PRODUCTS.map((product) => (product.port ? isRunning(product.port) : false)),
+  );
   return (
     <main className="gallery">
       <header className="gallery-head">
@@ -34,7 +36,6 @@ export default async function Gallery() {
 
 function ProductCard({ product, step, running }: { product: Product; step: number; running: boolean }) {
   const screenshot = firstScreenshot(product);
-  const url = `http://localhost:${product.port}`;
   return (
     <li className="gallery-item">
       {screenshot ? (
@@ -60,7 +61,7 @@ function ProductCard({ product, step, running }: { product: Product; step: numbe
             </span>
           ))}
         </div>
-        <Start running={running} url={url} slug={product.slug} />
+        <Start running={running} product={product} />
         <a className="gallery-readme" href={`${REPO}/${product.folder}`} target="_blank" rel="noreferrer">
           Read the learner page
         </a>
@@ -69,7 +70,16 @@ function ProductCard({ product, step, running }: { product: Product; step: numbe
   );
 }
 
-function Start({ running, url, slug }: { running: boolean; url: string; slug: string }) {
+function Start({ running, product }: { running: boolean; product: Product }) {
+  if (product.command) {
+    return (
+      <p className="gallery-start">
+        Runs in your terminal. Start it from the repo root:
+        <code>{product.command}</code>
+      </p>
+    );
+  }
+  const url = `http://localhost:${product.port}`;
   if (running) {
     return (
       <a className="button button-primary gallery-open" href={url}>
@@ -80,7 +90,7 @@ function Start({ running, url, slug }: { running: boolean; url: string; slug: st
   return (
     <p className="gallery-start">
       Not running. Start it from the repo root:
-      <code>bun run dev {slug}</code>
+      <code>bun run dev {product.slug}</code>
     </p>
   );
 }

@@ -2,7 +2,7 @@ import { mkdir, rm } from "node:fs/promises";
 import { homedir } from "node:os";
 import { basename, join } from "node:path";
 import { repoName } from "../rules/labels";
-import { PRACTICE_REPO, type PracticeTask } from "./tasks";
+import { PRACTICE_REPO, type PracticeTask } from "../rules/tasks";
 import { runProgram } from "./tools/run";
 
 // Where the CLI keeps its files: one copy of the practice repo, a fresh folder per run, and the session files.

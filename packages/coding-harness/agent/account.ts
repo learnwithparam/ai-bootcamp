@@ -1,6 +1,6 @@
 import { chmod, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { HOME } from "@bootcamp/coding-harness/agent/workspace";
+import { HOME } from "./workspace";
 
 // The CLI signs in to the review site the way the browser does, and keeps the session cookie in a file
 // only you can read (mode 0600). Your password is sent once and never saved.

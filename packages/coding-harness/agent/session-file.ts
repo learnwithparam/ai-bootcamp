@@ -1,8 +1,8 @@
 import { appendFileSync, mkdirSync } from "node:fs";
 import { readdir, readFile, stat } from "node:fs/promises";
 import { join } from "node:path";
-import { SESSIONS } from "@bootcamp/coding-harness/agent/workspace";
-import type { SessionEvent } from "@bootcamp/coding-harness/rules/session";
+import type { SessionEvent } from "../rules/session";
+import { SESSIONS } from "./workspace";
 
 // One session file per run, written a line at a time as the run goes.
 // If the run crashes halfway, every step up to the crash is still on disk.
@@ -17,7 +17,10 @@ export function newSessionFile(): { id: string; path: string; write: (event: Ses
 
 export async function latestSession(): Promise<string> {
   const names = (await readdir(SESSIONS).catch(() => [])).filter((name) => name.endsWith(".jsonl"));
-  if (names.length === 0) throw new Error("No runs yet. Start one with: bun run code run <task>");
+  if (names.length === 0)
+    throw new Error(
+      "No runs yet. Start one with /practice months in the terminal app, or bun run code practice months.",
+    );
   const dated = await Promise.all(
     names.map(async (name) => ({ name, at: (await stat(join(SESSIONS, name))).mtimeMs })),
   );

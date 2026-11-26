@@ -1,5 +1,5 @@
 import { auth } from "@bootcamp/auth";
-import { findProduct } from "@bootcamp/products";
+import { portOf } from "@bootcamp/products";
 import { sql } from "drizzle-orm";
 import { addToTeam, db } from "./queries";
 
@@ -31,7 +31,7 @@ export function signupsOn(daysAgo: number): number {
   return Math.max(0, (weekend ? 0 : 1) + ((daysAgo * 7) % 3 === 0 ? 1 : 0) + launch + dip);
 }
 
-const headers = () => new Headers({ host: `localhost:${findProduct("admin-assistant").port}` });
+const headers = () => new Headers({ host: `localhost:${portOf("admin-assistant")}` });
 
 async function signUp(name: string, email: string, createdAt: Date): Promise<string> {
   const made = await auth.api.signUpEmail({

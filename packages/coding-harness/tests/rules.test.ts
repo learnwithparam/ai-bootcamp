@@ -3,6 +3,7 @@ import { reasonToStop, refusal } from "../agent/extensions";
 import { readTestOutput } from "../rules/check";
 import { checkCommand } from "../rules/commands";
 import { checkPath } from "../rules/paths";
+import { permissionFor } from "../rules/permission";
 
 // The harness rules with no model: what the agent may run and touch, reading the check, and the extensions.
 // Products 10 and 12 both run on these, so a change here is tested once for both.
@@ -84,5 +85,29 @@ describe("extensions", () => {
   test("the spend cap ends a run over 50 cents", () => {
     expect(reasonToStop({ step: 3, cost: 0.2 })).toBeNull();
     expect(reasonToStop({ step: 9, cost: 0.51 })).toContain("over the $0.50 cap");
+  });
+});
+
+describe("what waits for a person", () => {
+  test("reading never waits", () => {
+    expect(permissionFor("read", { path: "src/index.ts" })).toBeNull();
+    expect(permissionFor("bash", { command: "grep -n months src/index.ts" })).toBeNull();
+    expect(permissionFor("bash", { command: "git diff" })).toBeNull();
+  });
+  test("an edit asks, and Always covers every edit", () => {
+    expect(permissionFor("edit", { path: "src/index.ts" })).toEqual({
+      key: "edits",
+      question: "Edit src/index.ts?",
+    });
+    expect(permissionFor("write", { path: "a.ts" })?.key).toBe("edits");
+  });
+  test("running tests asks, and Always covers that program and subcommand", () => {
+    expect(permissionFor("bash", { command: "bun test src" })).toEqual({
+      key: "bun test",
+      question: "Run bun test src?",
+    });
+  });
+  test("a command the rules refuse is never offered to a person", () => {
+    expect(permissionFor("bash", { command: "rm -rf /" })).toBeNull();
   });
 });

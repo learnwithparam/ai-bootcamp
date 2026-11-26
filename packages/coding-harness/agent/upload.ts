@@ -1,4 +1,4 @@
-import { readSession } from "@bootcamp/coding-harness/rules/session";
+import { readSession } from "../rules/session";
 import { readAccount } from "./account";
 import { latestSession, readText } from "./session-file";
 
@@ -7,7 +7,8 @@ import { latestSession, readText } from "./session-file";
 
 export async function upload(path?: string): Promise<string> {
   const account = await readAccount();
-  if (!account) throw new Error("Sign in first with: bun run code login");
+  if (!account)
+    throw new Error("Sign in to the review site first: /login in the terminal app, or bun run code login.");
   const file = path ?? (await latestSession());
   const text = await readText(file);
   readSession(text);
@@ -19,7 +20,8 @@ export async function upload(path?: string): Promise<string> {
     throw new Error(`Could not reach ${account.site}. Start the review site with: bun run dev coding-agent`);
   });
   const answer = (await response.json().catch(() => ({}))) as { id?: string; error?: string };
-  if (response.status === 401) throw new Error("Your sign-in has ended. Run: bun run code login");
+  if (response.status === 401)
+    throw new Error("Your sign-in has ended. Sign in again: /login, or bun run code login.");
   if (!response.ok || !answer.id)
     throw new Error(answer.error ?? `Upload failed with status ${response.status}.`);
   return `${account.site}/runs/${answer.id}`;

@@ -5,7 +5,8 @@ import { $ } from "bun";
 // bun run seed invoice-inbox   loads one product's sample data again
 
 const slug = process.argv[2];
-const products = slug ? [findProduct(slug)] : PRODUCTS;
+// A terminal product keeps no sample data, so there is nothing to seed.
+const products = (slug ? [findProduct(slug)] : PRODUCTS).filter((product) => !product.command);
 
 for (const product of products) {
   console.log(`== Seeding ${product.title}`);

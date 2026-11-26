@@ -1,5 +1,5 @@
 import { auth } from "@bootcamp/auth";
-import { findProduct } from "@bootcamp/products";
+import { portOf } from "@bootcamp/products";
 import { sql } from "drizzle-orm";
 import type { Role } from "../rules/team";
 import { INBOX } from "./inbox";
@@ -23,7 +23,7 @@ async function freshPeople(): Promise<Map<string, string>> {
   const seeded = sql`(select id from "user" where email like ${`%@${SEED_DOMAIN}`})`;
   await db.execute(sql`delete from ${operators} where user_id in ${seeded}`);
   await db.execute(sql`delete from "user" where email like ${`%@${SEED_DOMAIN}`}`);
-  const headers = new Headers({ host: `localhost:${findProduct("browser-agent").port}` });
+  const headers = new Headers({ host: `localhost:${portOf("browser-agent")}` });
   const ids = new Map<string, string>();
   for (const person of PEOPLE) {
     const body = { name: person.name, email: `${person.key}@${SEED_DOMAIN}`, password: SEED_PASSWORD };

@@ -1,9 +1,9 @@
 import { spawn } from "node:child_process";
 import { pool } from "@bootcamp/db";
-import { findProduct } from "@bootcamp/products";
+import { portOf } from "@bootcamp/products";
 import { CALLBACK, startConnect } from "../agent/oauth";
 
-export const MCP_SERVER = `http://localhost:${findProduct("mcp-server-and-cli").port}`;
+export const MCP_SERVER = `http://localhost:${portOf("mcp-server-and-cli")}`;
 
 async function isUp(url: string): Promise<boolean> {
   const response = await fetch(url, { signal: AbortSignal.timeout(2_000) }).catch(() => undefined);

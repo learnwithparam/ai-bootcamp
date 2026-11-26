@@ -180,13 +180,13 @@ The agent itself lives in `packages/coding-harness`, because the terminal app in
 3. `../packages/coding-harness/agent/tools/all.ts`, `../packages/coding-harness/agent/tools/files.ts` and `../packages/coding-harness/agent/tools/run.ts` - the six tools and what each one does.
 4. `../packages/coding-harness/rules/commands.ts` and `../packages/coding-harness/rules/paths.ts` - what the agent may run and touch.
 5. `../packages/coding-harness/agent/extensions.ts` and `../packages/coding-harness/extensions/protect-tests.ts` - how a rule refuses a call before it runs.
-6. `../packages/coding-harness/agent/call.ts` - one tool call: refused, run, then written down.
+6. `../packages/coding-harness/agent/call.ts` - one tool call: refused, run, then written down. With no one at the keyboard, nothing waits for a yes.
 7. `../packages/coding-harness/agent/check.ts` and `../packages/coding-harness/rules/check.ts` - running the tests and reading their output.
 8. `../packages/coding-harness/rules/session.ts` - the session file, its summary, and `settle`.
-9. `cli/code.ts` and `cli/upload.ts` - the terminal commands and the upload.
+9. `cli/code.ts` and `../packages/coding-harness/agent/upload.ts` - the terminal commands and the upload.
 10. `rules/replay.ts` and `components/Replay.tsx` - the session file as a replay.
 11. `rules/review.ts` and `app/actions.ts` - who may review, checked again on the server.
-12. `../packages/coding-harness/agent/tasks.ts` and `agent/seed.ts` - the practice tasks from `vercel/ms`, then real runs through the real paths.
+12. `../packages/coding-harness/rules/tasks.ts` and `agent/seed.ts` - the practice tasks from `vercel/ms`, then real runs through the real paths.
 
 ## Prove it
 

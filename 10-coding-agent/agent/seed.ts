@@ -1,7 +1,7 @@
 import { runAgent } from "@bootcamp/coding-harness/agent/agent";
-import { CHECK_COMMAND, findTask } from "@bootcamp/coding-harness/agent/tasks";
 import { prepare } from "@bootcamp/coding-harness/agent/workspace";
 import type { SessionEvent } from "@bootcamp/coding-harness/rules/session";
+import { CHECK_COMMAND, findTask } from "@bootcamp/coding-harness/rules/tasks";
 import { startTracing } from "@bootcamp/tracing";
 import { addReview } from "../db/people";
 import { saveRun } from "../db/queries";

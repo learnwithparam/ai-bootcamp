@@ -1,5 +1,5 @@
 import { auth } from "@bootcamp/auth";
-import { findProduct } from "@bootcamp/products";
+import { portOf } from "@bootcamp/products";
 import { sql } from "drizzle-orm";
 import { addMember } from "../db/people";
 import { db } from "../db/queries";
@@ -11,7 +11,7 @@ export const PASSWORD = "a long test password";
 export async function makeAccount(name: string, role: Role | null): Promise<{ id: string; email: string }> {
   const email = `coding-test-${crypto.randomUUID()}@example.com`;
   // The shared sign-in works out its own address from the host, as it does for a page request.
-  const headers = new Headers({ host: `localhost:${findProduct("coding-agent").port}` });
+  const headers = new Headers({ host: `localhost:${portOf("coding-agent")}` });
   const made = await auth.api.signUpEmail({ body: { name, email, password: PASSWORD }, headers });
   if (role) await addMember(made.user.id, role);
   return { id: made.user.id, email };
