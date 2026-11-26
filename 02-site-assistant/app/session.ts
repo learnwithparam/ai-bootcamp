@@ -14,10 +14,10 @@ export async function canSeeSupport(userId: string | undefined): Promise<boolean
   return userId ? isOnSupportTeam(userId) : false;
 }
 
-// The support queue and its action call this first. Anyone else gets a plain not-found page.
+// The inbox and its actions call this first. Signing in brings the teammate back to the inbox. Anyone else gets a plain not-found page.
 export async function requireSupport() {
   const user = await maybeUser();
-  if (!user) redirect("/sign-in");
+  if (!user) redirect("/sign-in?next=/inbox");
   if (!(await canSeeSupport(user.id))) notFound();
   return user;
 }

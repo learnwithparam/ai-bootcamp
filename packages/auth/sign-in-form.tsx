@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { type FormEvent, useState } from "react";
 import { authClient } from "./client";
 
 type Client = Pick<typeof authClient, "signIn" | "signUp">;
@@ -13,23 +13,29 @@ export function SignInForm({ client = authClient, next = "/" }: { client?: Clien
   const router = useRouter();
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
 
-  async function submit(form: FormData) {
-    const failed = await sendToAuth(client, form, creating);
+  // onSubmit, not a form action: React empties a form after its action runs, and a wrong password
+  // should not wipe the email the person typed.
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setBusy(true);
+    const failed = await sendToAuth(client, new FormData(event.currentTarget), creating);
+    setBusy(false);
     if (failed) return setError(failed);
     if (next) router.push(next);
   }
 
   return (
-    <form action={submit} className="sign-in-form">
+    <form onSubmit={submit} className="sign-in-form">
       <Fields creating={creating} />
       {error ? (
         <p className="form-error" role="alert">
           {error}
         </p>
       ) : null}
-      <button type="submit" className="button button-primary">
-        {creating ? "Create account" : "Sign in"}
+      <button type="submit" className="button button-primary" disabled={busy}>
+        {busy ? "One moment..." : creating ? "Create account" : "Sign in"}
       </button>
       <button type="button" className="link-button" onClick={() => setCreating(!creating)}>
         {creating ? "I have an account" : "Create an account"}

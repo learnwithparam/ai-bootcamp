@@ -1,17 +1,10 @@
 import { stripe } from "@bootcamp/stripe";
+import type { Plan } from "../rules/price";
+
+export type { Plan };
 
 // Stripe is the record of who pays for what. The assistant reads it and never changes it:
 // a member changes their own plan in Stripe's billing portal.
-
-export type Plan = {
-  name: string;
-  status: string;
-  amountCents: number;
-  currency: string;
-  interval: string;
-  renewsOn: string;
-  endsAtRenewal: boolean;
-};
 
 const CURRENT = new Set(["active", "trialing", "past_due"]);
 

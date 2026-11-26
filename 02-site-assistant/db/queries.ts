@@ -1,10 +1,10 @@
 import { connect } from "@bootcamp/db";
-import { and, asc, cosineDistance, count, eq, gte, isNull, sql, sum } from "drizzle-orm";
+import { and, cosineDistance, count, eq, gte, sql, sum } from "drizzle-orm";
 import type { Source } from "../rules/citations";
 import type { Usage } from "../rules/limits";
-import type { Page } from "../rules/sections";
+import type { CatalogEntry, Page } from "../rules/sections";
 import * as schema from "./schema";
-import { members, pages, sections, supportTeam, tickets, turns } from "./schema";
+import { members, pages, sections, supportTeam, turns } from "./schema";
 
 export const db = connect(schema);
 
@@ -60,27 +60,6 @@ export async function recordTurn(turn: typeof turns.$inferInsert) {
   await db.insert(turns).values(turn);
 }
 
-export async function openTicket(ticket: typeof tickets.$inferInsert): Promise<number> {
-  const [row] = await db.insert(tickets).values(ticket).returning({ id: tickets.id });
-  if (!row) throw new Error("The ticket was not saved.");
-  return row.id;
-}
-
-// Open tickets, oldest first: the visitor who has waited longest is answered first.
-export async function openTickets() {
-  return db.select().from(tickets).where(isNull(tickets.answeredAt)).orderBy(asc(tickets.openedAt));
-}
-
-// Marks a ticket answered only if nobody else has, so two people never answer the same visitor.
-export async function markAnswered(id: number, answeredBy: string): Promise<boolean> {
-  const changed = await db
-    .update(tickets)
-    .set({ answeredBy, answeredAt: sql`now()` })
-    .where(and(eq(tickets.id, id), isNull(tickets.answeredAt)))
-    .returning({ id: tickets.id });
-  return changed.length === 1;
-}
-
 export type Account = { id: string; name: string; email: string; createdAt: Date };
 
 // Looks up an account in the shared better-auth table. Only the scripts call this, never the chat.
@@ -107,4 +86,14 @@ export async function isOnSupportTeam(userId: string): Promise<boolean> {
 
 export async function addToSupportTeam(userId: string) {
   await db.insert(supportTeam).values({ userId }).onConflictDoNothing();
+}
+
+// The pages under one path, each with its first section and its first full paragraph, for the page the messenger sits on.
+export async function catalog(prefix: string): Promise<CatalogEntry[]> {
+  const found = await db.execute<CatalogEntry>(sql`
+    select p.url, p.title,
+      coalesce((select s.body from ${sections} s where s.url = p.url order by s.id limit 1), '') as intro,
+      coalesce((select s.body from ${sections} s where s.url = p.url and length(s.body) > 140 order by s.id limit 1), '') as blurb
+    from ${pages} p where p.url like ${`${prefix}%`} order by p.title`);
+  return found.rows;
 }

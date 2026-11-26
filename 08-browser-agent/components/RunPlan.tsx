@@ -1,7 +1,7 @@
+import { ListChecks } from "lucide-react";
 import { ACTIVE, PLAN, type Run } from "../rules/run";
 import { StatusChip } from "./StatusChip";
-
-const CHOICE = { submit: "send it", stop: "do not send it", ask_human: "ask a person" };
+import { when } from "./when";
 
 function stageState(run: Run, stage: number): "done" | "now" | "todo" {
   const last = run.steps.at(-1)?.stage ?? -1;
@@ -9,18 +9,21 @@ function stageState(run: Run, stage: number): "done" | "now" | "todo" {
   return run.steps.some((step) => step.stage === stage) ? "done" : "todo";
 }
 
-// The plan, ticked off as the log fills in, then the decision and why code acted on it.
+// The activity panel: the plan, ticked off as the agent logs each step, with what it did in words.
 export function RunPlan({ run }: { run: Run }) {
   return (
-    <div className="plan">
-      <div className="plan-head">
-        <StatusChip status={run.status} />
-        <span className="plan-cost">
-          ${run.cost.toFixed(4)}
-          {ACTIVE.includes(run.status) ? " so far" : ""}
+    <section className="panel" aria-labelledby="activity">
+      <h2 className="panel-head" id="activity">
+        <ListChecks aria-hidden="true" /> Activity
+        <span className="plan-head">
+          <StatusChip status={run.status} />
+          <span className="plan-cost">
+            ${run.cost.toFixed(4)}
+            {ACTIVE.includes(run.status) ? " so far" : ""}
+          </span>
         </span>
-      </div>
-      <ol className="plan-steps">
+      </h2>
+      <ol className="plan-steps panel-body">
         {PLAN.map((name, stage) => (
           <li key={name} className={`plan-step plan-${stageState(run, stage)}`}>
             <span className="plan-name">{name}</span>
@@ -28,22 +31,12 @@ export function RunPlan({ run }: { run: Run }) {
               .filter((step) => step.stage === stage)
               .map((step) => (
                 <span key={step.at} className="plan-log">
-                  {step.text}
+                  <time dateTime={step.at}>{when(step.at).split(", ")[1]}</time> {step.text}
                 </span>
               ))}
           </li>
         ))}
       </ol>
-      {run.verdict ? (
-        <p className={`verdict verdict-${run.verdict.choice}`}>
-          The decision model said {CHOICE[run.verdict.choice]}, {Math.round(run.verdict.confidence * 100)}%
-          sure.
-        </p>
-      ) : null}
-      {run.reason ? <p className="reason">{run.reason}</p> : null}
-      {run.decidedBy && !ACTIVE.includes(run.status) ? (
-        <p className="reason">Decided by {run.decidedBy}.</p>
-      ) : null}
-    </div>
+    </section>
   );
 }

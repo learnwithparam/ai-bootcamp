@@ -15,6 +15,13 @@
       "when": 1795617399371,
       "tag": "0001_runs-updated-at",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795644166756,
+      "tag": "0002_add-roles",
+      "breakpoints": true
     }
   ]
 }

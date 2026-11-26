@@ -13,7 +13,7 @@
   font-size: 14px;
 }
 
-.table th {
+.table thead th {
   position: sticky;
   top: 0;
   padding: 10px 14px;
@@ -26,13 +26,18 @@
   white-space: nowrap;
 }
 
-.table td {
+/* A row's own heading, such as the record's name, reads like a cell, not like a column heading. */
+.table td,
+.table tbody th {
   padding: 12px 14px;
   border-bottom: 1px solid var(--line);
+  font-weight: 400;
+  text-align: left;
   vertical-align: top;
 }
 
-.table tr:last-child td {
+.table tr:last-child td,
+.table tr:last-child th {
   border-bottom: 0;
 }
 

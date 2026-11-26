@@ -1,13 +1,7 @@
-import { INBOX } from "./inbox";
-import { db } from "./queries";
-import { emails } from "./schema";
+import { freshDesk } from "./desk";
 
-// bun run seed browser-agent
-// Loads the sample inbox in db/inbox.ts. Running it again replaces the emails, and removes every run made on them.
-
-await db.transaction(async (tx) => {
-  await tx.delete(emails);
-  await tx.insert(emails).values(INBOX);
-});
-console.log(`Inbox: ${INBOX.length} emails`);
+// bun run setup browser-agent
+// The intake desk and its inbox, with no runs and no model. bun run seed browser-agent adds real runs on top.
+const desk = await freshDesk();
+console.log(`Intake desk: ${desk.people.size} people, ${desk.emails.size} emails`);
 process.exit(0);

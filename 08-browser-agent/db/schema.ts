@@ -1,6 +1,7 @@
 import { doublePrecision, index, jsonb, pgSchema, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import type { Email, Form } from "../rules/email";
 import type { Placed, Run, Status, Step, Verdict } from "../rules/run";
+import type { Role } from "../rules/team";
 
 // All of this product's tables live in the browser_agent schema.
 export const agent = pgSchema("browser_agent");
@@ -48,9 +49,10 @@ export const runs = agent.table(
   (table) => [index("runs_email").on(table.emailId, table.createdAt), index("runs_status").on(table.status)],
 );
 
-// The accounts that may run the agent. Added by db/operator.ts, never by a page.
+// The intake desk: the accounts that may run the agent, and their role. Added by db/operator.ts or the seed, never a page.
 export const operators = agent.table("operators", {
   userId: text("user_id").primaryKey(),
+  role: text("role").$type<Role>().notNull().default("assistant"),
   addedAt: timestamp("added_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

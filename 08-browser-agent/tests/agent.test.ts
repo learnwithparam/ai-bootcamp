@@ -4,7 +4,7 @@ import { runEmail, sendApproved } from "../agent/agent";
 import { openPortal } from "../agent/browser";
 import { PORTAL } from "../agent/portal";
 import { INBOX } from "../db/inbox";
-import { addEmail, claim, removeEmails, runById, startRun } from "../db/queries";
+import { addEmail, moveRun, removeEmails, runById, startRun } from "../db/queries";
 import { sentPage, whyNotStart } from "../rules/run";
 import { ensureRunning, removePortalRequests } from "./portal";
 
@@ -57,9 +57,10 @@ test("a clear request reaches the portal with the client's own reply address", a
   expect(ruth.verdict?.choice).toBe("submit");
   if (ruth.status === "waiting") {
     // The model was not sure enough. A person approves, and plain code replays the same fields.
-    expect(await claim(ruth.id, "waiting", "submitting")).toBe(true);
+    expect(await moveRun(ruth.id, ["waiting"], "submitting")).toBe(true);
     await sendApproved(ruth.id);
     ruth = { ...ruth, ...(await runById(ruth.id)) };
+    console.log(`Ruth after approval: ${ruth.status} (${ruth.reason ?? ""})`);
   }
   expect(ruth.status).toBe("submitted");
   expect(sentPage(ruth.requestUrl ?? "", PORTAL)).toBe(true);

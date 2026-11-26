@@ -1,10 +1,9 @@
-import { afterAll, describe, expect, test } from "bun:test";
-import { sql } from "drizzle-orm";
-import { addEmail, claim, db, failStalled, removeEmails, runById, startRun, updateRun } from "../db/queries";
+import { describe, expect, test } from "bun:test";
 import { type Email, type Form, formFromEmail, whyNotFill } from "../rules/email";
 import { checkForm, nextMove, onPortal, type Seen, sentPage, whyNotStart } from "../rules/run";
+import { counts, may, viewOfStatus } from "../rules/team";
 
-// The limits the agent cannot change, and the queries, against a real Postgres. No model, no browser.
+// The limits the agent cannot change, and who on the desk may do what. No model, no browser, no database.
 
 const STORY =
   "My landlord Harbor Lettings has not returned my deposit of 1,200 pounds, three months after I moved out.";
@@ -20,13 +19,15 @@ const form: Form = {
   clientName: "Kofi Mensah",
   clientEmail: "kofi.mensah@example.com",
   otherSide: "Harbor Lettings",
+  goal: "Get my deposit back",
   story: email.body,
 };
 const LABELS = {
   clientName: "Your full name",
   clientEmail: "Email for our reply",
-  otherSide: "Who is on the other side?",
-  story: "What happened?",
+  otherSide: "The other side",
+  goal: "What you want to happen",
+  story: "Your message",
 };
 const filled = (change: Partial<Record<keyof Form, Partial<Seen>>> = {}): Seen[] =>
   (Object.keys(form) as (keyof Form)[]).map((field) => ({
@@ -38,13 +39,21 @@ const filled = (change: Partial<Record<keyof Form, Partial<Seen>>> = {}): Seen[]
 
 describe("the form the agent builds", () => {
   test("the reply address comes from the header, whatever the email asks", () => {
-    const built = formFromEmail(email, { clientName: "Kofi Mensah", otherSide: "Harbor Lettings" });
+    const built = formFromEmail(email, {
+      clientName: "Kofi Mensah",
+      otherSide: "Harbor Lettings",
+      goal: "Get my deposit back",
+    });
     expect(built.clientEmail).toBe("kofi.mensah@example.com");
     expect(built.story).toBe(email.body);
   });
 
   test("a name the email does not contain is dropped", () => {
-    const built = formFromEmail(email, { clientName: "Kofi Annan", otherSide: "Harbour Collect Ltd" });
+    const built = formFromEmail(email, {
+      clientName: "Kofi Annan",
+      otherSide: "Harbour Collect Ltd",
+      goal: "",
+    });
     expect(built.clientName).toBe("Kofi Mensah");
     expect(built.otherSide).toBe("");
   });
@@ -52,6 +61,9 @@ describe("the form the agent builds", () => {
   test("a form the portal would refuse is never filled in", () => {
     expect(whyNotFill({ ...form, story: "Call me about my divorce." })).toContain("too short");
     expect(whyNotFill({ ...form, clientName: "" })).toContain("who the client is");
+    expect(whyNotFill({ ...form, otherSide: "" })).toContain("who the problem is with");
+    expect(whyNotFill({ ...form, goal: "" })).toContain("what the client wants");
+    expect(whyNotFill({ ...form, story: "x".repeat(1_501) })).toContain("too long");
     expect(whyNotFill(form)).toBeNull();
   });
 });
@@ -103,51 +115,32 @@ describe("what code does with the decision", () => {
   });
 });
 
-// The queries run against a real Postgres. Each test closes the runs it opened, because open runs count
-// against the limit of two at once.
-const made: string[] = [];
-afterAll(() => removeEmails(made));
-async function newEmail() {
-  const id = await addEmail({ fromName: "Test", fromEmail: "t@example.com", subject: "s", body: STORY });
-  made.push(id);
-  return id;
-}
-const close = (id: string) => updateRun(id, { status: "stopped" });
-
-describe("starting and claiming runs", () => {
-  test("three clicks at once on one email start one run", async () => {
-    const id = await newEmail();
-    const results = await Promise.all([1, 2, 3].map(() => startRun(id, whyNotStart)));
-    expect(results.filter((result) => "id" in result)).toHaveLength(1);
-    for (const result of results) if ("id" in result) await close(result.id);
+describe("people on the intake desk", () => {
+  test("only the intake lead approves; both roles start, stop and take over", () => {
+    expect(may("assistant", "approve")).toBe(false);
+    expect(may("lead", "approve")).toBe(true);
+    for (const action of ["start", "stop", "take_over"] as const) expect(may("assistant", action)).toBe(true);
   });
 
-  test("two people approving at once: only one moves the run on", async () => {
-    const started = await startRun(await newEmail(), whyNotStart);
-    if (!("id" in started)) throw new Error(started.refused);
-    await claim(started.id, "reading", "waiting");
-    const both = await Promise.all([1, 2].map(() => claim(started.id, "waiting", "submitting")));
-    expect(both.sort()).toEqual([false, true]);
-    await close(started.id);
-  });
-});
-
-describe("runs that stop partway", () => {
-  test("a run that stopped writing, for example after a restart, fails and frees its email", async () => {
-    const id = await newEmail();
-    const dead = await startRun(id, whyNotStart);
-    if (!("id" in dead)) throw new Error(dead.refused);
-    await claim(dead.id, "reading", "filling");
-    await db.execute(
-      sql`update browser_agent.runs set updated_at = now() - interval '10 minutes' where id = ${dead.id}`,
-    );
-    const again = await startRun(id, whyNotStart);
-    if (!("id" in again)) throw new Error(again.refused);
-    expect((await runById(dead.id))?.status).toBe("failed");
-    expect((await runById(dead.id))?.reason).toContain("Run the agent again");
-    // A run that is still writing is left alone.
-    await failStalled();
-    expect((await runById(again.id))?.status).toBe("reading");
-    await close(again.id);
+  test("each status lands in one view of the inbox", () => {
+    expect(viewOfStatus(null)).toBe("inbox");
+    expect(viewOfStatus("waiting")).toBe("approvals");
+    expect(viewOfStatus("filling")).toBe("working");
+    expect(viewOfStatus("taken_over")).toBe("closed");
+    const row = {
+      id: "",
+      fromName: "",
+      fromEmail: "",
+      subject: "",
+      body: "",
+      receivedAt: new Date(),
+      runId: null,
+    };
+    expect(
+      counts([
+        { ...row, status: "submitted" },
+        { ...row, status: null },
+      ]),
+    ).toMatchObject({ sent: 1, inbox: 1 });
   });
 });

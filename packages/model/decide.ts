@@ -15,23 +15,35 @@ export type Decision<Choice extends string> = { choice: Choice; confidence: numb
 type Answer = { type: string; choice: string; confidence: number };
 
 const DECISIONS_URL = "https://openrouter.ai/api/alpha/decisions";
+// A gateway that is briefly down answers 502, 503 or 504. That one case is tried once more, a moment later.
+const BRIEFLY_DOWN = new Set([502, 503, 504]);
 
-export async function decide<Choice extends string>(
-  state: string,
-  question: Question<Choice>,
-): Promise<Decision<Choice>> {
-  const response = await fetch(DECISIONS_URL, {
+function ask(body: string): Promise<Response> {
+  return fetch(DECISIONS_URL, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${required("OPENROUTER_API_KEY")}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      model: required("DECISION_MODEL"),
-      state,
-      questions: { decision: { type: "choice", ...question } },
-    }),
+    body,
+    signal: AbortSignal.timeout(30_000),
   });
+}
+
+export async function decide<Choice extends string>(
+  state: string,
+  question: Question<Choice>,
+): Promise<Decision<Choice>> {
+  const body = JSON.stringify({
+    model: required("DECISION_MODEL"),
+    state,
+    questions: { decision: { type: "choice", ...question } },
+  });
+  let response = await ask(body);
+  if (BRIEFLY_DOWN.has(response.status)) {
+    await Bun.sleep(1_500);
+    response = await ask(body);
+  }
   if (!response.ok) {
     throw new Error(`Decision request failed (${response.status}): ${await response.text()}`);
   }

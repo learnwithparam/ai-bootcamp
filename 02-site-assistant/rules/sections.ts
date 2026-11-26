@@ -3,6 +3,8 @@
 
 export type Section = { heading: string; body: string };
 export type Page = { title: string; sections: Section[] };
+// A page of the site with its first section and first full paragraph, for the courses page.
+export type CatalogEntry = { url: string; title: string; intro: string; blurb: string };
 
 // A long section is split again, so each piece stays small enough to quote.
 const MAX_SECTION = 1_800;

@@ -1,0 +1,151 @@
+/* One run, on the shared buildcamp theme. One loud thing only: the agent's browser window. */
+
+/* One run: the browser beside the checkpoint, the controls and the activity log. */
+.run-split {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(300px, 2fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.run-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: start;
+}
+
+/* The one loud thing: a real browser window, drawn as one, with the agent's last picture inside. */
+.browser {
+  margin: 0;
+  border: 2px solid var(--fg);
+  border-radius: var(--r);
+  background: var(--surface);
+  overflow: hidden;
+  box-shadow: 6px 6px 0 var(--fg);
+}
+
+.browser-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--fg);
+  background: var(--hl);
+}
+
+.browser-dots {
+  width: 44px;
+  height: 10px;
+  background: radial-gradient(circle, var(--fg) 4px, transparent 5px) 0 0 / 15px 10px repeat-x;
+}
+
+.browser-address {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.browser img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.browser-empty {
+  margin: 0;
+  padding: 120px 24px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.run-side {
+  display: grid;
+  gap: 16px;
+}
+
+.panel-head svg {
+  width: 18px;
+  height: 18px;
+}
+
+.plan-head {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-left: auto;
+  font-weight: 400;
+}
+
+.plan-cost,
+.reason {
+  color: var(--muted);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.plan-steps {
+  margin: 0;
+  padding-left: 36px;
+  display: grid;
+  gap: 10px;
+}
+
+.plan-step {
+  display: grid;
+  gap: 2px;
+}
+
+.plan-name {
+  font-weight: 600;
+}
+
+.plan-todo .plan-name {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.plan-done::marker {
+  color: var(--pass);
+}
+
+.plan-now .plan-name {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 4px;
+}
+
+.plan-log {
+  color: var(--fg2);
+  font-size: 14px;
+}
+
+.plan-log time {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.verdict,
+.reason {
+  margin: 0 0 12px;
+}
+
+.verdict {
+  padding: 10px 12px;
+  border-left: 4px solid var(--wait);
+  border-radius: var(--r);
+  background: var(--waitbg);
+}
+
+@media (max-width: 1100px) {
+  .run-split {
+    grid-template-columns: 1fr;
+  }
+}

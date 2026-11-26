@@ -1,5 +1,7 @@
 import "@bootcamp/ui/base.css";
-import "../components/agent.css";
+import "../components/inbox.css";
+import "../components/run.css";
+import "../components/checkpoint.css";
 import type { ReactNode } from "react";
 
 export const metadata = { title: "Browser agent" };

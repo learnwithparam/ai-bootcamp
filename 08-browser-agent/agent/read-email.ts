@@ -5,7 +5,7 @@ import type { Email, Reading } from "../rules/email";
 import { costOf, fill } from "./prompt";
 import prompt from "./prompts/read-email.md" with { type: "text" };
 
-const Read = z.object({ clientName: z.string(), otherSide: z.string() });
+const Read = z.object({ clientName: z.string(), otherSide: z.string(), goal: z.string() });
 
 // Step one, before any browser: the model reads who needs help and against whom. Code builds the rest of the form.
 export async function readEmail(email: Email): Promise<{ reading: Reading; cost: number }> {

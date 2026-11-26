@@ -1,0 +1,1 @@
+ALTER TABLE "browser_agent"."operators" ADD COLUMN "role" text DEFAULT 'assistant' NOT NULL;

@@ -23,7 +23,7 @@ import { type SearchOutput, searchSite } from "./tools/search-site";
 //   3. plain code checks every [n] citation and records the cost of the turn.
 
 // id counts questions for the limits. userId and email come from the session, never from the conversation.
-export type Visitor = { id: string; userId: string | null; email: string | null };
+export type Visitor = { id: string; userId: string | null; email: string | null; conversationId: string };
 
 const STEPS: Record<Action, number> = { answer: 5, ask_follow_up: 1, hand_off: 2, decline: 1 };
 
@@ -32,12 +32,13 @@ const WHAT_TO_DO: Record<Action, string> = {
     "Answer the visitor. For facts about the school, search the site and cite every fact. " +
     "For their own plan use my_plan, and to change billing use billing_portal, without searching.",
   ask_follow_up: "Ask one short question that would let you help. Do not answer yet.",
-  hand_off: "Open a ticket with hand_off, then tell the visitor a person will reply by email.",
+  hand_off:
+    "Pass the conversation on with hand_off, then tell the visitor a person will reply in this conversation.",
   decline: "Say in one sentence that you can only help with learnwithparam, and offer to help with that.",
 };
 
 // The tools an action allows. A tool that is not in the list cannot be called, whatever the message says.
-function toolsFor(action: Action, visitor: Visitor, conversation: Turn[], returnUrl: string): ToolSet {
+function toolsFor(action: Action, visitor: Visitor, returnUrl: string): ToolSet {
   if (action === "answer") {
     return {
       search_site: searchSite({ next: 1 }),
@@ -45,7 +46,7 @@ function toolsFor(action: Action, visitor: Visitor, conversation: Turn[], return
       billing_portal: billingPortal(visitor.userId, returnUrl),
     };
   }
-  if (action === "hand_off") return { hand_off: handOff(visitor.email, conversation) };
+  if (action === "hand_off") return { hand_off: handOff(visitor.conversationId, visitor.email) };
   return {};
 }
 
@@ -78,7 +79,7 @@ export async function answerVisitor(messages: UIMessage[], visitor: Visitor, ret
     model: model(),
     system: `${instructions}\n\n## This reply\n\n${WHAT_TO_DO[action]}`,
     messages: await convertToModelMessages(messages),
-    tools: toolsFor(action, visitor, conversation, returnUrl),
+    tools: toolsFor(action, visitor, returnUrl),
     stopWhen: stepCountIs(STEPS[action]),
     prepareStep: ({ stepNumber }) =>
       action === "hand_off" && stepNumber === 0 ? { toolChoice: { type: "tool", toolName: "hand_off" } } : {},
@@ -87,6 +88,7 @@ export async function answerVisitor(messages: UIMessage[], visitor: Visitor, ret
       const citations = checkCitations(text, sourcesShown(steps));
       await recordTurn({
         visitor: visitor.id,
+        conversationId: visitor.conversationId,
         action,
         confidence: decision.confidence,
         costUsd: decision.costUsd + costOf(steps),

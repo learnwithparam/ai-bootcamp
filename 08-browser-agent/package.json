@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "setup": "bun db/seed.ts",
-    "seed": "bun db/seed.ts"
+    "seed": "bun agent/seed.ts"
   },
   "dependencies": {
     "@bootcamp/auth": "workspace:*",
@@ -18,6 +18,7 @@
     "ai": "7.0.181",
     "better-auth": "1.7.23",
     "drizzle-orm": "0.45.4",
+    "lucide-react": "1.80.0",
     "next": "16.4.6",
     "pg": "8.23.1",
     "react": "19.3.1",

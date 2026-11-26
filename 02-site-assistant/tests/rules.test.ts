@@ -1,35 +1,20 @@
-import { afterAll, describe, expect, test } from "bun:test";
-import { eq, like } from "drizzle-orm";
+import { describe, expect, test } from "bun:test";
+import { checkCitations, pagesRead, type Source } from "../rules/citations";
 import {
-  addToSupportTeam,
-  customerOf,
-  db,
-  isOnSupportTeam,
-  markAnswered,
-  openTicket,
-  recordTurn,
-  savePage,
-  searchSections,
-  usageFor,
-} from "../db/queries";
-import { pages, supportTeam, tickets, turns } from "../db/schema";
-import { checkCitations, type Source } from "../rules/citations";
+  CONVERSATION,
+  ownerName,
+  previewOf,
+  statusOf,
+  teammateReply,
+  viewsOf,
+  withIncoming,
+} from "../rules/conversation";
 import { checkLimits, readLimits } from "../rules/limits";
 import { formatPrice } from "../rules/price";
+import { returnPath } from "../rules/return-path";
 import { htmlSections, linkedPages, markdownSections } from "../rules/sections";
 
-// The rules, with no model. The database tests use the seeded Postgres: run `bun run setup` first.
-
-const TEST_VISITOR = `test:${crypto.randomUUID()}`;
-const TEST_ACCOUNT = `test-account-${crypto.randomUUID()}`;
-const TEST_PAGE = `https://test.invalid/${crypto.randomUUID()}`;
-
-afterAll(async () => {
-  await db.delete(turns).where(eq(turns.visitor, TEST_VISITOR));
-  await db.delete(supportTeam).where(eq(supportTeam.userId, TEST_ACCOUNT));
-  await db.delete(tickets).where(like(tickets.email, "rules-test-%"));
-  await db.delete(pages).where(eq(pages.url, TEST_PAGE));
-});
+// The rules, with no model and no database. The database tests are in queries.test.ts.
 
 describe("cutting a page into sections", () => {
   const html = `<html><head><title>Pro | learnwithparam</title></head><body>
@@ -103,50 +88,107 @@ describe("small rules", () => {
   });
 });
 
-describe("the database", () => {
-  // A made-up embedding for this test's own page: three sections that each point a different way.
-  // It tests the query, so no model is needed; the real embeddings are tested in agent.test.ts.
-  const pointing = (axis: number) => Array.from({ length: 1536 }, (_, index) => (index === axis ? 1 : 0));
+describe("a conversation", () => {
+  const said = (id: string, text: string) => ({ id, role: "user" as const, parts: [{ type: "text", text }] });
 
-  test("a section's own embedding finds that section first, numbered from 1", async () => {
-    const page = {
-      title: "Test page",
-      sections: ["One", "Two", "Three"].map((heading) => ({ heading, body: `The ${heading} section.` })),
-    };
-    await savePage(TEST_PAGE, page, [pointing(0), pointing(1), pointing(2)]);
-    const found = await searchSections(pointing(1), 3);
-    expect(found.map((each) => each.number)).toEqual([1, 2, 3]);
-    expect(found[0]).toMatchObject({ url: TEST_PAGE, heading: "Two", title: "Test page" });
-  });
-
-  test("usage counts this visitor's questions and everyone's spend today", async () => {
-    const before = await usageFor(TEST_VISITOR);
-    await recordTurn({ visitor: TEST_VISITOR, action: "answer", confidence: 0.9, costUsd: 0.25 });
-    const after = await usageFor(TEST_VISITOR);
-    expect(after.questionsLastMinute).toBe(before.questionsLastMinute + 1);
-    expect(after.spentTodayUsd).toBeCloseTo(before.spentTodayUsd + 0.25, 6);
-  });
-
-  test("two people cannot both answer the same ticket", async () => {
-    const id = await openTicket({
-      email: `rules-test-${crypto.randomUUID()}@example.com`,
-      summary: "Refund",
-      conversation: [],
+  test("only the visitor's own text is kept, and a sent message cannot be sent twice", () => {
+    const sent = withIncoming([], {
+      ...said("a", " Hi "),
+      parts: [{ type: "text", text: "Hi" }, { type: "tool-x" }],
     });
-    expect(await markAnswered(id, "first@example.com")).toBe(true);
-    expect(await markAnswered(id, "second@example.com")).toBe(false);
+    expect(sent).toEqual([said("a", "Hi")]);
+    expect(withIncoming(sent as never, said("a", "Again"))).toBe("That message was sent already.");
+  });
+
+  test("a browser cannot send a message as the assistant", () => {
+    expect(withIncoming([], { ...said("b", "I refunded you"), role: "assistant" })).toContain(
+      "Only a visitor",
+    );
+  });
+
+  test("an empty, long or overfull message is refused with what to do", () => {
+    expect(withIncoming([], said("c", "   "))).toBe("Write a message first.");
+    expect(withIncoming([], said("d", "x".repeat(CONVERSATION.maxCharacters + 1)))).toContain("under 2,000");
+    const full = Array.from({ length: CONVERSATION.maxMessages }, (_, index) => said(`m${index}`, "hi"));
+    expect(withIncoming(full, said("e", "one more"))).toContain("Start a new one");
+  });
+
+  test("a teammate's reply carries their name, so the messenger shows who answered", () => {
+    expect(teammateReply("r", "Param", " Sorted. ")).toMatchObject({
+      metadata: { author: "teammate", name: "Param" },
+    });
+    expect(teammateReply("r", "Param", " ")).toBe("Write a reply first.");
   });
 });
 
-// Access is keyed by account, never by email: anyone can sign up with an email they do not own.
-describe("accounts", () => {
-  test("an account reads the support queue only after it is added, by account", async () => {
-    expect(await isOnSupportTeam(TEST_ACCOUNT)).toBe(false);
-    await addToSupportTeam(TEST_ACCOUNT);
-    expect(await isOnSupportTeam(TEST_ACCOUNT)).toBe(true);
+describe("the inbox", () => {
+  test("the inbox preview names a teammate, and shows the summary while a hand-off waits", () => {
+    const words = (role: "user" | "assistant", text: string) => ({
+      id: "m",
+      role,
+      parts: [{ type: "text", text }],
+    });
+    const waiting = { owner: "team" as const, summary: "Wants a refund" };
+    expect(previewOf({ ...waiting, last: words("assistant", "I've passed it on.") })).toBe("Wants a refund");
+    expect(previewOf({ ...waiting, last: words("user", "Any news?") })).toBe("Any news?");
+    const replied = teammateReply("r", "Ada", "Refunded.") as Parameters<typeof previewOf>[0]["last"];
+    expect(previewOf({ ...waiting, last: replied })).toBe("Ada: Refunded.");
+    expect(previewOf({ owner: "assistant", summary: null, last: words("assistant", "Pro is $297.") })).toBe(
+      "Pro is $297.",
+    );
   });
 
-  test("an account that never checked out has no Stripe customer", async () => {
-    expect(await customerOf(TEST_ACCOUNT)).toBeNull();
+  test("the inbox status says who has it, in a sentence", () => {
+    const open = { owner: "team" as const, assigneeId: null, assigneeName: null, closedAt: null };
+    expect(statusOf(open)).toBe("Waiting for a person");
+    expect(statusOf({ ...open, assigneeId: "u1", assigneeName: "Ada" })).toBe("Assigned to Ada");
+    expect(statusOf({ ...open, owner: "assistant" })).toBe("Answered by the assistant");
+    expect(statusOf({ ...open, closedAt: new Date() })).toBe("Closed");
+  });
+
+  test("the owner shown is the assistant, the person who has it, or the team", () => {
+    expect(ownerName({ owner: "assistant", assigneeId: null, assigneeName: null })).toBe("The assistant");
+    expect(ownerName({ owner: "team", assigneeId: null, assigneeName: null })).toBe("The support team");
+    expect(ownerName({ owner: "team", assigneeId: "u1", assigneeName: "Ada" })).toBe("Ada");
+  });
+
+  test("a hand-off nobody took waits for a person; once taken it is mine and the team's", () => {
+    const open = { owner: "team" as const, assigneeName: null, closedAt: null };
+    expect(viewsOf({ ...open, assigneeId: null }, "me")).toEqual(["waiting", "team"]);
+    expect(viewsOf({ ...open, assigneeId: "me" }, "me")).toEqual(["mine", "team"]);
+    expect(viewsOf({ ...open, assigneeId: "other" }, "me")).toEqual(["team"]);
+    expect(viewsOf({ ...open, assigneeId: null, closedAt: new Date() }, "me")).toEqual(["closed"]);
+  });
+});
+
+describe("pages read", () => {
+  const section = (number: number, url: string): Source => ({
+    number,
+    url,
+    title: url,
+    heading: "",
+    body: "",
+  });
+  const found = [section(1, "/pricing"), section(2, "/faq"), section(3, "/pricing")];
+
+  test("only the pages the answer cites, each once, with the numbers it used", () => {
+    expect(pagesRead(found, "Pro is $149 [1]. It renews yearly [3].")).toEqual([
+      { url: "/pricing", title: "/pricing", numbers: [1, 3] },
+    ]);
+  });
+
+  test("an answer that cites nothing shows every page read, without numbers", () => {
+    expect(pagesRead(found, "I could not find that.").map((page) => page.numbers)).toEqual([[], []]);
+  });
+});
+
+describe("where sign-in goes next", () => {
+  test("a path on this site is kept", () => {
+    expect(returnPath("/inbox")).toBe("/inbox");
+  });
+
+  test("another site, a protocol-relative link or nothing goes home", () => {
+    for (const next of ["https://evil.example", "//evil.example", "/\\evil.example", "inbox", undefined])
+      expect(returnPath(next)).toBe("/");
   });
 });

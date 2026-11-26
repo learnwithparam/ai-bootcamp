@@ -1,15 +1,12 @@
 import { tool } from "ai";
 import { z } from "zod";
-import { openTicket } from "../../db/queries";
-import type { Turn } from "../choose-action";
+import { handOffConversation } from "../../db/conversations";
 
-export type HandOffOutput =
-  | { opened: true; ticket: number; email: string }
-  | { opened: false; reason: string };
+export type HandOffOutput = { opened: true; email: string } | { opened: false; reason: string };
 
-// Opens a ticket in the support queue with the whole conversation, so the person who picks it up
-// does not ask the visitor to repeat themselves. A signed-in visitor's own email always wins.
-export function handOff(signedInEmail: string | null, conversation: Turn[]) {
+// Passes this conversation to the support inbox. The team reads the whole conversation and the summary,
+// so nobody asks the visitor to repeat themselves. A signed-in visitor's own email always wins.
+export function handOff(conversationId: string, signedInEmail: string | null) {
   return tool({
     description:
       "Passes the conversation to a person on the team. Use for refunds, cancellations, price exceptions, " +
@@ -21,8 +18,9 @@ export function handOff(signedInEmail: string | null, conversation: Turn[]) {
     execute: async ({ summary, email }): Promise<HandOffOutput> => {
       const replyTo = signedInEmail ?? email;
       if (!replyTo) return { opened: false, reason: "No email to reply to. Ask the visitor for one." };
-      const ticket = await openTicket({ email: replyTo, summary, conversation });
-      return { opened: true, ticket, email: replyTo };
+      if (!(await handOffConversation(conversationId, summary, replyTo)))
+        return { opened: false, reason: "A person on the team has this conversation already." };
+      return { opened: true, email: replyTo };
     },
   });
 }

@@ -1,54 +1,76 @@
 import type { Page, Stagehand } from "@browserbasehq/stagehand";
 import { FIELDS, type Field, type Form } from "../rules/email";
-import type { Placed, Seen } from "../rules/run";
+import type { Placed } from "../rules/run";
 
 // What each answer is, in words. Stagehand finds the field on the page that asks for it.
-const ASKS_FOR: Record<Field, string> = {
-  clientName: "the client's full name",
-  clientEmail: "the email address for the reply",
-  otherSide: "who is on the other side",
-  story: "what happened",
+// The story goes into the portal's conversation, and the other side is added as a name, so both press a button after.
+const ASKS_FOR: Record<Field, { fill: string; press?: string }> = {
+  clientName: { fill: "the field for the client's own full name" },
+  clientEmail: { fill: "the field for the email address the firm replies to" },
+  otherSide: {
+    fill: "the box for adding a name to who is on the other side",
+    press: "the Add button next to the box for the other side",
+  },
+  goal: { fill: "the field for what the client wants to happen" },
+  story: {
+    fill: "the message box of the conversation",
+    press:
+      "the button that sends the message in the conversation, not the button that sends the whole request",
+  },
 };
 
-// The model picks the field. The answer travels as a variable, so the model never sees or retypes it.
-export async function placeAnswer(stagehand: Stagehand, field: Field, value: string): Promise<Placed> {
-  const result = await stagehand.act(`Fill the field that asks for ${ASKS_FOR[field]} with %value%`, {
-    variables: { value },
-  });
+async function act(stagehand: Stagehand, instruction: string, value?: string): Promise<string> {
+  const result = await stagehand.act(instruction, value === undefined ? {} : { variables: { value } });
   const selector = result.data.actions[0]?.selector;
-  if (!result.data.success || !selector) throw new Error(`Could not fill ${field}: ${result.data.message}`);
-  return { field, selector };
-}
-
-export async function findSendButton(stagehand: Stagehand): Promise<string> {
-  const found = await stagehand.observe("Find the button that sends the request");
-  const selector = found.data[0]?.selector;
-  if (!selector) throw new Error("Could not find the button that sends the request.");
+  if (!result.data.success || !selector) throw new Error(`Could not ${instruction}: ${result.data.message}`);
   return selector;
 }
 
-// A person's approval replays the same fields with plain code. No model is asked.
+// The model picks the field. The answer travels as a variable, so the model never sees or retypes it.
+export async function placeAnswer(stagehand: Stagehand, field: Field, value: string): Promise<Placed> {
+  const asks = ASKS_FOR[field];
+  const selector = await act(stagehand, `Fill ${asks.fill} with %value%`, value);
+  if (!asks.press) return { field, selector };
+  return { field, selector, press: await act(stagehand, `Click ${asks.press}`) };
+}
+
+// The portal's assistant answers each message. The agent waits for that answer, or for the portal's error.
+export async function waitForAnswer(page: Page, answersBefore: number) {
+  await page.waitForFunction(
+    (before: number) =>
+      document.querySelectorAll(".turn-agent:not(.turn-typing)").length > before ||
+      Boolean(document.querySelector(".conversation [role=alert]")),
+    answersBefore,
+    { timeout: 90_000 },
+  );
+}
+
+export const answersSoFar = (page: Page) =>
+  page.evaluate(() => document.querySelectorAll(".turn-agent:not(.turn-typing)").length);
+
+export async function findSendButton(stagehand: Stagehand, placed: Placed[]): Promise<string> {
+  const found = await stagehand.observe(
+    "Find the button under the request form that sends the whole request",
+  );
+  const selector = found.data[0]?.selector;
+  if (!selector) throw new Error("Could not find the button that sends the request.");
+  if (placed.some((each) => each.press === selector))
+    throw new Error("The button found sends a message, not the request.");
+  return selector;
+}
+
+// A person's approval replays the same fields and buttons with plain code. No model is asked.
 export async function replayAnswers(page: Page, form: Form, placed: Placed[]) {
-  for (const { field, selector } of placed) await page.locator(selector).fill(form[field]);
-}
-
-// The label around a field, when Stagehand's path puts the field straight inside one.
-export function labelPath(selector: string): string | null {
-  const parent = selector.replace(/\/[^/]+$/, "");
-  return /\/label\[\d+\]$/.test(parent) ? parent : null;
-}
-
-// Reads each field back from the page with code: its label and what it holds now.
-export async function readBack(page: Page, placed: Placed[]): Promise<Seen[]> {
-  const seen: Seen[] = [];
-  for (const { field, selector } of placed) {
-    const around = labelPath(selector);
-    const label = around ? await page.locator(around).textContent() : "";
-    seen.push({ field, label: label.trim(), value: await page.locator(selector).inputValue() });
+  for (const { field, selector, press } of placed) {
+    const answers = await answersSoFar(page);
+    await page.locator(selector).fill(form[field]);
+    if (press) await page.locator(press).click();
+    if (field === "story") await waitForAnswer(page, answers);
   }
-  return seen;
 }
 
 export function answersToPlace(form: Form): Field[] {
   return FIELDS.filter((field) => form[field]);
 }
+
+export { readBack } from "./read-back";

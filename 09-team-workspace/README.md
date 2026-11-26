@@ -187,7 +187,8 @@ Read in this order. Each file is short.
 ## Prove it
 
 ```bash
-bun test 09-team-workspace/tests/rules.test.ts   # memory rules, what the browser may send, connectors, the queries; no model
+bun test 09-team-workspace/tests/rules.test.ts     # memory rules, what the browser may send, connectors; no model
+bun test 09-team-workspace/tests/queries.test.ts   # the queries against Postgres, the memory limit under a race; no model
 bun run proof team-workspace                     # the real model, the real MCP server, and the whole path in a browser
 ```
 

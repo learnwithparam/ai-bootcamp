@@ -10,12 +10,21 @@ export type Status =
   | "submitting"
   | "submitted"
   | "stopped"
+  | "taken_over"
   | "failed";
 
 // Each email in the inbox, with the status of its latest run.
 export type InboxRow = Email & { runId: string | null; status: Status | null };
+export type HistoryRow = Pick<Run, "id" | "status" | "decidedBy" | "cost" | "createdAt" | "finishedAt"> & {
+  subject: string;
+  fromName: string;
+};
 
 export const ACTIVE: Status[] = ["reading", "filling", "deciding", "submitting"];
+
+// A person may stop a run or take it over until the agent starts the click that sends. After that it finishes.
+export const STOPPABLE: Status[] = ["reading", "filling", "deciding", "waiting"];
+export const CLOSED: Status[] = ["stopped", "taken_over", "failed"];
 
 // A run writes every few seconds. One that has not written for this long died with its server, so it is marked failed
 // and the email can run again.
@@ -32,6 +41,7 @@ export const PLAN = [
   "Read the email",
   "Open the intake portal",
   "Fill in the form",
+  "Tell the portal what happened",
   "Check the form",
   "Ask the decision model",
   "Send the request",
@@ -42,8 +52,9 @@ export type Step = { stage: number; text: string; at: string };
 export type Choice = "submit" | "stop" | "ask_human";
 export type Verdict = { choice: Choice; confidence: number };
 
-// Where the agent typed each answer, so a person's approval replays it without a model.
-export type Placed = { field: Field; selector: string };
+// Where the agent typed each answer, and the button it pressed after typing, if any.
+// A person's approval replays them with plain code, without a model.
+export type Placed = { field: Field; selector: string; press?: string };
 
 // What a form field holds after filling, read back by code, not by the model.
 export type Seen = { field: Field; label: string; value: string };
@@ -58,7 +69,8 @@ export const LABELS: Record<Field, RegExp> = {
   clientName: /name/i,
   clientEmail: /email/i,
   otherSide: /other side/i,
-  story: /what happened/i,
+  goal: /want to happen/i,
+  story: /message/i,
 };
 
 const flat = (text: string) => text.replace(/\s+/g, " ").trim();
@@ -84,20 +96,20 @@ export type Move = { move: "submit" | "stop" | "wait"; reason: string };
 // The decision model chooses, but code has the last word: a wrong form is never sent, and a doubt waits for a person.
 export function nextMove(verdict: Verdict, problems: string[]): Move {
   if (problems.length > 0) return { move: "stop", reason: `The form is wrong: ${problems.join(" ")}` };
-  if (verdict.choice === "stop") return { move: "stop", reason: "The decision model said not to send it." };
+  const sure = `${Math.round(verdict.confidence * 100)}% sure`;
+  if (verdict.choice === "stop")
+    return { move: "stop", reason: `The decision model said not to send it, ${sure}.` };
   if (verdict.choice === "ask_human")
-    return { move: "wait", reason: "The decision model asked for a person." };
+    return { move: "wait", reason: `The decision model asked a person to check who the client is, ${sure}.` };
   if (verdict.confidence < SURE_ENOUGH)
-    return {
-      move: "wait",
-      reason: `The decision model was only ${Math.round(verdict.confidence * 100)}% sure.`,
-    };
-  return { move: "submit", reason: `The decision model was ${Math.round(verdict.confidence * 100)}% sure.` };
+    return { move: "wait", reason: `The decision model would send it, but was only ${sure}.` };
+  return { move: "submit", reason: `The decision model said send it, ${sure}.` };
 }
 
 // An email is sent to the portal at most once. Each run holds a real browser, so only a few go at once.
 export function whyNotStart(active: number, earlier: Status[]): string | null {
   if (earlier.includes("submitted")) return "This email was sent to the portal already.";
+  if (earlier.includes("taken_over")) return "A person took this email over and handles it by hand.";
   if (earlier.some((status) => status === "waiting" || ACTIVE.includes(status)))
     return "The agent is already working on this email.";
   if (active >= MOST_AT_ONCE) return `${MOST_AT_ONCE} runs are going already. Wait for one to finish.`;

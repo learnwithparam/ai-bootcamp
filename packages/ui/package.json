@@ -6,7 +6,8 @@
   "exports": {
     "./base.css": "./base.css",
     "./parts": "./parts.tsx",
-    "./check-page": "./check-page.ts"
+    "./check-page": "./check-page.ts",
+    "./markdown": "./markdown.tsx"
   },
   "peerDependencies": {
     "react": "19.3.1"
@@ -16,6 +17,7 @@
     "@assistant-ui/react-markdown": "0.14.26",
     "@axe-core/playwright": "4.14.1",
     "lucide-react": "1.80.0",
+    "react-markdown": "10.1.0",
     "remark-gfm": "4.0.1"
   },
   "devDependencies": {}

@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "messages_order" ON "site_assistant"."messages" USING btree ("conversation_id","seq");

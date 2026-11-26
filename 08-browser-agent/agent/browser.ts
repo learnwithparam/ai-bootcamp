@@ -1,7 +1,7 @@
 import { model } from "@bootcamp/model";
 import { type ClientLLM, localBrowser, type Page, Stagehand } from "@browserbasehq/stagehand";
 import { generateText, jsonSchema, type ModelMessage, Output } from "ai";
-import { PORTAL } from "./portal";
+import { INTAKE, PORTAL } from "./portal";
 import { costOf } from "./prompt";
 
 // A real Chrome, driven by Stagehand. Stagehand asks our model, through generate below, which element to use.
@@ -72,7 +72,7 @@ export async function openPortal(): Promise<Session> {
     await browser.context.setDomainPolicy({ allowedDomains: [new URL(PORTAL).hostname] });
     const [page] = await browser.context.pages();
     if (!page) throw new Error("The browser opened with no page.");
-    await page.goto(PORTAL);
+    await page.goto(INTAKE);
     const close = async () => {
       await stagehand.close();
       await browser.close();
