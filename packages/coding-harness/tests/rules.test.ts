@@ -130,3 +130,13 @@ describe("a call the model got wrong", () => {
     expect(events).toEqual([expect.objectContaining({ type: "tool", tool: "read", ok: false })]);
   });
 });
+
+describe("which git commands skip the question", () => {
+  test("only the read-only git subcommands run without asking", async () => {
+    const { ALLOWED } = await import("../rules/commands");
+    for (const subcommand of ALLOWED.git ?? []) {
+      expect(permissionFor("bash", { command: `git ${subcommand}` })).toBeNull();
+    }
+    expect(["diff", "status", "log", "show"]).toEqual(expect.arrayContaining(ALLOWED.git ?? []));
+  });
+});

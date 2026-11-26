@@ -11,7 +11,9 @@ export type Permission = {
   question: string;
 };
 
-const READ_ONLY = new Set(["ls", "cat", "head", "tail", "grep", "wc", "find", "git"]);
+const READ_ONLY = new Set(["ls", "cat", "head", "tail", "grep", "wc", "find"]);
+// git is read-only only for these. A git subcommand added to the list in commands.ts later still asks first.
+const READ_ONLY_GIT = new Set(["diff", "status", "log", "show"]);
 
 export function permissionFor(tool: string, input: Record<string, unknown>): Permission | null {
   const path = String(input.path ?? "");
@@ -21,7 +23,7 @@ export function permissionFor(tool: string, input: Record<string, unknown>): Per
   const verdict = checkCommand(String(input.command ?? ""));
   if (!verdict.ok) return null;
   const [program = "", subcommand = ""] = verdict.argv;
-  if (READ_ONLY.has(program)) return null;
+  if (READ_ONLY.has(program) || (program === "git" && READ_ONLY_GIT.has(subcommand))) return null;
   return { key: `${program} ${subcommand}`.trim(), question: `Run ${verdict.argv.join(" ")}?` };
 }
 

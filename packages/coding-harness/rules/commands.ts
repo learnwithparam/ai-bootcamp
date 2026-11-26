@@ -5,7 +5,7 @@
 export type CommandVerdict = { ok: true; argv: string[] } | { ok: false; reason: string };
 
 // Each program the agent may run, and the subcommands it may use. null means any arguments.
-const ALLOWED: Record<string, string[] | null> = {
+export const ALLOWED: Record<string, string[] | null> = {
   ls: null,
   cat: null,
   head: null,
