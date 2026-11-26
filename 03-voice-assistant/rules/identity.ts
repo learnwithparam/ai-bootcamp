@@ -3,11 +3,14 @@
 // was booked under as well, as a receptionist would ask. Speech to text may drop or add a first name, so the
 // family name decides, and it must match in full.
 
+// Accents are dropped, so Núñez and Nunez match. Every other letter is kept, in any script, so a family name
+// in Chinese or Arabic is never thrown away, leaving the first name to decide.
 function words(name: string): string[] {
   return name
     .toLowerCase()
     .normalize("NFKD")
-    .replace(/[^a-z\s'-]/g, "")
+    .replace(/\p{M}/gu, "")
+    .replace(/[^\p{L}\s'-]/gu, "")
     .split(/[\s-]+/)
     .filter(Boolean);
 }

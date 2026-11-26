@@ -160,5 +160,8 @@ describe("who may hear or cancel an appointment", () => {
     expect(sameCaller("Ruth Ellis", "Ruth Ellison")).toBe(false);
     expect(sameCaller("Ruth Ellis", "Ruth")).toBe(false);
     expect(sameCaller("Ruth Ellis", "")).toBe(false);
+    expect(sameCaller("José Núñez", "Jose Nunez")).toBe(true);
+    expect(sameCaller("Ruth 李", "Ruth")).toBe(false);
+    expect(sameCaller("Wei 李", "李")).toBe(true);
   });
 });
