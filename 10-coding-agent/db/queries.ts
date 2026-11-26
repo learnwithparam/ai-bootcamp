@@ -1,8 +1,8 @@
+import { type SessionEvent, summarize } from "@bootcamp/coding-harness/rules/session";
 import { connect } from "@bootcamp/db";
 import { sql } from "drizzle-orm";
 import { parseDiff } from "../rules/diff";
 import type { ReviewState } from "../rules/review";
-import { type SessionEvent, summarize } from "../rules/session";
 import * as schema from "./schema";
 import { runs } from "./schema";
 

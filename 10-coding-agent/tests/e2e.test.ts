@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, expect, test } from "bun:test";
-import { findProduct } from "@bootcamp/products";
+import { portOf } from "@bootcamp/products";
 import { checkPage } from "@bootcamp/ui/check-page";
 import { type Browser, chromium, type Page } from "playwright";
 import { saveRun } from "../db/queries";
@@ -11,7 +11,7 @@ import { asFile, sampleSession } from "./session";
 // the reviewer reads it on every tab and asks for changes, and the developer sees the note and no form.
 // A signed-in stranger gets a 404, and the upload API refuses everything it should.
 
-const URL = `http://localhost:${findProduct("coding-agent").port}`;
+const URL = `http://localhost:${portOf("coding-agent")}`;
 const accounts: Record<"developer" | "reviewer" | "stranger", { id: string; email: string }> = {} as never;
 const stops: (() => void)[] = [];
 let browser: Browser;

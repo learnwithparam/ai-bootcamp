@@ -1,6 +1,6 @@
 import { auth } from "@bootcamp/auth";
 import { pool } from "@bootcamp/db";
-import { findProduct } from "@bootcamp/products";
+import { portOf } from "@bootcamp/products";
 import { sql } from "drizzle-orm";
 import { assignReport, db, setRole, startReport, updateReport } from "../db/queries";
 import { members, reports } from "../db/schema";
@@ -46,7 +46,7 @@ async function freshTeam(): Promise<Map<string, string>> {
   await db.execute(sql`delete from ${reports} where created_by not in (select id from "user")`);
   await db.execute(sql`delete from ${members} where user_id in ${seeded}`);
   await db.execute(sql`delete from "user" where email like ${`%@${SEED_DOMAIN}`}`);
-  const headers = new Headers({ host: `localhost:${findProduct("research-agent").port}` });
+  const headers = new Headers({ host: `localhost:${portOf("research-agent")}` });
   const ids = new Map<string, string>();
   for (const person of PEOPLE) {
     const email = `${person.key}@${SEED_DOMAIN}`;

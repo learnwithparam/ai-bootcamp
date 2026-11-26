@@ -1,6 +1,6 @@
+import { headline, money } from "@bootcamp/coding-harness/rules/labels";
 import { SquareTerminal } from "lucide-react";
 import Link from "next/link";
-import { headline, money } from "../rules/labels";
 import type { RunRow } from "../rules/run";
 import { CheckMove, OutcomeChip, StateChip } from "./Chips";
 import { when } from "./when";

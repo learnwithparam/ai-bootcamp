@@ -1,4 +1,4 @@
-import { findProduct, GALLERY_PORT } from "@bootcamp/products";
+import { findProduct, GALLERY_PORT, portOf } from "@bootcamp/products";
 import { $ } from "bun";
 
 // bun run dev                  starts the gallery on http://localhost:3100
@@ -6,7 +6,7 @@ import { $ } from "bun";
 
 const slug = process.argv[2];
 const folder = slug ? findProduct(slug).folder : "gallery";
-const port = slug ? findProduct(slug).port : GALLERY_PORT;
+const port = slug ? portOf(slug) : GALLERY_PORT;
 
 console.log(`Starting ${folder} on http://localhost:${port}`);
 // Next.js runs on Node, from the version pinned in the product's package.json (bunx would fetch the latest).

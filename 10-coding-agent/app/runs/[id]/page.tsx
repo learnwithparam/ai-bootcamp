@@ -1,3 +1,4 @@
+import { headline } from "@bootcamp/coding-harness/rules/labels";
 import { Download } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -9,7 +10,6 @@ import { ReviewPanel } from "../../../components/ReviewPanel";
 import { RunFacts } from "../../../components/RunFacts";
 import { TeamShell } from "../../../components/TeamShell";
 import { runById, tabCounts } from "../../../db/runs";
-import { headline } from "../../../rules/labels";
 import { replayItems } from "../../../rules/replay";
 import type { RunDetail } from "../../../rules/run";
 import { requireMember } from "../../session";

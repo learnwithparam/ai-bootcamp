@@ -1,6 +1,6 @@
+import { checkWords } from "@bootcamp/coding-harness/rules/check";
+import type { Check } from "@bootcamp/coding-harness/rules/session";
 import { CircleCheck, CircleX } from "lucide-react";
-import { checkWords } from "../rules/check";
-import type { Check } from "../rules/session";
 
 // The same test command run twice: once before the agent changed anything, once when it said it was done.
 export function ChecksView({

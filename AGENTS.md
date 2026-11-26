@@ -1,6 +1,6 @@
 # AI Bootcamp
 
-Ten AI products a learner can run, use and read, in TypeScript on Bun, Next.js and Postgres.
+Eleven AI products a learner can run, use and read, in TypeScript on Bun, Next.js and Postgres.
 Each numbered folder is one complete product. Its README is the learner page.
 
 ## Running it
@@ -9,7 +9,7 @@ Run every command from the repo root, so Bun loads the root environment file.
 
 ```bash
 bun run setup                  # Postgres and Langfuse in Docker, migrations, seed data
-bun run dev invoice-inbox      # one product on its own port (3101 to 3110)
+bun run dev invoice-inbox      # one web product on its own port (3101 to 3111)
 bun run seed invoice-inbox     # load that product's sample data again
 bun run check                  # types, Biome, structure, learner pages, controls, prose, unit tests
 bun run proof invoice-inbox    # the real-model and browser tests behind each page's "Prove it"

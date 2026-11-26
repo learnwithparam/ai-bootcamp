@@ -17,15 +17,23 @@ export type Idea =
   | "human in the loop"
   | "ui the agent draws"
   | "memory"
-  | "structured output";
+  | "structured output"
+  | "terminal ui"
+  | "shared state"
+  | "adaptive ui";
 
 export type Product = {
   folder: string;
   slug: string;
   title: string;
   job: string;
-  port: number;
+  // The product's web port, from 3101. A product that runs only in a terminal has none, and names its command.
+  port?: number;
+  command?: string;
   ideas: Idea[];
+  // Where the agent's loop lives, from the product folder. Only set when it is not agent/agent.ts,
+  // as for the coding agent, whose loop is shared with the terminal app in packages/coding-harness.
+  agent?: string;
 };
 
 export const GALLERY_PORT = 3100;
@@ -102,10 +110,27 @@ export const PRODUCTS: Product[] = [
     job: "Fix a bug in a real repo from the terminal, with a check that must pass before it stops, then let a teammate review the run.",
     port: 3110,
     ideas: ["harness", "loop", "verification", "boundary", "skills", "cli", "human in the loop"],
+    agent: "../packages/coding-harness/agent/agent.ts",
+  },
+  {
+    folder: "11-personal-storefront",
+    slug: "personal-storefront",
+    title: "Personal storefront",
+    job: "Lay out a grocery shop for each shopper from what they say, and never show a product their allergies or diet rule out.",
+    port: 3111,
+    ideas: ["adaptive ui", "shared state", "ui the agent draws", "human in the loop", "boundary"],
+  },
+  {
+    folder: "12-coding-agent-terminal",
+    slug: "coding-agent-terminal",
+    title: "Coding agent terminal",
+    job: "Work with the coding agent in a terminal app: watch it think, read each change before it lands, say yes or no, and stop it with Esc.",
+    command: "bun run terminal",
+    ideas: ["terminal ui", "human in the loop", "harness", "loop"],
   },
 ];
 
-export const ALL_PORTS = [GALLERY_PORT, ...PRODUCTS.map((product) => product.port)];
+export const ALL_PORTS = [GALLERY_PORT, ...PRODUCTS.flatMap((product) => product.port ?? [])];
 
 export function findProduct(slug: string): Product {
   const product = PRODUCTS.find((each) => each.slug === slug);
@@ -114,4 +139,12 @@ export function findProduct(slug: string): Product {
     throw new Error(`No product called "${slug}". Known products: ${known}.`);
   }
   return product;
+}
+
+// The port a web product listens on. A terminal product has no port, so asking for one is a mistake in the code.
+export function portOf(slug: string): number {
+  const product = findProduct(slug);
+  if (product.port === undefined)
+    throw new Error(`${product.title} runs in a terminal, not on a port. Start it with: ${product.command}`);
+  return product.port;
 }

@@ -1,6 +1,6 @@
-import { checkWords } from "../rules/check";
-import { blockedLabel, money, OUTCOME_LABEL, toolLabel } from "../rules/labels";
-import type { SessionEvent } from "../rules/session";
+import { checkWords } from "@bootcamp/coding-harness/rules/check";
+import { blockedLabel, money, OUTCOME_LABEL, toolLabel } from "@bootcamp/coding-harness/rules/labels";
+import type { SessionEvent } from "@bootcamp/coding-harness/rules/session";
 
 // What the terminal shows while the agent works: one line per event, coloured, in the words the review page uses.
 

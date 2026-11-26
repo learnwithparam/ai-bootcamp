@@ -1,11 +1,11 @@
 import { afterAll, expect, test } from "bun:test";
 import { rm } from "node:fs/promises";
-import { runAgent } from "../agent/agent";
-import { runCheck } from "../agent/check";
-import { CHECK_COMMAND, findTask } from "../agent/tasks";
-import { prepare } from "../agent/workspace";
+import { runAgent } from "@bootcamp/coding-harness/agent/agent";
+import { runCheck } from "@bootcamp/coding-harness/agent/check";
+import { prepare } from "@bootcamp/coding-harness/agent/workspace";
+import { type SessionEvent, summarize } from "@bootcamp/coding-harness/rules/session";
+import { CHECK_COMMAND, findTask } from "@bootcamp/coding-harness/rules/tasks";
 import { parseDiff } from "../rules/diff";
-import { type SessionEvent, summarize } from "../rules/session";
 
 // The real model on fresh copies of vercel/ms. Runs in `bun run proof`.
 // The metric on the learner page: the agent turns a failing check green by changing code, never a test,

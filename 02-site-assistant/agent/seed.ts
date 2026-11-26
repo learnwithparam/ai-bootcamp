@@ -1,6 +1,6 @@
 import { auth } from "@bootcamp/auth";
 import { pool } from "@bootcamp/db";
-import { findProduct } from "@bootcamp/products";
+import { portOf } from "@bootcamp/products";
 import { stripe } from "@bootcamp/stripe";
 import { sql } from "drizzle-orm";
 import { messagesOf, startConversation } from "../db/conversations";
@@ -18,7 +18,7 @@ import { replyInConversation } from "./converse";
 
 export const SEED_PASSWORD = "seeded support password";
 const SEED_DOMAIN = "support-seed.learnwithparam.test";
-const SITE = `http://localhost:${findProduct("site-assistant").port}/`;
+const SITE = `http://localhost:${portOf("site-assistant")}/`;
 const HOUR = 3_600_000;
 
 type Person = { key: string; name: string };

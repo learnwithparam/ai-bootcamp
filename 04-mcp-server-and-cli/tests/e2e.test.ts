@@ -3,7 +3,7 @@ import { type ChildProcess, spawn } from "node:child_process";
 import { mkdtemp, rm, stat } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { findProduct } from "@bootcamp/products";
+import { portOf } from "@bootcamp/products";
 import { checkPage } from "@bootcamp/ui/check-page";
 import { $ } from "bun";
 import { sql } from "drizzle-orm";
@@ -14,7 +14,7 @@ import { saved, toolCalls } from "../db/schema";
 // The learner's path, for real: `bun run cli login` prints a code, a person approves it in a browser,
 // and the CLI then calls a personal tool over MCP. The CLI keeps its tokens in a throwaway home folder.
 
-const URL = `http://localhost:${findProduct("mcp-server-and-cli").port}`;
+const URL = `http://localhost:${portOf("mcp-server-and-cli")}`;
 let server: ChildProcess | undefined;
 let browser: Browser;
 let home: string;

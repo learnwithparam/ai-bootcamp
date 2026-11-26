@@ -1,8 +1,8 @@
 "use client";
 
+import { money } from "@bootcamp/coding-harness/rules/labels";
 import { ChevronLeft, ChevronRight, ListChecks, Pause, Play } from "lucide-react";
 import { useEffect, useState } from "react";
-import { money } from "../rules/labels";
 import type { ReplayItem } from "../rules/replay";
 
 const PLAY_EVERY_MS = 900;

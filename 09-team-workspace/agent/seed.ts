@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { auth } from "@bootcamp/auth";
-import { findProduct } from "@bootcamp/products";
+import { portOf } from "@bootcamp/products";
 import { toUIMessageStream, type UIMessage } from "ai";
 import { eq, inArray, sql } from "drizzle-orm";
 import { addMember, db, openChat, type StoredMessage, saveMessages } from "../db/queries";
@@ -69,7 +69,7 @@ async function freshPeople(): Promise<{ id: string; name: string }[]> {
     await db.delete(members).where(inArray(members.userId, ids));
     await db.execute(sql`delete from "user" where email like ${`%@${SEED_DOMAIN}`}`);
   }
-  const headers = new Headers({ host: `localhost:${findProduct("team-workspace").port}` });
+  const headers = new Headers({ host: `localhost:${portOf("team-workspace")}` });
   const made = [];
   for (const person of PEOPLE) {
     const { user } = await auth.api.signUpEmail({

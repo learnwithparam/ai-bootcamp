@@ -1,4 +1,4 @@
-import { duration, money } from "../rules/labels";
+import { duration, money } from "@bootcamp/coding-harness/rules/labels";
 import type { RunDetail } from "../rules/run";
 import { when } from "./when";
 

@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, expect, test } from "bun:test";
-import { findProduct } from "@bootcamp/products";
+import { portOf } from "@bootcamp/products";
 import { checkPage } from "@bootcamp/ui/check-page";
 import { type Browser, chromium, type Page } from "playwright";
 import { PORTAL } from "../agent/portal";
@@ -13,7 +13,7 @@ import { ensureRunning, removePortalRequests } from "./portal";
 // The intake lead runs the agent on an email, approves it if it waits, and opens the request it made.
 // The intake assistant runs it on another and takes it over mid-run. A signed-in stranger gets a 404.
 
-const URL = `http://localhost:${findProduct("browser-agent").port}`;
+const URL = `http://localhost:${portOf("browser-agent")}`;
 const tag = crypto.randomUUID().slice(0, 6);
 const LEAD_SUBJECT = `Unpaid wages ${tag}`;
 const ASSISTANT_SUBJECT = `Unpaid wages, again ${tag}`;

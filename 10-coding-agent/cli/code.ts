@@ -1,13 +1,13 @@
 import { resolve } from "node:path";
+import { readAccount, signIn, signOut } from "@bootcamp/coding-harness/agent/account";
+import { runAgent } from "@bootcamp/coding-harness/agent/agent";
+import { newSessionFile } from "@bootcamp/coding-harness/agent/session-file";
+import { upload } from "@bootcamp/coding-harness/agent/upload";
+import { ownRepo, type Place, prepare } from "@bootcamp/coding-harness/agent/workspace";
+import { CHECK_COMMAND, findTask, PRACTICE_TASKS } from "@bootcamp/coding-harness/rules/tasks";
 import { startTracing } from "@bootcamp/tracing";
-import { runAgent } from "../agent/agent";
-import { CHECK_COMMAND, findTask, PRACTICE_TASKS } from "../agent/tasks";
-import { ownRepo, type Place, prepare } from "../agent/workspace";
-import { readAccount, signIn, signOut } from "./account";
 import { ask, askHidden } from "./ask";
-import { newSessionFile } from "./session-file";
 import { printEvent } from "./trace";
-import { upload } from "./upload";
 
 // The coding agent in your terminal. Run it from the repo root:
 //   bun run code practice months        a real task in a fresh copy of vercel/ms

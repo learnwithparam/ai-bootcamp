@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, expect, test } from "bun:test";
 import { type ChildProcess, spawn } from "node:child_process";
-import { findProduct } from "@bootcamp/products";
+import { portOf } from "@bootcamp/products";
 import { checkPage } from "@bootcamp/ui/check-page";
 import { and, eq, gt } from "drizzle-orm";
 import { type Browser, chromium, type Page } from "playwright";
@@ -11,7 +11,7 @@ import { reports } from "../db/schema";
 // cells fill in as each researcher returns. Priya, the lead, gives the account to Tomás. The model and the
 // web are real, so this runs in `bun run proof`. The test removes its account after, so the seed stays as it was.
 
-const URL = `http://localhost:${findProduct("research-agent").port}`;
+const URL = `http://localhost:${portOf("research-agent")}`;
 const COMPANY = "Raycast";
 const started = new Date();
 let server: ChildProcess | undefined;

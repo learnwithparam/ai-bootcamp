@@ -1,4 +1,4 @@
-import type { SessionEvent } from "../rules/session";
+import type { SessionEvent } from "@bootcamp/coding-harness/rules/session";
 
 // A small session file for tests that read one without running the model: one edit, then the check passes.
 // The diff is a real `git diff` shape, so the runs list counts one changed file.

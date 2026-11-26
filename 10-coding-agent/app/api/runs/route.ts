@@ -1,7 +1,7 @@
 import { currentSession } from "@bootcamp/auth";
+import { readSession, type SessionEvent, summarize } from "@bootcamp/coding-harness/rules/session";
 import { roleOf } from "../../../db/people";
 import { saveRun } from "../../../db/queries";
-import { readSession, type SessionEvent, summarize } from "../../../rules/session";
 
 // Where `bun run code upload` sends a session file. Only a developer on the team may send one,
 // and the file is checked line by line before anything is saved.

@@ -1,12 +1,12 @@
+import { runAgent } from "@bootcamp/coding-harness/agent/agent";
+import { prepare } from "@bootcamp/coding-harness/agent/workspace";
+import type { SessionEvent } from "@bootcamp/coding-harness/rules/session";
+import { CHECK_COMMAND, findTask } from "@bootcamp/coding-harness/rules/tasks";
 import { startTracing } from "@bootcamp/tracing";
 import { addReview } from "../db/people";
 import { saveRun } from "../db/queries";
 import { freshTeam } from "../db/team";
 import type { Verdict } from "../rules/review";
-import type { SessionEvent } from "../rules/session";
-import { runAgent } from "./agent";
-import { CHECK_COMMAND, findTask } from "./tasks";
-import { prepare } from "./workspace";
 
 // bun run seed coding-agent
 // The team, then four real runs on fresh copies of vercel/ms, made the way `bun run code practice` makes them,

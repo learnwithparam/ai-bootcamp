@@ -1,0 +1,17 @@
+{
+  "name": "@bootcamp/coding-agent-terminal",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@bootcamp/coding-harness": "workspace:*",
+    "@bootcamp/tracing": "workspace:*",
+    "@bootcamp/ui": "workspace:*",
+    "@opentui/core": "0.9.9",
+    "@opentui/react": "0.9.9",
+    "react": "19.3.1"
+  },
+  "devDependencies": {
+    "@xterm/headless": "6.0.0"
+  }
+}

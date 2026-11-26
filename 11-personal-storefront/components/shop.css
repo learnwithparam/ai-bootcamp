@@ -1,0 +1,188 @@
+/* Fernhill Grocer. Colours come only from packages/ui/tokens.css: --firm is the shop, --hl marks what the agent chose. */
+
+.store {
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.store-top {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+
+.wordmark {
+  margin: 0;
+  white-space: nowrap;
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
+}
+
+.wordmark a {
+  color: var(--firm);
+  text-decoration: none;
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--fg2);
+}
+
+.store-body {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.tailor {
+  position: sticky;
+  top: 76px;
+  max-height: calc(100vh - 92px);
+  overflow-y: auto;
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-width: 0;
+}
+
+.ask {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.ask label {
+  font-weight: 600;
+}
+
+.ask textarea {
+  min-height: 72px;
+  resize: vertical;
+}
+
+.ask-examples {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.example {
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--fg2);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.example:hover {
+  border-color: var(--firm);
+  color: var(--fg);
+}
+
+.said {
+  margin: 0;
+  color: var(--fg2);
+  font-size: 0.95rem;
+}
+
+.said.problem {
+  color: var(--fail);
+}
+
+.chips {
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chips-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.chips-empty {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.chips ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chips .belief {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px 4px 10px;
+  background: var(--firm-soft);
+  color: var(--fg);
+  border-radius: 999px;
+  font-size: 0.85rem;
+}
+
+.chips .belief button {
+  border: 0;
+  background: none;
+  color: var(--fg2);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 4px;
+}
+
+@media (max-width: 860px) {
+  .store-body {
+    grid-template-columns: 1fr;
+    padding: 16px;
+  }
+  .tailor {
+    position: static;
+    max-height: none;
+  }
+  .store-top {
+    padding: 10px 16px;
+    gap: 10px;
+  }
+  .wordmark {
+    font-size: 1.05rem;
+  }
+  .basket-link {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+}

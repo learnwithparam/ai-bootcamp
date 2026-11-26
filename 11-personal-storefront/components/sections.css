@@ -1,0 +1,174 @@
+/* The sections the agent may lay out, and the product card they share. Colours come only from tokens.css. */
+
+.shelf {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+.product {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+}
+
+.product img {
+  width: 100%;
+  height: 120px;
+  object-fit: contain;
+}
+
+.product h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.3;
+}
+
+.product-meta {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.product-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+}
+
+.tag {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--surface-2);
+  color: var(--fg2);
+  font-size: 0.75rem;
+}
+
+.tag-diet {
+  background: var(--passbg);
+  color: var(--pass);
+}
+
+.product-buy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  font-weight: 600;
+}
+
+/* While the page changes, shelves are marked with a dashed edge, never faded, so their text keeps its contrast. */
+.page[aria-busy="true"] .shelf {
+  outline: 2px dashed var(--line);
+  outline-offset: 4px;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: 24px;
+  align-items: center;
+  padding: 28px;
+  background: var(--firm);
+  color: var(--on-firm);
+  border-radius: var(--r-lg);
+}
+
+.hero h2 {
+  margin: 0 0 8px;
+  font-size: 2rem;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.hero-subline {
+  margin: 0;
+  opacity: 0.9;
+}
+
+.hero .product {
+  background: var(--surface);
+  color: var(--fg);
+}
+
+.row h2,
+.recipe h2 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.reason {
+  margin: 4px 0 12px;
+  font-size: 0.9rem;
+  color: var(--fg2);
+}
+
+.reason::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--firm);
+}
+
+.bundle {
+  padding: 16px;
+  background: var(--firm-soft);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.recipe {
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+}
+
+.recipe ol {
+  margin: 8px 0 16px;
+  padding-left: 20px;
+  color: var(--fg2);
+}
+
+.aisles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.aisle {
+  padding: 6px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--fg);
+  cursor: pointer;
+}
+
+.aisle[aria-pressed="true"] {
+  background: var(--firm);
+  border-color: var(--firm);
+  color: var(--on-firm);
+}
+
+/* After the base rules above, so a phone's single column wins. */
+@media (max-width: 860px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+  .hero h2 {
+    font-size: 1.5rem;
+  }
+  .shelf {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

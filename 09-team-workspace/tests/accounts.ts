@@ -1,6 +1,6 @@
 import { auth } from "@bootcamp/auth";
 import { pool } from "@bootcamp/db";
-import { findProduct } from "@bootcamp/products";
+import { portOf } from "@bootcamp/products";
 import { addMember, type Role } from "../db/queries";
 
 // Real accounts for the tests, made the way the sign-up page makes them, and removed afterwards.
@@ -10,7 +10,7 @@ export type Person = { id: string; name: string; email: string; cookie: string }
 export async function makeAccount(name: string, role?: Role): Promise<Person> {
   const email = `workspace-test-${crypto.randomUUID()}@example.com`;
   // The shared sign-in works out its own address from the host, as it does for a page request.
-  const host = new Headers({ host: `localhost:${findProduct("team-workspace").port}` });
+  const host = new Headers({ host: `localhost:${portOf("team-workspace")}` });
   const made = await auth.api.signUpEmail({
     body: { name, email, password: PASSWORD },
     headers: host,
