@@ -1,0 +1,261 @@
+/* The replay, the diff and the checks on a run page. Every colour comes from packages/ui/tokens.css. */
+
+.replay-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  background: var(--bg);
+}
+
+.replay-where {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.replay-list {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.replay-item {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+  border-left: 3px solid transparent;
+}
+
+.replay-item:last-child {
+  border-bottom: 0;
+}
+
+.replay-item[aria-current="step"] {
+  background: var(--hl);
+}
+
+.replay-item.tone-pass {
+  border-left-color: var(--pass);
+}
+
+.replay-item.tone-fail {
+  border-left-color: var(--fail);
+}
+
+.replay-item.tone-wait {
+  border-left-color: var(--wait);
+}
+
+.replay-item.tone-info {
+  border-left-color: var(--info);
+}
+
+.replay-step {
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  padding-top: 2px;
+}
+
+.replay-title {
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.replay-detail {
+  margin: 4px 0 0;
+  color: var(--fg2);
+  white-space: pre-wrap;
+}
+
+.replay-body details {
+  margin-top: 6px;
+}
+
+.replay-body summary {
+  color: var(--fg2);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.replay-output {
+  max-height: 360px;
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface-2);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.diff {
+  display: grid;
+  gap: 16px;
+}
+
+.diff-file {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.diff-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+  font-size: 14px;
+}
+
+.diff-head svg {
+  width: 16px;
+  height: 16px;
+}
+
+.diff-path {
+  font-family: var(--mono);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.diff-added {
+  margin-left: auto;
+  color: var(--pass);
+  font-weight: 600;
+}
+
+.diff-removed {
+  color: var(--fail);
+  font-weight: 600;
+}
+
+.diff-scroll {
+  overflow-x: auto;
+}
+
+.diff-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 14px;
+}
+
+.diff-table td {
+  padding: 0 10px;
+  vertical-align: top;
+}
+
+.diff-number {
+  width: 1%;
+  color: var(--muted);
+  text-align: right;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.diff-text code {
+  font-family: inherit;
+  white-space: pre;
+}
+
+.diff-hunk td {
+  padding: 4px 10px;
+  background: var(--infobg);
+  color: var(--fg2);
+}
+
+.diff-add {
+  background: var(--passbg);
+}
+
+.diff-remove {
+  background: var(--failbg);
+}
+
+.checks-command {
+  margin: 0 0 14px;
+  color: var(--fg2);
+}
+
+.checks-pair {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.check-card {
+  padding: 16px;
+  border-top: 3px solid var(--line-strong);
+}
+
+.check-card-pass {
+  border-top-color: var(--pass);
+}
+
+.check-card-fail {
+  border-top-color: var(--fail);
+}
+
+.check-card h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 15px;
+}
+
+.check-card h2 svg {
+  width: 18px;
+  height: 18px;
+}
+
+.check-card-count {
+  margin: 8px 0;
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.check-failures {
+  margin: 0 0 10px;
+  padding-left: 18px;
+  color: var(--fail);
+  font-size: 14px;
+}
+
+.check-card summary {
+  color: var(--fg2);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .replay-item {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+
+  .replay-where {
+    width: 100%;
+    margin-left: 0;
+  }
+}

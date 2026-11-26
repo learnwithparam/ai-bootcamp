@@ -13,7 +13,8 @@
     "06-research-agent",
     "07-legal-intake",
     "08-browser-agent",
-    "09-team-workspace"
+    "09-team-workspace",
+    "10-coding-agent"
   ],
   "scripts": {
     "setup": "bun scripts/setup.ts",
@@ -21,7 +22,8 @@
     "seed": "bun scripts/seed.ts",
     "proof": "bun scripts/proof.ts",
     "check": "bun scripts/check.ts",
-    "cli": "bun 04-mcp-server-and-cli/cli/learnwithparam.ts"
+    "cli": "bun 04-mcp-server-and-cli/cli/learnwithparam.ts",
+    "code": "bun 10-coding-agent/cli/code.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.9",

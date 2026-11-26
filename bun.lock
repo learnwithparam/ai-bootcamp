@@ -75,8 +75,6 @@
         "learnwithparam": "cli/learnwithparam.ts",
       },
       "dependencies": {
-        "@assistant-ui/react": "0.15.38",
-        "@assistant-ui/react-ai-sdk": "1.4.25",
         "@better-auth/cimd": "1.7.23",
         "@better-auth/mcp": "1.7.23",
         "@better-auth/oauth-provider": "1.7.23",
@@ -215,6 +213,30 @@
         "@ai-sdk/mcp": "2.0.104",
         "@assistant-ui/react": "0.15.38",
         "@assistant-ui/react-ai-sdk": "1.4.25",
+        "@bootcamp/auth": "workspace:*",
+        "@bootcamp/db": "workspace:*",
+        "@bootcamp/model": "workspace:*",
+        "@bootcamp/products": "workspace:*",
+        "@bootcamp/tracing": "workspace:*",
+        "@bootcamp/ui": "workspace:*",
+        "ai": "7.0.181",
+        "better-auth": "1.7.23",
+        "drizzle-orm": "0.45.4",
+        "lucide-react": "1.80.0",
+        "next": "16.4.6",
+        "pg": "8.23.1",
+        "react": "19.3.1",
+        "react-dom": "19.3.1",
+        "zod": "4.6.7",
+      },
+      "devDependencies": {
+        "drizzle-kit": "0.31.11",
+      },
+    },
+    "10-coding-agent": {
+      "name": "@bootcamp/coding-agent",
+      "version": "0.1.0",
+      "dependencies": {
         "@bootcamp/auth": "workspace:*",
         "@bootcamp/db": "workspace:*",
         "@bootcamp/model": "workspace:*",
@@ -406,6 +428,8 @@
     "@bootcamp/browser-agent": ["@bootcamp/browser-agent@workspace:08-browser-agent"],
 
     "@bootcamp/catalog": ["@bootcamp/catalog@workspace:packages/catalog"],
+
+    "@bootcamp/coding-agent": ["@bootcamp/coding-agent@workspace:10-coding-agent"],
 
     "@bootcamp/db": ["@bootcamp/db@workspace:packages/db"],
 

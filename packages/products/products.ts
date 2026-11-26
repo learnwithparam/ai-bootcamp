@@ -95,6 +95,14 @@ export const PRODUCTS: Product[] = [
     port: 3109,
     ideas: ["mcp", "memory", "context", "boundary", "human in the loop"],
   },
+  {
+    folder: "10-coding-agent",
+    slug: "coding-agent",
+    title: "Coding agent",
+    job: "Fix a bug in a real repo from the terminal, with a check that must pass before it stops, then let a teammate review the run.",
+    port: 3110,
+    ideas: ["harness", "loop", "verification", "boundary", "skills", "cli", "human in the loop"],
+  },
 ];
 
 export const ALL_PORTS = [GALLERY_PORT, ...PRODUCTS.map((product) => product.port)];
