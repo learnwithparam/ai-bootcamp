@@ -1,0 +1,65 @@
+/* LiveKit's Agents UI is written in Tailwind. Only its theme and utilities load here: Tailwind's page-wide
+   reset is left out, so the clinic page and the front desk keep their own look. LiveKit's theme names point
+   at our tokens, so no colour is written in this file. */
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+@import "tw-animate-css";
+@source "./";
+@source "../../node_modules/streamdown/dist/index.js";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: var(--sans);
+  --font-mono: var(--mono);
+  --radius: var(--r-lg);
+  --color-background: var(--surface);
+  --color-foreground: var(--fg);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--fg);
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--fg);
+  --color-primary: var(--firm);
+  --color-primary-foreground: var(--on-firm);
+  --color-secondary: var(--surface-2);
+  --color-secondary-foreground: var(--fg);
+  --color-muted: var(--surface-2);
+  --color-muted-foreground: var(--muted);
+  --color-accent: var(--surface-2);
+  --color-accent-foreground: var(--fg);
+  --color-destructive: var(--fail);
+  --color-border: var(--line);
+  --color-input: var(--line);
+  --color-ring: var(--line-strong);
+}
+
+/* The few names the components read straight from CSS rather than through a utility. */
+.agents-ui {
+  --primary: var(--firm);
+  --secondary: var(--surface-2);
+  --foreground: var(--fg);
+}
+
+/* The part of Tailwind's reset the components rely on, kept inside the phone. */
+@layer base {
+  .agents-ui *,
+  .agents-ui ::before,
+  .agents-ui ::after {
+    box-sizing: border-box;
+    border: 0 solid;
+  }
+  .agents-ui button,
+  .agents-ui textarea {
+    font: inherit;
+    color: inherit;
+    background: none;
+    padding: 0;
+  }
+  .agents-ui svg {
+    display: block;
+  }
+  .agents-ui p {
+    margin: 0;
+  }
+}

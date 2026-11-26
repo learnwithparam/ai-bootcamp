@@ -1,6 +1,6 @@
 # AI Bootcamp
 
-Eleven AI products you can run, use and read. Each one is a complete product, built the way a team would ship it.
+Twelve AI products you can run, use and read. Each one is a complete product, built the way a team would ship it.
 There are real model calls, a real database, real sign-in and tests that run against the real thing.
 
 The ideas behind each product are taught in depth in the [live labs](https://www.learnwithparam.com/live).
@@ -16,6 +16,7 @@ This repo is where you see those ideas working together in a product.
 |---|---|---|---|
 | 1 | [Invoice inbox](01-invoice-inbox/README.md) | Read supplier invoices and match each one to its purchase order. | structured output, verification, human in the loop |
 | 2 | [Site assistant](02-site-assistant/README.md) | Answer visitors from the site's own pages, show members their plan, and hand off to a person. | loop, context, decision model, boundary, verification, human in the loop |
+| 3 | [Voice assistant](03-voice-assistant/README.md) | Answer a physio clinic's phone, book callers into the real diary, and leave the front desk a transcript. | voice, loop, boundary, verification, human in the loop |
 | 4 | [MCP server and CLI](04-mcp-server-and-cli/README.md) | Offer the school's catalog as one set of tools, used from chat, from Claude or Cursor, and from a terminal. | mcp, cli, boundary |
 | 5 | [Admin assistant](05-admin-assistant/README.md) | Answer the owner's questions about signups, make Stripe coupons after approval, and draft the newsletter. | skills, ui the agent draws, human in the loop, boundary |
 | 6 | [Research agent](06-research-agent/README.md) | Research a company on the live web, check every claim against its page, and score it as a lead. | graph, verification, structured output |
@@ -26,8 +27,6 @@ This repo is where you see those ideas working together in a product.
 | 11 | [Personal storefront](11-personal-storefront/README.md) | Lay out a grocery shop for each shopper from what they say, and never show a product their allergies or diet rule out. | adaptive ui, shared state, ui the agent draws, human in the loop, boundary |
 | 12 | [Coding agent terminal](12-coding-agent-terminal/README.md) | Work with the coding agent in a terminal app: watch it think, read each change before it lands, say yes or no, and stop it with Esc. | terminal ui, human in the loop, harness, loop |
 <!-- products:end -->
-
-Product 3, a voice assistant for the site assistant, is not built yet, so the numbers skip from 2 to 4.
 
 ## How each product folder is laid out
 

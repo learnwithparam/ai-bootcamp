@@ -5,10 +5,16 @@ import { $ } from "bun";
 // bun run dev invoice-inbox    starts one product on its own port
 
 const slug = process.argv[2];
-const folder = slug ? findProduct(slug).folder : "gallery";
+const product = slug ? findProduct(slug) : undefined;
+const folder = product?.folder ?? "gallery";
 const port = slug ? portOf(slug) : GALLERY_PORT;
 
 console.log(`Starting ${folder} on http://localhost:${port}`);
 // Next.js runs on Node, from the version pinned in the product's package.json (bunx would fetch the latest).
 // Bun installs the packages and runs this script, and the child inherits the repo's settings.
+const worker = product?.worker
+  ? Bun.spawn(["bun", product.worker, "dev"], { cwd: folder, stdio: ["ignore", "inherit", "inherit"] })
+  : undefined;
+if (worker) console.log(`Starting the worker in ${folder}/${product?.worker}`);
+process.on("exit", () => worker?.kill());
 await $`./node_modules/.bin/next dev --port ${port}`.cwd(folder);

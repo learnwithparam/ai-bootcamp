@@ -1,6 +1,6 @@
 # AI Bootcamp
 
-Eleven AI products a learner can run, use and read, in TypeScript on Bun, Next.js and Postgres.
+Twelve AI products a learner can run, use and read, in TypeScript on Bun, Next.js and Postgres.
 Each numbered folder is one complete product. Its README is the learner page.
 
 ## Running it
@@ -38,6 +38,12 @@ Each rule below is enforced by `bun run check` (scripts named in brackets) unles
   the most common failure here. Vet a package before adding it.
 - **No model name in a product's UI.** Not checked; review for it.
 
-## Not built
+## Where this repo differs from the engineering standard
 
-`03-voice-assistant` waits for LiveKit keys. The Python demos are kept at the `v1-python` tag.
+`03-voice-assistant/components/agents-ui/` is LiveKit's Agents UI, copied from agent-starter-react as its
+registry ships it. The size and colour rules skip it (`check-structure.ts`), and Biome turns off five lint
+rules for it (`biome.json`), so an update from LiveKit stays a copy, not a hand merge. Every other rule applies.
+
+## Older versions
+
+The Python demos are kept at the `v1-python` tag.

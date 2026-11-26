@@ -28,7 +28,7 @@ select:focus {
 }
 
 /* A text box with no class still gets the shared look. :where keeps it weak, so .field and
-   product rules such as the composer win. */
+   product rules such as the composer win. LiveKit's Agents UI (.agents-ui) styles its own. */
 :where(
   input:not([type]),
   input[type="text"],
@@ -40,7 +40,7 @@ select:focus {
   input[type="date"],
   input[type="tel"],
   textarea
-) {
+):not(:where(.agents-ui *)) {
   width: 100%;
   padding: 8px 10px;
   border: 1px solid var(--line);
@@ -61,11 +61,11 @@ select:focus {
   input[type="date"],
   input[type="tel"],
   textarea
-):focus-visible {
+):not(:where(.agents-ui *)):focus-visible {
   border-color: var(--fg);
 }
 
-:where(textarea) {
+:where(textarea):not(:where(.agents-ui *)) {
   min-height: 96px;
   line-height: 1.5;
   resize: vertical;

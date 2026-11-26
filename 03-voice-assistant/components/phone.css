@@ -1,0 +1,158 @@
+/* The clinic's page and the caller's phone. Colours come only from tokens.css. */
+
+.clinic {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(300px, 1fr);
+  gap: 40px;
+  align-items: start;
+}
+
+.clinic-head {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 14px;
+}
+
+.clinic-name {
+  margin: 0;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--firm);
+}
+
+.clinic-staff {
+  color: var(--fg2);
+}
+
+.clinic-intro h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1.1;
+  margin: 8px 0 16px;
+  letter-spacing: -0.02em;
+}
+
+.clinic-intro > p {
+  color: var(--fg2);
+  max-width: 52ch;
+  line-height: 1.55;
+}
+
+.clinic-hours {
+  margin-top: 24px;
+  border-collapse: collapse;
+  min-width: 280px;
+}
+
+.clinic-hours caption {
+  text-align: left;
+  font-weight: 700;
+  padding-bottom: 8px;
+}
+
+.clinic-hours th,
+.clinic-hours td {
+  text-align: left;
+  padding: 6px 24px 6px 0;
+  border-top: 1px solid var(--line);
+  font-weight: 400;
+}
+
+.clinic-emergency {
+  margin-top: 24px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--fail);
+  background: var(--failbg);
+  color: var(--fg);
+}
+
+.phone {
+  position: sticky;
+  top: 24px;
+  background: var(--firm);
+  color: var(--on-firm);
+  border-radius: 28px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 480px;
+  box-shadow: var(--shadow);
+}
+
+/* During a call the panel holds LiveKit's session view, on the page's own surface. */
+.phone[data-phase="calling"] {
+  background: var(--surface);
+  color: var(--fg);
+  border: 1px solid var(--line);
+  padding: 0;
+  height: 600px;
+  overflow: hidden;
+}
+
+.phone-ready {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.phone-number {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.phone-status {
+  margin: 0;
+  opacity: 0.85;
+}
+
+.phone-problem {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--r);
+  background: var(--waitbg);
+  color: var(--fg);
+}
+
+.button.phone-call {
+  justify-content: center;
+  padding: 14px;
+  font-size: 1.05rem;
+  border-radius: 999px;
+}
+
+.button.phone-call {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.phone-note {
+  margin: 0;
+  text-align: center;
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.sign-in {
+  max-width: 420px;
+  margin: 64px auto;
+  padding: 0 20px;
+}
+
+@media (max-width: 760px) {
+  .clinic {
+    grid-template-columns: 1fr;
+  }
+  .phone {
+    position: static;
+  }
+}

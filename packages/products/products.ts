@@ -34,6 +34,8 @@ export type Product = {
   // Where the agent's loop lives, from the product folder. Only set when it is not agent/agent.ts,
   // as for the coding agent, whose loop is shared with the terminal app in packages/coding-harness.
   agent?: string;
+  // A process that runs beside the site, from the product folder. The voice assistant's phone line is one.
+  worker?: string;
 };
 
 export const GALLERY_PORT = 3100;
@@ -54,6 +56,16 @@ export const PRODUCTS: Product[] = [
     job: "Answer visitors from the site's own pages, show members their plan, and hand off to a person.",
     port: 3102,
     ideas: ["loop", "context", "decision model", "boundary", "verification", "human in the loop"],
+  },
+  {
+    folder: "03-voice-assistant",
+    slug: "voice-assistant",
+    title: "Voice assistant",
+    job: "Answer a physio clinic's phone, book callers into the real diary, and leave the front desk a transcript.",
+    port: 3103,
+    ideas: ["voice", "loop", "boundary", "verification", "human in the loop"],
+    agent: "agent/worker.ts",
+    worker: "agent/worker.ts",
   },
   {
     folder: "04-mcp-server-and-cli",
