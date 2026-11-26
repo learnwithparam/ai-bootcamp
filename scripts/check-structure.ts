@@ -11,6 +11,9 @@ const MAX_FUNCTION_LINES = 40;
 const TOKENS_FILE = "packages/ui/tokens.css";
 const SKIP = new Set(["node_modules", ".next", "screenshots", "migrations"]);
 const CODE = /\.(ts|tsx)$/;
+// LiveKit's Agents UI, copied from agent-starter-react as its registry ships it. Held to our size and colour
+// rules, every update from LiveKit would become a hand merge, so those two rules skip it. The rest still apply.
+const VENDORED = /\/components\/agents-ui\//;
 
 // What each part of a product may import. rules/ never sees the model, so it reads and tests without AI.
 const FORBIDDEN_IMPORTS: Record<string, RegExp[]> = {
@@ -31,7 +34,15 @@ export type Problem = string;
 // What may sit at the top of a product folder: the shared shape, then the few parts one product adds
 // (auth and cli in 04, sample-invoices in 01, extensions in 10, tui in 12). A stray script here is a leftover, not a lesson.
 const TOP_LEVEL = new Set([
-  ...["README.md", "package.json", "tsconfig.json", "next.config.ts", "next-env.d.ts", "drizzle.config.ts"],
+  ...[
+    "README.md",
+    "package.json",
+    "tsconfig.json",
+    "next.config.ts",
+    "next-env.d.ts",
+    "drizzle.config.ts",
+    "postcss.config.mjs",
+  ],
   ...[
     "instrumentation.ts",
     "agent",
@@ -102,12 +113,12 @@ function isSilentCatch(clause: ts.CatchClause): boolean {
   return !handled;
 }
 
-function checkSyntax(path: string, source: ts.SourceFile): Problem[] {
+function checkSyntax(path: string, source: ts.SourceFile, vendored: boolean): Problem[] {
   const problems: Problem[] = [];
   const visit = (node: ts.Node) => {
     const isFunction =
       ts.isFunctionDeclaration(node) || ts.isArrowFunction(node) || ts.isMethodDeclaration(node);
-    if (isFunction && lineCount(source, node) > MAX_FUNCTION_LINES) {
+    if (isFunction && !vendored && lineCount(source, node) > MAX_FUNCTION_LINES) {
       const line = source.getLineAndCharacterOfPosition(node.getStart(source)).line + 1;
       problems.push(
         `${path}:${line}: a function over ${MAX_FUNCTION_LINES} lines. Split it into named steps.`,
@@ -127,7 +138,8 @@ function checkCodeFile(path: string, product: string | undefined): Problem[] {
   const text = readFileSync(path, "utf8");
   const problems: Problem[] = [];
   const lines = text.split("\n").length;
-  if (lines > MAX_FILE_LINES)
+  const vendored = VENDORED.test(path);
+  if (lines > MAX_FILE_LINES && !vendored)
     problems.push(`${path}: ${lines} lines, over ${MAX_FILE_LINES}. Split the file.`);
   const fake = FAKE.exec(text);
   if (fake && !path.startsWith("scripts/check-"))
@@ -137,7 +149,7 @@ function checkCodeFile(path: string, product: string | undefined): Problem[] {
     problems.push(`${path}: calls ${old[0]} on a stream result. Use the helper of the same name from "ai".`);
   const kind = path.endsWith(".tsx") ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
   const source = ts.createSourceFile(path, text, ts.ScriptTarget.Latest, true, kind);
-  problems.push(...checkSyntax(path, source));
+  problems.push(...checkSyntax(path, source, vendored));
   if (product) problems.push(...checkImports(path, source, product));
   return problems;
 }
@@ -146,7 +158,7 @@ const COLOUR = /#[0-9a-fA-F]{3,8}\b|\brgba?\(|\bhsla?\(/;
 
 function checkColours(files: string[]): Problem[] {
   return files
-    .filter((path) => /\.(css|tsx)$/.test(path) && path !== TOKENS_FILE)
+    .filter((path) => /\.(css|tsx)$/.test(path) && path !== TOKENS_FILE && !VENDORED.test(path))
     .filter((path) => COLOUR.test(readFileSync(path, "utf8").replace(/\/\*[\s\S]*?\*\//g, "")))
     .map((path) => `${path}: writes a colour. Colours live only in ${TOKENS_FILE}.`);
 }

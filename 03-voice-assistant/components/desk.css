@@ -1,0 +1,118 @@
+/* The front desk's pages. Colours come only from tokens.css. */
+
+.desk-today,
+.desk-call {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.desk-call-side {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.desk-calls {
+  margin-top: 28px;
+}
+
+.appointments,
+.messages,
+.transcript {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.appointment,
+.message {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  column-gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.appointment:first-child,
+.message:first-child {
+  border-top: 0;
+}
+
+.appointment p,
+.message p {
+  margin: 0;
+  grid-column: 1;
+}
+
+.appointment form,
+.message form {
+  grid-column: 2;
+  grid-row: 1 / span 4;
+  align-self: center;
+}
+
+.appointment-time,
+.message-who {
+  font-weight: 700;
+}
+
+.appointment-reason,
+.appointment-source,
+.message-when {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.appointment[data-booked-by="phone"] .appointment-source a {
+  background: var(--hl);
+  padding: 0 4px;
+}
+
+.transcript {
+  gap: 8px;
+}
+
+.line {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  gap: 12px;
+  padding: 6px 8px;
+  border-radius: var(--r);
+}
+
+.line-who {
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.line-at {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-family: var(--mono);
+}
+
+.line-agent {
+  background: var(--surface-2);
+}
+
+.line-tool {
+  background: var(--hl);
+  font-size: 0.9rem;
+}
+
+.diary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 860px) {
+  .desk-today,
+  .desk-call {
+    grid-template-columns: 1fr;
+  }
+}
