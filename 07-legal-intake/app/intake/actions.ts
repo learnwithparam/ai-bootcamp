@@ -19,6 +19,7 @@ import {
   type Draft,
   type FieldName,
   readDraft,
+  readTurnsPerVisitor,
   tidyDraft,
   tidyEdited,
   whyNotTalk,
@@ -56,7 +57,11 @@ export async function talk(input: {
     (await startConversation(who, OPENING));
   const draft = tidyDraft(input.draft);
   const counts = await turnsToday(who);
-  const refused = whyNotTalk(input.message, conversation.transcript, counts.visitor, counts.everyone);
+  const refused = whyNotTalk(input.message, conversation.transcript, {
+    visitorToday: counts.visitor,
+    today: counts.everyone,
+    perVisitor: readTurnsPerVisitor(process.env),
+  });
   const base = { conversationId: conversation.id, transcript: conversation.transcript, draft, filled: [] };
   if (refused) return { ...base, error: refused };
   const asked: Turn[] = [...conversation.transcript, { from: "client", text: input.message.trim() }];

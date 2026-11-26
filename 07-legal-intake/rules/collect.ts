@@ -30,7 +30,6 @@ export const EMPTY_DRAFT: Draft = {
 
 export const MESSAGE_MAX = 1_500;
 export const TURNS_MAX = 12;
-export const TURNS_PER_VISITOR_PER_DAY = 60;
 export const TURNS_PER_DAY = 3_000;
 export const STORY_MIN = 80;
 
@@ -104,13 +103,27 @@ export function tidyDraft(raw: unknown): Draft {
 export const tidyEdited = (raw: unknown): FieldName[] =>
   Array.isArray(raw) ? FIELDS.map((field) => field.name).filter((name) => raw.includes(name)) : [];
 
+// How many messages one visitor may send in 24 hours, from LEGAL_INTAKE_TURNS_PER_VISITOR.
+// A missing or broken value is an error, never a silent default.
+export function readTurnsPerVisitor(settings: Record<string, string | undefined>): number {
+  const value = Number(settings.LEGAL_INTAKE_TURNS_PER_VISITOR);
+  if (!Number.isInteger(value) || value <= 0)
+    throw new Error("Set LEGAL_INTAKE_TURNS_PER_VISITOR to a whole number above 0.");
+  return value;
+}
+
 // Checked before any model call. visitorToday and today count the turns already taken.
-export function whyNotTalk(message: string, transcript: Turn[], visitorToday: number, today: number) {
+export function whyNotTalk(
+  message: string,
+  transcript: Turn[],
+  counts: { visitorToday: number; today: number; perVisitor: number },
+) {
+  const { visitorToday, today, perVisitor } = counts;
   if (!message.trim()) return "Type a message first.";
   if (message.length > MESSAGE_MAX) return `Keep each message under ${MESSAGE_MAX} characters.`;
   if (transcript.filter((turn) => turn.from === "client").length >= TURNS_MAX)
     return "That is all we need to ask. Check the form, then send it.";
-  if (visitorToday >= TURNS_PER_VISITOR_PER_DAY)
+  if (visitorToday >= perVisitor)
     return "You have sent a lot of messages today. Send the form as it is, or come back tomorrow.";
   if (today >= TURNS_PER_DAY) return "We are not taking more messages today. Please come back tomorrow.";
   return null;

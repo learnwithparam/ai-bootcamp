@@ -1,4 +1,4 @@
-import { afterAll, describe, expect, test } from "bun:test";
+import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { eq, like } from "drizzle-orm";
 import {
   appendMessages,
@@ -28,11 +28,18 @@ const TEST_VISITOR = `test:${crypto.randomUUID()}`;
 const TEST_ACCOUNT = `test-account-${crypto.randomUUID()}`;
 const TEST_PAGE = `https://test.invalid/${crypto.randomUUID()}`;
 
+// A run that stopped before its afterAll leaves its page behind, with the same embedding as this run's.
+// Every test.invalid page is a test page, so each run starts by removing them.
+async function removeTestPages() {
+  await db.delete(pages).where(like(pages.url, "https://test.invalid/%"));
+}
+beforeAll(removeTestPages);
+
 afterAll(async () => {
   await db.delete(turns).where(eq(turns.visitor, TEST_VISITOR));
   await db.delete(conversations).where(like(conversations.visitor, "test:%"));
   await db.delete(supportTeam).where(eq(supportTeam.userId, TEST_ACCOUNT));
-  await db.delete(pages).where(eq(pages.url, TEST_PAGE));
+  await removeTestPages();
 });
 
 const said = (text: string): StoredMessage => ({

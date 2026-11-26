@@ -6,6 +6,7 @@ import {
   merge,
   missing,
   readDraft,
+  readTurnsPerVisitor,
   TURNS_MAX,
   tidyDraft,
   tidyEdited,
@@ -78,12 +79,19 @@ describe("checking what the page sends", () => {
 describe("before and after the conversation", () => {
   test("limits are checked before any model call", () => {
     const full = Array.from({ length: TURNS_MAX }, () => ({ from: "client" as const, text: "more" }));
-    expect(whyNotTalk("hi", TRANSCRIPT, 0, 0)).toBeNull();
-    expect(whyNotTalk(" ", TRANSCRIPT, 0, 0)).toContain("Type");
-    expect(whyNotTalk("x".repeat(2000), TRANSCRIPT, 0, 0)).toContain("under");
-    expect(whyNotTalk("hi", full, 0, 0)).toContain("Check the form");
-    expect(whyNotTalk("hi", TRANSCRIPT, 60, 0)).toContain("tomorrow");
-    expect(whyNotTalk("hi", TRANSCRIPT, 0, 3000)).toContain("tomorrow");
+    expect(whyNotTalk("hi", TRANSCRIPT, { visitorToday: 0, today: 0, perVisitor: 60 })).toBeNull();
+    expect(whyNotTalk(" ", TRANSCRIPT, { visitorToday: 0, today: 0, perVisitor: 60 })).toContain("Type");
+    expect(whyNotTalk("x".repeat(2000), TRANSCRIPT, { visitorToday: 0, today: 0, perVisitor: 60 })).toContain(
+      "under",
+    );
+    expect(whyNotTalk("hi", full, { visitorToday: 0, today: 0, perVisitor: 60 })).toContain("Check the form");
+    expect(whyNotTalk("hi", TRANSCRIPT, { visitorToday: 60, today: 0, perVisitor: 60 })).toContain(
+      "tomorrow",
+    );
+    expect(whyNotTalk("hi", TRANSCRIPT, { visitorToday: 0, today: 3000, perVisitor: 60 })).toContain(
+      "tomorrow",
+    );
+    expect(whyNotTalk("hi", TRANSCRIPT, { visitorToday: 60, today: 0, perVisitor: 300 })).toBeNull();
   });
 
   test("the form is checked again when sent, and the story is the client's words only", () => {
@@ -146,4 +154,11 @@ describe("the intake board", () => {
     expect(stepStates("failed", true, true)[3]).toBe("now");
     expect(stepStates("failed", false, false)[0]).toBe("now");
   });
+});
+
+test("the limit per visitor comes from the settings, and a missing one is an error", () => {
+  expect(readTurnsPerVisitor({ LEGAL_INTAKE_TURNS_PER_VISITOR: "60" })).toBe(60);
+  expect(() => readTurnsPerVisitor({})).toThrow("LEGAL_INTAKE_TURNS_PER_VISITOR");
+  expect(() => readTurnsPerVisitor({ LEGAL_INTAKE_TURNS_PER_VISITOR: "0" })).toThrow();
+  expect(() => readTurnsPerVisitor({ LEGAL_INTAKE_TURNS_PER_VISITOR: "lots" })).toThrow();
 });

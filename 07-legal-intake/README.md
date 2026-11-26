@@ -50,9 +50,12 @@ bun 07-legal-intake/db/lawyer.ts someone@example.com paralegal
 ```
 
 Each conversation turn costs about $0.00015, and reading a request and drafting its letter about $0.0003.
-One visitor may send 60 messages a day and one email 3 requests a day. The firm takes 200 requests a day in all.
+One visitor may send `LEGAL_INTAKE_TURNS_PER_VISITOR` messages in 24 hours (60 in `.env.example`), and one email 3 requests a day.
+The firm takes 200 requests a day in all.
 A visitor is counted by the address in the one header your proxy sets, named by `LEGAL_INTAKE_IP_HEADER` in `.env`.
 Any other header can be typed by the visitor, so it is never read.
+On your own machine no proxy sets that header, so every browser counts as one visitor.
+If you run the browser agent's proof often, raise `LEGAL_INTAKE_TURNS_PER_VISITOR` in your `.env`.
 
 ## Run it
 
