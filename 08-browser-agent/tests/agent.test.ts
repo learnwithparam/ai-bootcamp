@@ -39,7 +39,9 @@ async function run(fromName: string) {
   await runEmail(started.id);
   const done = await runById(started.id);
   if (!done) throw new Error("The run is gone.");
-  console.log(`${fromName}: ${done.status}, ${JSON.stringify(done.verdict)}, $${done.cost.toFixed(4)}`);
+  console.log(
+    `${fromName}: ${done.status}, ${JSON.stringify(done.verdict)}, $${done.cost.toFixed(4)} (${done.reason ?? ""})`,
+  );
   return { ...done, fromEmail };
 }
 

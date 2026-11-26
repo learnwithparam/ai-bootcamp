@@ -34,6 +34,9 @@ export async function placeAnswer(stagehand: Stagehand, field: Field, value: str
   return { field, selector, press: await act(stagehand, `Click ${asks.press}`) };
 }
 
+// The portal turned a message away, for example at its daily limit. The run stops with the portal's own words.
+export class PortalRefused extends Error {}
+
 // The portal's assistant answers each message. The agent waits for that answer, or for the portal's error.
 export async function waitForAnswer(page: Page, answersBefore: number) {
   await page.waitForFunction(
@@ -43,6 +46,10 @@ export async function waitForAnswer(page: Page, answersBefore: number) {
     answersBefore,
     { timeout: 90_000 },
   );
+  const refused = await page.evaluate(
+    () => document.querySelector(".conversation [role=alert]")?.textContent?.trim() ?? "",
+  );
+  if (refused) throw new PortalRefused(`The portal turned the message away: ${refused}`);
 }
 
 export const answersSoFar = (page: Page) =>

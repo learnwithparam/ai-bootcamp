@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { type Draft, EMPTY_DRAFT, type FieldName } from "../rules/collect";
 import type { Turn } from "../rules/intake";
 import { Conversation } from "./Conversation";
@@ -23,9 +23,12 @@ type Send = (input: { conversationId: string; draft: Draft }) => Promise<{ error
 
 export type FormState = { draft: Draft; edited: FieldName[]; byAgent: FieldName[] };
 
-// The agent's answer marks the fields it filled, except any the client already changed.
+// The agent's answer marks the fields it filled, except any the client changed, even while it was answering.
 const filledByAgent = (before: FormState, answer: TalkResult): FormState => ({
-  draft: answer.draft,
+  draft: {
+    ...answer.draft,
+    ...Object.fromEntries(before.edited.map((name) => [name, before.draft[name]])),
+  },
   edited: before.edited,
   byAgent: [...new Set([...before.byAgent, ...answer.filled])].filter(
     (name) => !before.edited.includes(name),
@@ -50,6 +53,9 @@ export function IntakeDesk({ opening, talk, send }: { opening: Turn; talk: Talk;
   const [form, setForm] = useState<FormState>({ draft: EMPTY_DRAFT, edited: [], byAgent: [] });
   const [error, setError] = useState<string>();
   const [waiting, startWaiting] = useTransition();
+  // Busy until React runs on the page: text typed before then would show but never reach the form.
+  const [busy, setBusy] = useState(true);
+  useEffect(() => setBusy(false), []);
 
   function say(message: string) {
     setTranscript((before) => [...before, { from: "client", text: message }]);
@@ -74,7 +80,7 @@ export function IntakeDesk({ opening, talk, send }: { opening: Turn; talk: Talk;
   }
 
   return (
-    <div className="intake-desk">
+    <div className="intake-desk" aria-busy={busy}>
       <Conversation transcript={transcript} waiting={waiting} error={error} onSay={say} />
       <RequestPanel form={form} onEdit={edit} onSend={submit} canSend={Boolean(conversationId) && !waiting} />
     </div>

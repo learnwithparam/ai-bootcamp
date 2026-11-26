@@ -8,6 +8,7 @@ import {
   answersSoFar,
   answersToPlace,
   findSendButton,
+  PortalRefused,
   placeAnswer,
   readBack,
   replayAnswers,
@@ -134,6 +135,7 @@ async function guarded(runId: string, work: (runId: string) => Promise<unknown>)
     await work(runId);
   } catch (error) {
     if (error instanceof Halted) return;
+    if (error instanceof PortalRefused) return moveRun(runId, ACTIVE, "stopped", { reason: error.message });
     console.error(`Browser agent run ${runId} failed:`, error);
     const message = error instanceof Error ? error.message : String(error);
     await moveRun(runId, ACTIVE, "failed", { reason: STOPPED, error: message });

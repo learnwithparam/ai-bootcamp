@@ -73,6 +73,8 @@ export async function openPortal(): Promise<Session> {
     const [page] = await browser.context.pages();
     if (!page) throw new Error("The browser opened with no page.");
     await page.goto(INTAKE);
+    // Answers typed before the page is running would show on screen but never reach the form.
+    await page.waitForSelector(".intake-desk[aria-busy=false]", { timeout: 30_000 });
     const close = async () => {
       await stagehand.close();
       await browser.close();
