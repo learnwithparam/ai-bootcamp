@@ -199,7 +199,10 @@ Sam's email never opens the browser, and the browser cannot leave the portal.
 and opens the request it made. The assistant takes a run over while it works and gets the Copy card with no Approve button.
 A signed-in account that is not on the desk gets a 404.
 
-LAST_RUN_LINE
+Last run (26 Nov 2026): Ruth Okonkwo's email waited for a person, because the decision model would send it but was only 66% sure.
+Lewis Grant's waited too, because the decision model asked a person to check who the client is (89% sure).
+Kofi Mensah's was stopped by the decision model (80% sure). Dana's and Sam's were stopped by the rules before any model call.
+Each run cost about $0.002. All 25 proof tests passed.
 
 ## Learn the idea in depth
 
