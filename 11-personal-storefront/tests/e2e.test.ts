@@ -93,6 +93,8 @@ test("a guest asks, the page rebuilds for a nut allergy, and the basket waits fo
   await checkPage(page);
   await card.getByRole("button", { name: "Add all" }).click();
   await card.getByText("Added to your basket.").waitFor({ timeout: 30_000 });
+  // The card answers at once; the top bar changes only when the server has saved the basket.
+  await page.getByRole("link", { name: /^Basket \d+/ }).waitFor({ timeout: 30_000 });
   await page.goto(`${URL}/basket`);
   expect(await page.getByRole("button", { name: "Take out" }).count()).toBeGreaterThan(0);
   await checkPage(page);

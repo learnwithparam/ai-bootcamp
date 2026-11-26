@@ -32,6 +32,8 @@ export const asRequest = (asked: Asked) =>
 export function layOut(profile: Profile, products: Product[], enabled: SectionType[], signal?: AbortSignal) {
   const result = streamText({
     model: model(),
+    // A cap on what this call may write, so one ask stays under ASK_CEILING_USD in rules/state.ts.
+    maxOutputTokens: 4000,
     system: `${instructions}\n\n## Allowed sections\n\n${enabled.join(", ")}\n\n${catalogueText(products)}`,
     prompt: `The shopper:\n${JSON.stringify(profile)}\n\nLay out their page.`,
     output: Output.array({ element: Asked }),

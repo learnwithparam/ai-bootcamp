@@ -21,6 +21,8 @@ Keep the total under their weekly budget if they have one.`;
 export async function fillBasket(profile: Profile, products: Product[], shelf: Shelf) {
   const result = await generateText({
     model: model(),
+    // A cap on what this call may write, so one ask stays under ASK_CEILING_USD in rules/state.ts.
+    maxOutputTokens: 1500,
     system: `${RULES}\n\n${catalogueText(products)}`,
     prompt: `The shopper:\n${JSON.stringify(profile)}`,
     output: Output.object({ schema: Picked }),
