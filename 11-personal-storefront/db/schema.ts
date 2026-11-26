@@ -86,3 +86,12 @@ export const team = shop.table("team", {
 });
 
 export type BasketLine = Line;
+
+// One row per ask, written before the model is called, so the daily limits count asks still running.
+export const asks = shop.table("asks", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  owner: text("owner").notNull(),
+  costUsd: real("cost_usd").notNull(),
+  settled: boolean("settled").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});

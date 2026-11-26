@@ -132,6 +132,8 @@ flowchart LR
 6. **The basket waits for a yes.** `rules/basket.ts` keeps what the shopper may have and takes the dearest lines off until the total fits the budget.
    The total is added up in code. The proposal is saved on the server, and Add all adds that saved proposal, never what the page sends.
 7. **Limits in words.** One shopper may ask 40 times a day, and the shop may spend $3 a day on the model in all. Past either, the shopper reads a sentence asking them to come back tomorrow.
+   `db/asks.ts` holds the count: each ask takes its place under a lock before the model is called, at the most one ask may cost.
+   So asks sent all at once cannot pass the limit, and an ask that fails keeps counting.
 
 ## Try these
 
@@ -165,13 +167,15 @@ Read in this order. Each file is short.
 9. `app/api/agent/route.ts` and `app/api/agent/input.ts` - the AG-UI endpoint and what it reads from the page.
 10. `components/Storefront.tsx` and `components/Shop.tsx` - CopilotKit on the page, the shared state, and the basket card as a tool.
 11. `components/BasketCard.tsx` and `components/ProfileChips.tsx` - Add all, and the chips the shopper changes.
-12. `db/fetch-products.ts` - how the catalogue is made from Open Food Facts, and what it refuses.
+12. `db/asks.ts` - the ledger behind the daily limits, and the lock that keeps asks sent at once from passing them.
+13. `db/fetch-products.ts` - how the catalogue is made from Open Food Facts, and what it refuses.
 
 ## Prove it
 
 ```bash
 bun test 11-personal-storefront/tests/rules.test.ts   # allergens, diets, basket, chips, limits; no model
 bun test 11-personal-storefront/tests/layout.test.ts  # every section the agent asks for, checked; no model
+bun test 11-personal-storefront/tests/asks.test.ts    # 45 asks sent at once, and only 40 get a place; no model
 bun run proof personal-storefront                     # the real model, and the real shop in a browser
 ```
 
@@ -185,7 +189,7 @@ the sections streamed to the page are the ones the rules passed, the basket fits
 An allergy chip hides products with no model call. The merchandiser reads a personalization and turns the banner off.
 A signed-in shopper not on the team gets a 404. Every page goes through `checkPage`, which fails on raw markdown, a raw tool id or an accessibility problem.
 
-Last run (26 Nov 2026): five shoppers, 0 products shown that a shopper must avoid, $0.0053 in all. The browser test passed 4 of 4.
+Last run (26 Nov 2026): five shoppers, 0 products shown that a shopper must avoid, $0.0047 in all. The browser test passed 4 of 4.
 
 ## Learn the idea in depth
 

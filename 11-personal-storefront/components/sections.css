@@ -62,8 +62,10 @@
   font-weight: 600;
 }
 
+/* While the page changes, shelves are marked with a dashed edge, never faded, so their text keeps its contrast. */
 .page[aria-busy="true"] .shelf {
-  opacity: 0.85;
+  outline: 2px dashed var(--line);
+  outline-offset: 4px;
 }
 
 .hero {

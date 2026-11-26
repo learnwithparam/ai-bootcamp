@@ -41,6 +41,19 @@ export const TOOLS = {
 
 export type ToolName = keyof typeof TOOLS;
 
+// A model can ask for a call its own tool list does not allow, such as read with no path. The call is
+// answered with what was wrong, so the model can ask again, instead of reaching the tool and breaking the run.
+export function checkInput(name: string, input: unknown): string | null {
+  const spec = TOOLS[name as ToolName];
+  if (!spec) return `There is no tool called ${name}.`;
+  const parsed = (spec.inputSchema as z.ZodType).safeParse(input);
+  if (parsed.success) return null;
+  const wrong = parsed.error.issues.map(
+    (issue) => `${issue.path.join(".") || "the input"}: ${issue.message}`,
+  );
+  return `The call to ${name} was not complete (${wrong.join("; ")}). Call it again with every field.`;
+}
+
 async function bashTool(repo: string, input: { command: string }): Promise<ToolAnswer> {
   const verdict = checkCommand(input.command);
   if (!verdict.ok) return { ok: false, output: verdict.reason };

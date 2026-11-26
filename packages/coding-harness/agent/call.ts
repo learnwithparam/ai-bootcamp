@@ -4,7 +4,7 @@ import { type Permission, permissionFor, SAID_NO } from "../rules/permission";
 import type { SessionEvent } from "../rules/session";
 import { runCheck } from "./check";
 import { refusal } from "./extensions";
-import { runTool } from "./tools/all";
+import { checkInput, runTool } from "./tools/all";
 
 // One tool call, from the model's request to the answer it reads back.
 // Order matters: the extensions may refuse first, then a person may say no, then the tool runs,
@@ -55,6 +55,19 @@ async function personSaysNo(call: Called, run: Run, input: Record<string, unknow
 
 export async function handleCall(call: Called, run: Run): Promise<Answer> {
   const input = (call.input ?? {}) as Record<string, unknown>;
+  const incomplete = checkInput(call.toolName, input);
+  if (incomplete) {
+    run.record({
+      type: "tool",
+      at: now(),
+      step: run.step,
+      tool: call.toolName,
+      input,
+      ok: false,
+      output: incomplete,
+    });
+    return { part: answer(call, incomplete) };
+  }
   const refused = refusal({ tool: call.toolName, input });
   if (refused) return deny(call, run, input, refused.by, refused.reason);
   if (await personSaysNo(call, run, input)) return deny(call, run, input, "You", SAID_NO);

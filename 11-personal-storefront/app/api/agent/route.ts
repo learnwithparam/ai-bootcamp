@@ -1,8 +1,8 @@
 import { EventType } from "@ag-ui/core";
 import { EventEncoder } from "@ag-ui/encoder";
 import { type Emit, personalize } from "../../../agent/agent";
-import { allProducts, enabledTypes, savePage, savePersonalization, usageToday } from "../../../db/queries";
-import { limitMessage } from "../../../rules/state";
+import { reserveAsk, settleAsk } from "../../../db/asks";
+import { allProducts, enabledTypes, savePage, savePersonalization } from "../../../db/queries";
 import { shopperOf } from "../../shopper";
 import { answerBasket } from "./basket";
 import { RunInput, type Turn, turnOf } from "./input";
@@ -17,12 +17,13 @@ async function ask(
   emit: Emit,
   signal: AbortSignal,
 ) {
-  const blocked = limitMessage(await usageToday(owner));
-  if (blocked) throw new ShopperError(blocked);
+  const reserved = await reserveAsk(owner);
+  if ("blocked" in reserved) throw new ShopperError(reserved.blocked);
   const started = Date.now();
   const [products, enabled] = await Promise.all([allProducts(), enabledTypes()]);
   const ask = { said: turn.said, profile: input.state.profile, products, enabled };
   const outcome = await personalize(ask, emit, signal);
+  await settleAsk(reserved.id, outcome.cost);
   const { profile, sections, reply, removed, dropped, proposal, toolCallId, cost } = outcome;
   await savePage({ owner, profile, sections });
   const basketStatus = toolCallId ? "waiting" : "none";

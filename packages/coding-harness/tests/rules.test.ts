@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { handleCall } from "../agent/call";
 import { reasonToStop, refusal } from "../agent/extensions";
 import { readTestOutput } from "../rules/check";
 import { checkCommand } from "../rules/commands";
@@ -109,5 +110,23 @@ describe("what waits for a person", () => {
   });
   test("a command the rules refuse is never offered to a person", () => {
     expect(permissionFor("bash", { command: "rm -rf /" })).toBeNull();
+  });
+});
+
+describe("a call the model got wrong", () => {
+  test("read with no path is answered with what was missing, and the run goes on", async () => {
+    const events: unknown[] = [];
+    const run = {
+      repo: process.cwd(),
+      check: "true",
+      step: 1,
+      record: (event: unknown) => events.push(event),
+    };
+    const answered = await handleCall({ toolCallId: "c1", toolName: "read", input: {} }, run as never);
+    expect(answered.part.output).toEqual({
+      type: "text",
+      value: expect.stringContaining("The call to read was not complete (path:"),
+    });
+    expect(events).toEqual([expect.objectContaining({ type: "tool", tool: "read", ok: false })]);
   });
 });

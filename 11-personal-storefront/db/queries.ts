@@ -137,19 +137,3 @@ export async function addToTeam(userId: string) {
 export async function productsByCode(codes: string[]): Promise<Product[]> {
   return codes.length ? db.select().from(products).where(inArray(products.code, codes)) : [];
 }
-
-const midnight = () => new Date(new Date().setHours(0, 0, 0, 0));
-
-// What one shopper asked today, and what the whole shop spent on the model today, for the limits in rules/state.ts.
-export async function usageToday(owner: string) {
-  const since = midnight();
-  const [mine] = await db
-    .select({ asks: sql<number>`count(*)`.mapWith(Number) })
-    .from(personalizations)
-    .where(and(eq(personalizations.owner, owner), sql`${personalizations.createdAt} >= ${since}`));
-  const [shop] = await db
-    .select({ spent: sql<number>`coalesce(sum(${personalizations.costUsd}), 0)`.mapWith(Number) })
-    .from(personalizations)
-    .where(sql`${personalizations.createdAt} >= ${since}`);
-  return { asks: mine?.asks ?? 0, spent: shop?.spent ?? 0 };
-}

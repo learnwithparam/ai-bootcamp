@@ -32,6 +32,9 @@ export const LONGEST_ASK = 500;
 // What the whole shop may spend on the model in a day, in dollars. A cleared cookie makes a new guest,
 // so the per-shopper count alone cannot bound the bill; this can.
 export const SHOP_SPEND_PER_DAY = 3;
+// The most one ask may cost, in dollars. It is counted against the day before the model is called, and an
+// ask that fails keeps it. tests/agent.test.ts holds each real ask under it.
+export const ASK_CEILING_USD = 0.02;
 
 export function limitMessage(usage: { asks: number; spent: number }): string | null {
   if (usage.asks >= ASKS_PER_DAY) return "You have changed your page a lot today. Try again tomorrow.";

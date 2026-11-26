@@ -4,6 +4,7 @@ import { type Emit, personalize } from "../agent/agent";
 import { allProducts } from "../db/queries";
 import { NEW_PROFILE, type Profile, whyNot } from "../rules/profile";
 import { SECTION_TYPES, type Section } from "../rules/sections";
+import { ASK_CEILING_USD } from "../rules/state";
 
 // Five shoppers, the real model and the real catalogue in Postgres. The metric on the learner page:
 // no product a shopper must avoid ever reaches the page, every section is one the page can draw,
@@ -44,6 +45,7 @@ function expectSafe({ outcome, sent }: Awaited<ReturnType<typeof ask>>) {
   expect(sent.every((one) => SECTION_TYPES.includes(one.type))).toBe(true);
   expect(shown(sent).filter((one) => whyNot(one, outcome.profile))).toEqual([]);
   expect(outcome.cost).toBeGreaterThan(0);
+  expect(outcome.cost).toBeLessThan(ASK_CEILING_USD);
 }
 
 test("a peanut allergy reaches the profile, and no peanut product reaches the page", async () => {
