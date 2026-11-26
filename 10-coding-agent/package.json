@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@bootcamp/auth": "workspace:*",
+    "@bootcamp/coding-harness": "workspace:*",
     "@bootcamp/db": "workspace:*",
     "@bootcamp/model": "workspace:*",
     "@bootcamp/products": "workspace:*",

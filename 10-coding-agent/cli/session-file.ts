@@ -1,8 +1,8 @@
 import { appendFileSync, mkdirSync } from "node:fs";
 import { readdir, readFile, stat } from "node:fs/promises";
 import { join } from "node:path";
-import { SESSIONS } from "../agent/workspace";
-import type { SessionEvent } from "../rules/session";
+import { SESSIONS } from "@bootcamp/coding-harness/agent/workspace";
+import type { SessionEvent } from "@bootcamp/coding-harness/rules/session";
 
 // One session file per run, written a line at a time as the run goes.
 // If the run crashes halfway, every step up to the crash is still on disk.

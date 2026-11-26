@@ -7,6 +7,7 @@ const config: NextConfig = {
   devIndicators: false,
   transpilePackages: [
     "@bootcamp/auth",
+    "@bootcamp/coding-harness",
     "@bootcamp/db",
     "@bootcamp/model",
     "@bootcamp/tracing",

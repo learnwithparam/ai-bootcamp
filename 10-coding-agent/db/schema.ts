@@ -1,6 +1,6 @@
+import type { Check, Outcome, SessionEvent } from "@bootcamp/coding-harness/rules/session";
 import { doublePrecision, index, integer, jsonb, pgSchema, text, timestamp, uuid } from "drizzle-orm/pg-core";
 import type { Role, Verdict } from "../rules/review";
-import type { Check, Outcome, SessionEvent } from "../rules/session";
 
 // All of this product's tables live in the coding_agent schema.
 export const coding = pgSchema("coding_agent");

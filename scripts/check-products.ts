@@ -23,7 +23,6 @@ export const SECTIONS = [
 const REQUIRED_FILES = [
   "README.md",
   "package.json",
-  "agent/agent.ts",
   "tests/rules.test.ts",
   "tests/agent.test.ts",
   "tests/e2e.test.ts",
@@ -74,7 +73,8 @@ function checkE2e(product: Product): string[] {
 function checkProduct(product: Product): string[] {
   if (!existsSync(product.folder))
     return [`${product.folder}: listed in products.ts but the folder is missing.`];
-  const missing = REQUIRED_FILES.filter((file) => !existsSync(join(product.folder, file)));
+  const required = [...REQUIRED_FILES, product.agent ?? "agent/agent.ts"];
+  const missing = required.filter((file) => !existsSync(join(product.folder, file)));
   return [
     ...missing.map((file) => `${product.folder}: missing ${file}.`),
     ...checkReadme(product),

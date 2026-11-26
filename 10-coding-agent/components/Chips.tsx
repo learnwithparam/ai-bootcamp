@@ -1,6 +1,6 @@
-import { OUTCOME_LABEL } from "../rules/labels";
+import { OUTCOME_LABEL } from "@bootcamp/coding-harness/rules/labels";
+import type { Check, Outcome } from "@bootcamp/coding-harness/rules/session";
 import { type ReviewState, STATE_LABEL } from "../rules/review";
-import type { Check, Outcome } from "../rules/session";
 
 const OUTCOME_TONE: Record<Outcome, string> = {
   passed: "pill-pass",

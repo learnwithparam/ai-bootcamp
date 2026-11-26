@@ -1,6 +1,6 @@
-import { checkWords } from "./check";
-import { blockedLabel, OUTCOME_LABEL, toolLabel } from "./labels";
-import type { Check, Outcome, SessionEvent } from "./session";
+import { checkWords } from "@bootcamp/coding-harness/rules/check";
+import { blockedLabel, OUTCOME_LABEL, toolLabel } from "@bootcamp/coding-harness/rules/labels";
+import type { Check, Outcome, SessionEvent } from "@bootcamp/coding-harness/rules/session";
 
 const OUTCOME_TONE: Record<Outcome, "pass" | "fail" | "wait"> = {
   passed: "pass",

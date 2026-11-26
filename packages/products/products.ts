@@ -26,6 +26,9 @@ export type Product = {
   job: string;
   port: number;
   ideas: Idea[];
+  // Where the agent's loop lives, from the product folder. Only set when it is not agent/agent.ts,
+  // as for the coding agent, whose loop is shared with the terminal app in packages/coding-harness.
+  agent?: string;
 };
 
 export const GALLERY_PORT = 3100;
@@ -102,6 +105,7 @@ export const PRODUCTS: Product[] = [
     job: "Fix a bug in a real repo from the terminal, with a check that must pass before it stops, then let a teammate review the run.",
     port: 3110,
     ideas: ["harness", "loop", "verification", "boundary", "skills", "cli", "human in the loop"],
+    agent: "../packages/coding-harness/agent/agent.ts",
   },
 ];
 

@@ -1,8 +1,8 @@
 import { resolve } from "node:path";
+import { runAgent } from "@bootcamp/coding-harness/agent/agent";
+import { CHECK_COMMAND, findTask, PRACTICE_TASKS } from "@bootcamp/coding-harness/agent/tasks";
+import { ownRepo, type Place, prepare } from "@bootcamp/coding-harness/agent/workspace";
 import { startTracing } from "@bootcamp/tracing";
-import { runAgent } from "../agent/agent";
-import { CHECK_COMMAND, findTask, PRACTICE_TASKS } from "../agent/tasks";
-import { ownRepo, type Place, prepare } from "../agent/workspace";
 import { readAccount, signIn, signOut } from "./account";
 import { ask, askHidden } from "./ask";
 import { newSessionFile } from "./session-file";

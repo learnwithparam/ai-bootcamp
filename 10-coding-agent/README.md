@@ -173,19 +173,20 @@ flowchart LR
 ## Read the code
 
 Read in this order. Each file is short.
+The agent itself lives in `packages/coding-harness`, because the terminal app in 12 runs the same one.
 
-1. `agent/agent.ts` - start here. The loop: the check before, each turn, and how a run ends.
-2. `agent/prompt.md` - everything the model is told.
-3. `agent/tools/all.ts`, `agent/tools/files.ts` and `agent/tools/run.ts` - the six tools and what each one does.
-4. `rules/commands.ts` and `rules/paths.ts` - what the agent may run and touch.
-5. `agent/extensions.ts` and `extensions/protect-tests.ts` - how a rule refuses a call before it runs.
-6. `agent/call.ts` - one tool call: refused, run, then written down.
-7. `agent/check.ts` and `rules/check.ts` - running the tests and reading their output.
-8. `rules/session.ts` - the session file, its summary, and `settle`.
+1. `../packages/coding-harness/agent/agent.ts` - start here. The loop: the check before, each turn, and how a run ends.
+2. `../packages/coding-harness/agent/prompt.md` - everything the model is told.
+3. `../packages/coding-harness/agent/tools/all.ts`, `../packages/coding-harness/agent/tools/files.ts` and `../packages/coding-harness/agent/tools/run.ts` - the six tools and what each one does.
+4. `../packages/coding-harness/rules/commands.ts` and `../packages/coding-harness/rules/paths.ts` - what the agent may run and touch.
+5. `../packages/coding-harness/agent/extensions.ts` and `../packages/coding-harness/extensions/protect-tests.ts` - how a rule refuses a call before it runs.
+6. `../packages/coding-harness/agent/call.ts` - one tool call: refused, run, then written down.
+7. `../packages/coding-harness/agent/check.ts` and `../packages/coding-harness/rules/check.ts` - running the tests and reading their output.
+8. `../packages/coding-harness/rules/session.ts` - the session file, its summary, and `settle`.
 9. `cli/code.ts` and `cli/upload.ts` - the terminal commands and the upload.
 10. `rules/replay.ts` and `components/Replay.tsx` - the session file as a replay.
 11. `rules/review.ts` and `app/actions.ts` - who may review, checked again on the server.
-12. `agent/tasks.ts` and `agent/seed.ts` - the practice tasks from `vercel/ms`, then real runs through the real paths.
+12. `../packages/coding-harness/agent/tasks.ts` and `agent/seed.ts` - the practice tasks from `vercel/ms`, then real runs through the real paths.
 
 ## Prove it
 

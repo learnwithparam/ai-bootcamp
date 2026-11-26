@@ -1,4 +1,4 @@
-import { readSession } from "../rules/session";
+import { readSession } from "@bootcamp/coding-harness/rules/session";
 import { readAccount } from "./account";
 import { latestSession, readText } from "./session-file";
 

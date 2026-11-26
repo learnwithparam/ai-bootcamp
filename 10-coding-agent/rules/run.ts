@@ -1,5 +1,5 @@
+import type { Check, Outcome, SessionEvent } from "@bootcamp/coding-harness/rules/session";
 import type { ReviewState, Verdict } from "./review";
-import type { Check, Outcome, SessionEvent } from "./session";
 
 // The shapes the review site shows. The database fills them; the screens only read them.
 

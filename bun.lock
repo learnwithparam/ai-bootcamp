@@ -238,6 +238,7 @@
       "version": "0.1.0",
       "dependencies": {
         "@bootcamp/auth": "workspace:*",
+        "@bootcamp/coding-harness": "workspace:*",
         "@bootcamp/db": "workspace:*",
         "@bootcamp/model": "workspace:*",
         "@bootcamp/products": "workspace:*",
@@ -285,6 +286,15 @@
     "packages/catalog": {
       "name": "@bootcamp/catalog",
       "version": "0.1.0",
+    },
+    "packages/coding-harness": {
+      "name": "@bootcamp/coding-harness",
+      "version": "0.1.0",
+      "dependencies": {
+        "@bootcamp/model": "workspace:*",
+        "ai": "7.0.181",
+        "zod": "4.6.7",
+      },
     },
     "packages/db": {
       "name": "@bootcamp/db",
@@ -430,6 +440,8 @@
     "@bootcamp/catalog": ["@bootcamp/catalog@workspace:packages/catalog"],
 
     "@bootcamp/coding-agent": ["@bootcamp/coding-agent@workspace:10-coding-agent"],
+
+    "@bootcamp/coding-harness": ["@bootcamp/coding-harness@workspace:packages/coding-harness"],
 
     "@bootcamp/db": ["@bootcamp/db@workspace:packages/db"],
 
