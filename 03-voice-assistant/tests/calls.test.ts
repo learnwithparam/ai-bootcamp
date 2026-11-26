@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { eq, inArray } from "drizzle-orm";
 import { reserveCall, settleCall, usageToday } from "../db/calls";
-import { bookingsFor, bookSlot, cancelBooking } from "../db/diary";
+import { bookingsFor, bookingsOfCaller, bookSlot, cancelBooking } from "../db/diary";
 import { addLine, db, linesOf } from "../db/queries";
 import { bookings, calls } from "../db/schema";
 import { NO_USAGE } from "../rules/cost";
@@ -42,6 +42,13 @@ describe("the diary", () => {
     );
     const results = await Promise.all(tries);
     expect(results.filter((one) => "booked" in one)).toHaveLength(1);
+  });
+
+  test("a caller with only the phone number finds nothing", async () => {
+    const [winner] = await bookingsFor(phone, new Date());
+    if (!winner) throw new Error("The booking from the test before is missing.");
+    expect(await bookingsOfCaller(phone, "Someone Else", new Date())).toHaveLength(0);
+    expect(await bookingsOfCaller(phone, winner.callerName.toLowerCase(), new Date())).toHaveLength(1);
   });
 
   test("a booking is cancelled only with the phone number it was made with", async () => {

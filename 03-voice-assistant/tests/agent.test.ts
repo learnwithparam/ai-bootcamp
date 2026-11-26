@@ -136,7 +136,7 @@ describe("real phone calls that book nothing new", () => {
     expect(agent.some((text) => text.includes("closed"))).toBe(true);
   }, 240_000);
 
-  test("a caller cancels, found by their phone number", async () => {
+  test("a caller cancels, found by their name and phone number", async () => {
     const wednesday = addDays(tuesday, 1);
     const made = await bookSlot({
       physioId: "tom",

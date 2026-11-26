@@ -126,8 +126,9 @@ flowchart LR
    Expect: ten is taken, and the agent offers the nearest free times.
 3. Ask for an appointment on Sunday.
    Expect: the clinic is closed on Sundays, and nothing is booked.
-4. Say "I need to cancel my appointment", then give the number you booked with.
-   Expect: the agent finds it by that number and cancels it, and it leaves the front desk's diary.
+4. Say "I need to cancel my appointment", then give the name and number you booked with.
+   Expect: the agent finds it by both and cancels it, and it leaves the front desk's diary.
+   Give the number with someone else's name, and the agent finds nothing.
 5. Ask "How much is a first appointment?"
    Expect: the agent takes a message, and it appears under **Call backs** on the front desk.
 6. Call three times from the same browser, then try a fourth.
@@ -142,7 +143,8 @@ Read in this order. Each file is short.
 3. `agent/prompt.ts` - today's date, the hours, the team and the dates of the coming days, added to the instructions.
 4. `agent/tools.ts` and `agent/booking.ts` - the agent's tools on one call. Each answer is a sentence to say.
 5. `rules/clinic.ts` - the hours, how long an appointment is, and how far ahead the phone may book.
-6. `rules/hold.ts` - the read back, and why a held slot may not be booked yet.
+6. `rules/hold.ts` and `rules/identity.ts` - the read back, why a held slot may not be booked yet,
+   and why a phone number alone never finds or cancels an appointment.
 7. `rules/slots.ts` and `rules/offer.ts` - which times exist, and which few to offer.
 8. `rules/time.ts` - clinic time, so ten o'clock means ten in London whatever the server's zone.
 9. `rules/limits.ts` and `rules/cost.ts` - what a call may use, and what it cost. No AI in these files.
@@ -167,15 +169,15 @@ and removing a call removes its transcript but keeps what it booked.
 
 `tests/agent.test.ts` is the metric. A bot caller speaks recorded lines into a real LiveKit room,
 and the real worker answers with the real speech models and the real model. Four calls:
-a booking read back and confirmed, a full ten o'clock that books eleven instead, a Sunday refused, and a cancel found by phone number.
+a booking read back and confirmed, a full ten o'clock that books eleven instead, a Sunday refused, and a cancel found by name and phone number.
 It passes only when Postgres shows exactly that, the hold came before the booking, and every call cost under $0.10.
 
 `tests/e2e.test.ts` walks each role in a real browser on a real call: a caller presses Call with a recorded line
 as the microphone and hears that Sunday is closed, the receptionist finds that call and reads its transcript,
 and an account not on the team gets a not-found page. It removes every account and call it made.
 
-Last run (26 Nov 2026): 25 of 25 passed. The four real calls took 76, 79, 38 and 58 seconds
-and cost $0.0414, $0.0444, $0.0205 and $0.0324, each under the $0.10 ceiling.
+Last run (26 Nov 2026): 27 of 27 passed. The four real calls took 73, 81, 37 and 58 seconds
+and cost $0.0394, $0.0451, $0.0208 and $0.0288, each under the $0.10 ceiling.
 
 ## Learn the idea in depth
 

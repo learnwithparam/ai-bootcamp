@@ -1,4 +1,5 @@
 import { and, asc, eq, gte, lt } from "drizzle-orm";
+import { sameCaller } from "../rules/identity";
 import type { Physio, Taken } from "../rules/slots";
 import { addDays, atClinicTime } from "../rules/time";
 import { db } from "./queries";
@@ -49,6 +50,12 @@ export async function bookingsFor(phone: string, now: Date): Promise<Booking[]> 
     .from(bookings)
     .where(and(eq(bookings.phone, phone), eq(bookings.status, "booked"), gte(bookings.start, now)))
     .orderBy(asc(bookings.start));
+}
+
+// A caller's coming appointments: booked with this phone number and under this name. The phone shows
+// nothing to a caller who has only the number.
+export async function bookingsOfCaller(phone: string, name: string, now: Date): Promise<Booking[]> {
+  return (await bookingsFor(phone, now)).filter((one) => sameCaller(one.callerName, name));
 }
 
 // Cancels one appointment, only when the phone number matches the one it was booked with.

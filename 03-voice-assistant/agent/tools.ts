@@ -1,6 +1,6 @@
 import { llm } from "@livekit/agents";
 import { z } from "zod";
-import { bookingsFor, cancelBooking } from "../db/diary";
+import { bookingsOfCaller, cancelBooking } from "../db/diary";
 import { takeMessage } from "../db/queries";
 import { type Hold, phoneDigits, spokenPhone, whyNotPhone } from "../rules/hold";
 import { type Physio, slotOf } from "../rules/slots";
@@ -23,27 +23,33 @@ export type CallState = {
 
 const day = z.string().describe("The day, as YYYY-MM-DD from the table of coming days");
 const phone = z.string().describe("The caller's phone number, digits as they said it");
+const callerName = z.string().describe("The caller's full name, as they said it");
 
-async function findBookings(state: CallState, args: { phone: string }) {
+async function findBookings(state: CallState, args: { phone: string; caller_name: string }) {
   const digits = phoneDigits(args.phone);
   if (!digits) return log(state, `Not found: ${whyNotPhone(args.phone)}`);
-  const found = await bookingsFor(digits, state.now());
-  if (found.length === 0) return log(state, `No coming appointments for ${spokenPhone(digits)}.`);
+  const found = await bookingsOfCaller(digits, args.caller_name, state.now());
+  if (found.length === 0)
+    return log(state, `No coming appointments for ${args.caller_name} on ${spokenPhone(digits)}.`);
   const list = found.map((one) => {
     const slot = slotOf(one.start);
     const who = state.physios.find((physio) => physio.id === one.physioId)?.name ?? "a physio";
     return `${spokenDay(slot.day)} at ${spokenTime(slot.clock)} with ${who} (booking ${one.id})`;
   });
-  return log(state, `Appointments for ${spokenPhone(digits)}: ${list.join("; ")}.`);
+  return log(state, `Appointments for ${args.caller_name}: ${list.join("; ")}.`);
 }
 
-async function cancel(state: CallState, args: { booking_id: string; phone: string }) {
+// Cancels only an appointment the caller could find: their number and their name.
+async function cancel(state: CallState, args: { booking_id: string; phone: string; caller_name: string }) {
   const digits = phoneDigits(args.phone);
+  const theirs = digits ? await bookingsOfCaller(digits, args.caller_name, state.now()) : [];
   const ok =
-    digits && /^[0-9a-f-]{36}$/.test(args.booking_id) && (await cancelBooking(args.booking_id, digits));
+    digits &&
+    theirs.some((one) => one.id === args.booking_id) &&
+    (await cancelBooking(args.booking_id, digits));
   return log(
     state,
-    ok ? "Cancelled. Tell the caller." : "Not cancelled: no such appointment for that phone number.",
+    ok ? "Cancelled. Tell the caller." : "Not cancelled: no such appointment for that name and phone number.",
   );
 }
 
@@ -91,13 +97,13 @@ function bookingTools(state: CallState) {
 function deskTools(state: CallState) {
   return {
     find_my_bookings: llm.tool({
-      description: "The caller's coming appointments, by the phone number they booked with.",
-      parameters: z.object({ phone }),
+      description: "The caller's coming appointments, by the name and phone number they booked with.",
+      parameters: z.object({ phone, caller_name: callerName }),
       execute: (args) => findBookings(state, args),
     }),
     cancel_booking: llm.tool({
       description: "Cancel one of the caller's appointments.",
-      parameters: z.object({ booking_id: z.string(), phone }),
+      parameters: z.object({ booking_id: z.string(), phone, caller_name: callerName }),
       execute: (args) => cancel(state, args),
     }),
     take_message: llm.tool({

@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { callCost } from "../rules/cost";
 import { type Hold, phoneDigits, readBack, whyNotConfirm, whyNotPhone } from "../rules/hold";
+import { sameCaller } from "../rules/identity";
 import {
   CALL_CEILING_USD,
   CALL_SECONDS,
@@ -148,5 +149,16 @@ describe("the limits", () => {
     // Heard, spoken, the model (half its input cached), and the line cleaned for five minutes.
     expect(cost).toBeCloseTo(0.01875 + 0.0375 + (8_000 + 4_000 + 1_200) / 1e6 + 0.006, 6);
     expect(cost).toBeLessThan(CALL_CEILING_USD);
+  });
+});
+
+describe("who may hear or cancel an appointment", () => {
+  test("the family name must match the one it was booked under", () => {
+    expect(sameCaller("Ruth Ellis", "Ruth Ellis")).toBe(true);
+    expect(sameCaller("Ruth Ellis", "ellis")).toBe(true);
+    expect(sameCaller("Mary-Jane O'Neil", "Mary Jane O'Neil.")).toBe(true);
+    expect(sameCaller("Ruth Ellis", "Ruth Ellison")).toBe(false);
+    expect(sameCaller("Ruth Ellis", "Ruth")).toBe(false);
+    expect(sameCaller("Ruth Ellis", "")).toBe(false);
   });
 });
