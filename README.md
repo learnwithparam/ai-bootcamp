@@ -1,6 +1,6 @@
 # AI Bootcamp
 
-Twelve AI products you can run, use and read. Each one is a complete product, built the way a team would ship it.
+AI products you can run, use and read. Each one is a complete product, built the way a team would ship it.
 There are real model calls, a real database, real sign-in and tests that run against the real thing.
 
 The ideas behind each product are taught in depth in the [live labs](https://www.learnwithparam.com/live).
@@ -26,6 +26,7 @@ This repo is where you see those ideas working together in a product.
 | 10 | [Coding agent](10-coding-agent/README.md) | Fix a bug in a real repo from the terminal, with a check that must pass before it stops, then let a teammate review the run. | harness, loop, verification, boundary, skills, cli, human in the loop |
 | 11 | [Personal storefront](11-personal-storefront/README.md) | Lay out a grocery shop for each shopper from what they say, and never show a product their allergies or diet rule out. | adaptive ui, shared state, ui the agent draws, human in the loop, boundary |
 | 12 | [Coding agent terminal](12-coding-agent-terminal/README.md) | Work with the coding agent in a terminal app: watch it think, read each change before it lands, say yes or no, and stop it with Esc. | terminal ui, human in the loop, harness, loop |
+| 13 | [Marketplace analyst](13-marketplace-analyst/README.md) | Answer a marketplace team's questions with SQL over its own orders, without sending a row to the model. | rag, multi-agent, graph, boundary, evals |
 <!-- products:end -->
 
 ## How each product folder is laid out

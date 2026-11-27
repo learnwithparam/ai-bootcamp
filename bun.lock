@@ -337,6 +337,39 @@
         "@xterm/headless": "6.0.0",
       },
     },
+    "13-marketplace-analyst": {
+      "name": "@bootcamp/marketplace-analyst",
+      "version": "0.1.0",
+      "dependencies": {
+        "@ai-sdk/react": "4.0.186",
+        "@assistant-ui/react": "0.15.38",
+        "@assistant-ui/react-ai-sdk": "1.4.25",
+        "@bootcamp/auth": "workspace:*",
+        "@bootcamp/db": "workspace:*",
+        "@bootcamp/model": "workspace:*",
+        "@bootcamp/products": "workspace:*",
+        "@bootcamp/tracing": "workspace:*",
+        "@bootcamp/ui": "workspace:*",
+        "@langchain/core": "1.5.1",
+        "@langchain/langgraph": "1.7.5",
+        "ai": "7.0.181",
+        "better-auth": "1.7.23",
+        "drizzle-orm": "0.45.4",
+        "libpg-query": "17.8.3",
+        "lucide-react": "1.80.0",
+        "next": "16.4.6",
+        "pg": "8.23.1",
+        "pg-copy-streams": "7.0.0",
+        "react": "19.3.1",
+        "react-dom": "19.3.1",
+        "zod": "4.6.7",
+      },
+      "devDependencies": {
+        "@types/pg": "8.23.1",
+        "@types/pg-copy-streams": "1.2.5",
+        "drizzle-kit": "0.31.11",
+      },
+    },
     "gallery": {
       "name": "@bootcamp/gallery",
       "version": "0.1.0",
@@ -551,6 +584,8 @@
     "@bootcamp/invoice-inbox": ["@bootcamp/invoice-inbox@workspace:01-invoice-inbox"],
 
     "@bootcamp/legal-intake": ["@bootcamp/legal-intake@workspace:07-legal-intake"],
+
+    "@bootcamp/marketplace-analyst": ["@bootcamp/marketplace-analyst@workspace:13-marketplace-analyst"],
 
     "@bootcamp/mcp-server-and-cli": ["@bootcamp/mcp-server-and-cli@workspace:04-mcp-server-and-cli"],
 
@@ -976,6 +1011,8 @@
 
     "@opentui/react": ["@opentui/react@0.9.9", "", { "dependencies": { "@opentui/core": "0.9.9", "react-reconciler": "^0.33.0" }, "peerDependencies": { "react": ">=19.2.0", "react-devtools-core": "^7.0.1", "ws": "^8.18.0" } }, "sha512-ZDCNCsccvwifob7zoaDcJCk30XgUB867NxBtozK3KknyRzD7lzOW+eh8qrHRFh3wyGxcEaoL1WKAtFKr0R5LFw=="],
 
+    "@pgsql/types": ["@pgsql/types@17.6.2", "", {}, "sha512-1UtbELdbqNdyOShhrVfSz3a1gDi0s9XXiQemx+6QqtsrXe62a6zOGU+vjb2GRfG5jeEokI1zBBcfD42enRv0Rw=="],
+
     "@pinojs/redact": ["@pinojs/redact@0.4.0", "", {}, "sha512-k2ENnmBugE/rzQfEcdWHcCY+/FM3VLzH9cYEsbdsoqrvzAKRhUZeRNhAZvB8OitQJ1TBed3yqWtdjzS6wJKBwg=="],
 
     "@preact/signals-core": ["@preact/signals-core@1.14.5", "", {}, "sha512-vcRv7Ityz5JVmeiVqIluLFzT/PDS/AlhHUpw3/aUWqcVUs6bDGIPXE/6RSC4evBNWYvnniozg5Syfj33al3gkg=="],
@@ -1263,6 +1300,8 @@
     "@types/node-fetch": ["@types/node-fetch@2.6.13", "", { "dependencies": { "@types/node": "*", "form-data": "^4.0.4" } }, "sha512-QGpRVpzSaUs30JBSGPjOg4Uveu384erbHBoT1zeONvyCfwQxIkUshLAOqN/k9EjGviPRmWTTe6aH2qySWKTVSw=="],
 
     "@types/pg": ["@types/pg@8.23.1", "", { "dependencies": { "@types/node": "*", "pg-protocol": "*", "pg-types": "^2.2.0" } }, "sha512-fKVHpikPdg4GKks3JuLEhvwSyvwzF23hnabPy6DD8ljVbC7+6J5dQzdv4arV6jqq57djnMgs1HKBxX4P8aBI3A=="],
+
+    "@types/pg-copy-streams": ["@types/pg-copy-streams@1.2.5", "", { "dependencies": { "@types/node": "*", "@types/pg": "*" } }, "sha512-7D6/GYW2uHIaVU6S/5omI+6RZnwlZBpLQDZAH83xX1rjxAOK0f6/deKyyUTewxqts145VIGn6XWYz1YGf50G5g=="],
 
     "@types/pidusage": ["@types/pidusage@2.0.5", "", {}, "sha512-MIiyZI4/MK9UGUXWt0jJcCZhVw7YdhBuTOuqP/BjuLDLZ2PmmViMIQgZiWxtaMicQfAz/kMrZ5T7PKxFSkTeUA=="],
 
@@ -1758,6 +1797,8 @@
 
     "layout-base": ["layout-base@1.0.2", "", {}, "sha512-8h2oVEZNktL4BH2JCOI90iD1yXwL6iNW7KcCKT2QZgQJR2vbqDsldCTPRU9NifTCqHZci57XvQQ15YTu+sTYPg=="],
 
+    "libpg-query": ["libpg-query@17.8.3", "", { "dependencies": { "@pgsql/types": "^17.6.2" } }, "sha512-xTnGMsBFFUSarYUBGgechWdLV3OyI3B7uEZhrRQTh0KwUbMcJB6sn4y26BxsR5YTwrh9MzDDhB77xv0xRO9q+g=="],
+
     "lightningcss": ["lightningcss@1.33.0", "", { "dependencies": { "detect-libc": "^2.0.3" }, "optionalDependencies": { "lightningcss-android-arm64": "1.33.0", "lightningcss-darwin-arm64": "1.33.0", "lightningcss-darwin-x64": "1.33.0", "lightningcss-freebsd-x64": "1.33.0", "lightningcss-linux-arm-gnueabihf": "1.33.0", "lightningcss-linux-arm64-gnu": "1.33.0", "lightningcss-linux-arm64-musl": "1.33.0", "lightningcss-linux-x64-gnu": "1.33.0", "lightningcss-linux-x64-musl": "1.33.0", "lightningcss-win32-arm64-msvc": "1.33.0", "lightningcss-win32-x64-msvc": "1.33.0" } }, "sha512-WkUDrojuJs0xkgGf2udWxa3yGBRxPtxUkB79i6aCZLRgc7PM8fZe9TosfPDcvEpQZbuFASnHYmRLBLUbmLOIIA=="],
 
     "lightningcss-android-arm64": ["lightningcss-android-arm64@1.33.0", "", { "os": "android", "cpu": "arm64" }, "sha512-gEpRTalKdosp4Bb8qWtc2iOgE5SeIHlpS1up9bFq2wAyYhl1UdTObYiHe98zEM9SQvSoqQZ1IQD0JNpg3Ml5pg=="],
@@ -2015,6 +2056,8 @@
     "pg-cloudflare": ["pg-cloudflare@1.4.1", "", {}, "sha512-6PQbsFWZcp9EmJEwy5cGQ2La+AMWpP46lgbb8X+U/XsHIUweYDNCpeuKck5RxL2MdVFi7krbbEi5nX4Zh7JhrQ=="],
 
     "pg-connection-string": ["pg-connection-string@2.14.1", "", {}, "sha512-qR3kGNPBLpCNtz0evbKA0Y/MRFXwSSdT+pTJvYp/bXTcReZbvX1kzF0IyTc1QnxqF7AZbOeBhNL8R5mYQZV/MA=="],
+
+    "pg-copy-streams": ["pg-copy-streams@7.0.0", "", {}, "sha512-zBvnY6wtaBRE2ae2xXWOOGMaNVPkXh1vhypAkNSKgMdciJeTyIQAHZaEeRAxUjs/p1El5jgzYmwG5u871Zj3dQ=="],
 
     "pg-int8": ["pg-int8@1.0.1", "", {}, "sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw=="],
 

@@ -1,0 +1,239 @@
+/* What an answer rests on: the query's rows and the chart drawn from them. */
+
+.evidence {
+  display: grid;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 16px;
+}
+
+.evidence h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.evidence h2 svg {
+  width: 16px;
+  height: 16px;
+}
+
+.evidence summary {
+  color: var(--fg2);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.rows {
+  max-height: 300px;
+  overflow: auto;
+}
+
+.sql p {
+  margin: 8px 0 0;
+  color: var(--fg2);
+  font-size: 13px;
+}
+.sql pre {
+  margin: 8px 0 0;
+  padding: 12px;
+  border-radius: var(--r);
+  background: var(--surface-2);
+  font-size: 14px;
+  white-space: pre-wrap;
+}
+
+.chart {
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+}
+
+.chart figcaption {
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.bars {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bars li {
+  display: grid;
+  grid-template-columns: minmax(90px, 180px) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+
+.bar-track {
+  display: block;
+  height: 14px;
+}
+
+.bar {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+  border-radius: 0 var(--r) var(--r) 0;
+  background: var(--series-1);
+}
+
+.bars li:hover {
+  background: var(--surface-2);
+}
+
+.bar-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.bar-value {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.chart-readout {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.chart-readout strong {
+  margin-right: 6px;
+  color: var(--fg);
+  font-size: 18px;
+}
+
+.line-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.line-chart .tick line {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.line-chart .tick text {
+  fill: var(--muted);
+  font-size: 11px;
+  text-anchor: end;
+  dominant-baseline: middle;
+}
+
+.line-chart polyline {
+  fill: none;
+  stroke: var(--series-1);
+  stroke-width: 2;
+}
+
+.line-chart .dot {
+  fill: var(--series-1);
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+
+.line-chart .hit {
+  fill: transparent;
+}
+
+.chart-ends {
+  display: flex;
+  justify-content: space-between;
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.pie {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px;
+}
+
+.pie-drawing {
+  width: 180px;
+  height: 180px;
+}
+
+.slice {
+  stroke: var(--surface);
+  stroke-width: 2;
+}
+
+.pie-list {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+}
+
+.pie-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.series-1 {
+  fill: var(--series-1);
+  background: var(--series-1);
+}
+
+.series-2 {
+  fill: var(--series-2);
+  background: var(--series-2);
+}
+
+.series-3 {
+  fill: var(--series-3);
+  background: var(--series-3);
+}
+
+.series-4 {
+  fill: var(--series-4);
+  background: var(--series-4);
+}
+
+.series-5 {
+  fill: var(--series-5);
+  background: var(--series-5);
+}
+
+.series-6 {
+  fill: var(--series-6);
+  background: var(--series-6);
+}
+
+.series-7 {
+  fill: var(--series-7);
+  background: var(--series-7);
+}
+
+.series-8 {
+  fill: var(--series-8);
+  background: var(--series-8);
+}
+
+.eval-answer {
+  white-space: pre-line;
+}

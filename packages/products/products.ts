@@ -20,7 +20,10 @@ export type Idea =
   | "structured output"
   | "terminal ui"
   | "shared state"
-  | "adaptive ui";
+  | "adaptive ui"
+  | "rag"
+  | "multi-agent"
+  | "evals";
 
 export type Product = {
   folder: string;
@@ -139,6 +142,14 @@ export const PRODUCTS: Product[] = [
     job: "Work with the coding agent in a terminal app: watch it think, read each change before it lands, say yes or no, and stop it with Esc.",
     command: "bun run terminal",
     ideas: ["terminal ui", "human in the loop", "harness", "loop"],
+  },
+  {
+    folder: "13-marketplace-analyst",
+    slug: "marketplace-analyst",
+    title: "Marketplace analyst",
+    job: "Answer a marketplace team's questions with SQL over its own orders, without sending a row to the model.",
+    port: 3112,
+    ideas: ["rag", "multi-agent", "graph", "boundary", "evals"],
   },
 ];
 

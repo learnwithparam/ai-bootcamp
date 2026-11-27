@@ -42,6 +42,15 @@
   --firm: #1e4d3f;
   --firm-soft: #e6efe9;
   --on-firm: #ffffff;
+  /* Chart series, in fixed order. A colour follows its slice and is never cycled. */
+  --series-1: #257de0;
+  --series-2: #f47230;
+  --series-3: #00b894;
+  --series-4: #f2a600;
+  --series-5: #ee7fac;
+  --series-6: #008a17;
+  --series-7: #6a4ce2;
+  --series-8: #ec4647;
   color-scheme: light;
 }
 

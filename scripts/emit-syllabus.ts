@@ -3,7 +3,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { PRODUCTS } from "@bootcamp/products";
 
-// bun run syllabus: writes syllabus.json, the 12-week cohort the course platform imports.
+// bun run syllabus: writes syllabus.json, the cohort the course platform imports, one week per product.
 // Every module is one product folder. Keys come from folder names, so they stay the same between runs.
 // The platform validates the shape in syllabus-shape.ts. `bun run check` fails when the file is stale.
 

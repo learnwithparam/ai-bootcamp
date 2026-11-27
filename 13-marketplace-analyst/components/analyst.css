@@ -1,0 +1,218 @@
+/* The chat: the question on the right, then one answer laid out as route, text, chart, evidence. */
+
+.shell {
+  height: 100vh;
+}
+
+.shell-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.chat-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: var(--r);
+  background: none;
+  color: var(--fg2);
+}
+
+.icon-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+.analyst-thread {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  margin: -24px -32px -48px;
+}
+
+.analyst-viewport {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  overflow-y: auto;
+  padding: 24px 16px;
+}
+
+.welcome,
+.turn-question,
+.turn-answer {
+  width: 100%;
+  max-width: 820px;
+}
+
+.welcome h1 {
+  margin: 7vh 0 8px;
+  font-size: 30px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.welcome p {
+  max-width: 62ch;
+  margin: 0 0 24px;
+  color: var(--fg2);
+}
+
+.starters {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+  list-style: none;
+}
+
+.starter {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 14px 4px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  color: var(--fg);
+  text-align: left;
+}
+
+.starter:hover {
+  background: var(--hl);
+}
+
+.starter span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.turn-question {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.turn-question p {
+  max-width: 80%;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--r-lg);
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.turn-answer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.answer-text {
+  max-width: 68ch;
+  font-size: 16px;
+}
+
+.analyst-thread .composer {
+  max-width: 820px;
+}
+
+.analyst-thread .composer-input {
+  border: 0;
+  background: none;
+  resize: none;
+}
+
+/* The route map: the nodes that ran, top to bottom, joined by a line. */
+.route-map {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.route-node {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 2px 12px;
+  margin-left: 6px;
+  padding: 4px 0 4px 14px;
+  border-left: 2px solid var(--line-strong);
+  font-size: 13px;
+  line-height: 1.45;
+}
+.route-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+}
+.route-name svg {
+  width: 13px;
+  height: 13px;
+  flex: none;
+}
+.route-detail {
+  color: var(--fg2);
+  overflow-wrap: anywhere;
+}
+.route-notes {
+  grid-column: 2;
+  margin: 0;
+  padding: 0;
+  color: var(--muted);
+  font-family: var(--mono, monospace);
+  font-size: 12px;
+  list-style: none;
+  overflow-wrap: anywhere;
+}
+.route-failed {
+  border-color: var(--fail);
+}
+.route-running svg {
+  animation: turn 1s linear infinite;
+}
+@keyframes turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-running svg {
+    animation: none;
+  }
+}
+
+.route-total {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 860px) {
+  .shell {
+    height: 100dvh;
+  }
+
+  .analyst-thread {
+    margin: -16px;
+  }
+
+  .route-node {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .route-notes {
+    grid-column: 1;
+  }
+}
