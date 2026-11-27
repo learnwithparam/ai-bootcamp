@@ -132,7 +132,8 @@ sequenceDiagram
 
 1. **The gate comes first.** The model picks one of four intents. Only a real question goes further.
 2. **The schema is looked up.** Column meanings live in the database as `COMMENT ON COLUMN`, next to the columns.
-3. **Two walls stand around model-written SQL.** Postgres's own parser allows one `SELECT` over the seven tables.
+3. **Two walls stand around model-written SQL.** Postgres's own parser allows one `SELECT` over the seven tables,
+   calling only the functions listed in `rules/sql-guard.ts`.
    The query then runs as an account that can only read them, with an eight second limit.
 4. **A failed query is repaired** from the database's error, with every value removed from that message first.
 5. **The answer is written with slots.** `{{q1.1.orders}}` is one value and `{{q1.list}}` is the rows.
@@ -184,7 +185,7 @@ Read in this order. Each file is short.
 ## Prove it
 
 ```bash
-bun test 13-marketplace-analyst/tests/{rules,answer,scoring,screen,privacy}.test.ts   # no model
+bun test 13-marketplace-analyst/tests/{rules,sql-guard,answer,scoring,screen,privacy}.test.ts   # no model
 bun run proof marketplace-analyst                                             # real model, data and browser
 ```
 
@@ -212,9 +213,9 @@ Faithfulness, answer relevancy, context precision and context recall follow the
 For faithfulness, one call lists the claims from the answer alone and a second checks each against the context.
 Context precision and recall compare table names, so they need no judge.
 
-On 27 November 2026 the last run of the gold set measured: SQL accuracy 100%, faithfulness 99%,
-answer relevancy 81%, no value in any prompt, and about US$0.0002 a question.
-Answer relevancy moved between 69% and 81% across that day's runs.
+On 27 November 2026 the last run of the gold set measured: SQL accuracy 100%, faithfulness 91%,
+answer relevancy 77%, no value in any prompt, and about US$0.0002 a question.
+Across that day's runs faithfulness moved between 91% and 99%, and answer relevancy between 69% and 81%.
 A small model varies from run to run, so read a failed case before blaming a change.
 
 Answer relevancy compares two questions by meaning, so a correct answer scores well under 100%.

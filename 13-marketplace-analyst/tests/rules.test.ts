@@ -7,37 +7,12 @@ import { chartable, chartFrom, worthCharting } from "../rules/chart-spec";
 import { SOURCES } from "../rules/dataset";
 import { type Query, shapeOf } from "../rules/result";
 import { safeError } from "../rules/safe-error";
-import { guardSql, TABLES } from "../rules/sql-guard";
+import { TABLES } from "../rules/sql-guard";
 
 // The rules that keep the agents honest, with no model. The read-only tests need Postgres with the
 // migrations applied, not the data.
 
-describe("the SQL guard", () => {
-  test.each([
-    ["DELETE FROM orders", "only a SELECT"],
-    ["DROP TABLE orders", "only a SELECT"],
-    ["SELECT 1; DELETE FROM orders", "exactly one statement"],
-    ["WITH gone AS (DELETE FROM orders RETURNING *) SELECT * FROM gone", "only reading"],
-    ["SELECT * INTO copy FROM orders", "SELECT INTO"],
-    ["SELECT * FROM orders FOR UPDATE", "locking"],
-    ["SELECT * FROM public.user", "schema public"],
-    ["SELECT * FROM pg_user", "no table called pg_user"],
-    ["SELECT set_config('role', 'bootcamp', false)", "set_config"],
-    ["SELECT pg_sleep(60)", "pg_sleep"],
-    ["SELECT query_to_xml('select 1', true, true, '')", "query_to_xml"],
-    ["SELEC 1", "syntax error"],
-  ])("refuses %s", async (sql, why) => {
-    const result = await guardSql(sql);
-    expect(result.ok ? "allowed" : result.why).toContain(why);
-  });
-
-  test("lets a read through, with a row limit around it", async () => {
-    const sql = "WITH paid AS (SELECT order_id FROM payments) SELECT count(*) FROM paid; -- done";
-    const result = await guardSql(sql);
-    expect(result.ok && result.sql).toEndWith(") AS answer LIMIT 200");
-    expect(result.ok && result.sql).not.toContain(";");
-  });
-
+describe("the loaded tables", () => {
   test("knows exactly the tables the schema defines and the loader fills", () => {
     const defined = DATA_TABLES.map((table) => getTableName(table)).sort();
     expect([...TABLES].sort()).toEqual(defined);

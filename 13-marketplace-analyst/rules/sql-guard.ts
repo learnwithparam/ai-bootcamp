@@ -12,8 +12,23 @@ export type Guarded = { ok: true; sql: string } | { ok: false; why: string };
 type Node = Record<string, unknown>;
 
 const WRITES = ["InsertStmt", "UpdateStmt", "DeleteStmt", "MergeStmt"];
-// Functions that reach outside a plain read: settings, server files, other servers, running text as SQL.
-const BLOCKED_FUNCTION = /^(pg_|lo_|dblink)|^(set_config|current_setting)$|_to_xml/;
+// The only functions a query may call. A list of what is allowed, because Postgres has many functions
+// that read settings or files, or run text as SQL, and a list of banned ones always misses some.
+const FUNCTIONS = new Set(
+  [
+    "count sum avg min max stddev stddev_pop stddev_samp variance var_pop var_samp corr covar_pop covar_samp",
+    "regr_slope regr_intercept percentile_cont percentile_disc mode bool_and bool_or every string_agg array_agg",
+    "row_number rank dense_rank percent_rank cume_dist ntile lag lead first_value last_value nth_value",
+    "round floor ceil ceiling trunc abs sign mod power sqrt exp ln log width_bucket",
+    "extract date_part date_trunc date_bin age make_date to_char to_date to_timestamp to_number now timezone",
+    "justify_interval isfinite overlaps lower upper initcap length char_length substring substr left right",
+    "trim btrim ltrim rtrim lpad rpad replace overlay split_part concat concat_ws format strpos position",
+    "starts_with regexp_replace regexp_match similar_to_escape like_escape",
+    "unnest generate_series cardinality array_length array_to_string",
+  ]
+    .join(" ")
+    .split(" "),
+);
 
 // Every node of the parse tree, as [kind, contents].
 function* walk(value: unknown): Generator<[string, Node]> {
@@ -33,9 +48,11 @@ function tableProblem(table: Node, ctes: Set<unknown>): string {
 }
 
 function functionProblem(call: Node): string {
-  const parts = call.funcname as { String?: { sval?: string } }[];
-  const name = (parts.at(-1)?.String?.sval ?? "").toLowerCase();
-  return BLOCKED_FUNCTION.test(name) ? `the function ${name} is not allowed` : "";
+  const parts = (call.funcname as { String?: { sval?: string } }[]).map((part) => part.String?.sval ?? "");
+  const [schema, name = ""] = parts.length > 1 ? parts : ["pg_catalog", ...parts];
+  return schema === "pg_catalog" && FUNCTIONS.has(name.toLowerCase())
+    ? ""
+    : `the function ${name} is not allowed`;
 }
 
 function nodeProblem(kind: string, node: Node, ctes: Set<unknown>): string {
@@ -47,9 +64,13 @@ function nodeProblem(kind: string, node: Node, ctes: Set<unknown>): string {
   return "";
 }
 
+// A WITH name counts as a table anywhere in the query, though Postgres only sees it inside its own part.
+// Outside that part the same name would reach a system catalog, and every catalog name starts with pg_.
 function treeProblem(tree: unknown): string {
   const nodes = [...walk(tree)];
   const ctes = new Set(nodes.filter(([kind]) => kind === "CommonTableExpr").map(([, n]) => n.ctename));
+  const catalog = [...ctes].find((name) => String(name).startsWith("pg_"));
+  if (catalog) return `there is no table called ${catalog}, and a WITH query cannot take that name`;
   for (const [kind, node] of nodes) {
     const problem = nodeProblem(kind, node, ctes);
     if (problem) return problem;
