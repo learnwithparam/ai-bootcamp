@@ -1,15 +1,16 @@
 import { expect, test } from "bun:test";
+import { PRODUCTS } from "@bootcamp/products";
 import { checkSyllabus } from "./check-syllabus";
 import { buildSyllabus } from "./emit-syllabus";
 import { validateSyllabus } from "./syllabus-shape";
 
 const SHA = "0".repeat(40);
 
-test("the emitted syllabus has week zero and twelve weeks and passes the shape", () => {
+test("the emitted syllabus has week zero, one week per product, and passes the shape", () => {
   const syllabus = buildSyllabus(SHA);
   expect(validateSyllabus(syllabus)).toEqual([]);
   expect(syllabus.tree.modules.map((m) => m.key)).toEqual(
-    Array.from({ length: 13 }, (_, i) => `w${String(i).padStart(2, "0")}`),
+    Array.from({ length: PRODUCTS.length + 1 }, (_, i) => `w${String(i).padStart(2, "0")}`),
   );
 });
 

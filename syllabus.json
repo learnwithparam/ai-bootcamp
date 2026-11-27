@@ -2,7 +2,7 @@
   "source": {
     "repo": "learnwithparam/ai-bootcamp",
     "ref": "main",
-    "sha": "7192a243981a05905132ea5bc0e6044fe81691ec"
+    "sha": "5f0a520c4174b4018a3c77abd589f9cbf87570c5"
   },
   "tree": {
     "modules": [
@@ -436,6 +436,40 @@
                 "lab": {
                   "slug": "coding-agent-terminal",
                   "repo_path": "12-coding-agent-terminal"
+                },
+                "proof": {
+                  "kind": "github-check",
+                  "check_name": "check"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "w13",
+        "title": "Marketplace analyst",
+        "units": [
+          {
+            "key": "marketplace-analyst-build",
+            "title": "Build the marketplace analyst",
+            "items": [
+              {
+                "key": "marketplace-analyst-build-reading",
+                "kind": "reading",
+                "title": "The problem and the goal: Marketplace analyst",
+                "minutes": 5,
+                "body_md": "## Why\n\nA first text-to-SQL chatbot usually has three risks.\n\nIt sends your rows to the model so the model can describe them.\nIt pastes a schema into the prompt by hand, which goes stale the day a column changes.\nIt draws charts by running code the model wrote, so the model's text runs on your machine.\n\nThis product takes all three away. The model sees table descriptions and the shape of a result:\ncolumn names, types and the row count. It writes an answer with slots, and code fills them from the rows.\nA chart is only a choice of columns, drawn by the app's own code.\nAn eval run says how often all of that holds.\n\n## Goal\n\nAsk \"What are the top 5 product categories by sales?\"\nSee each step run, the tables the agent looked up, the SQL, the rows and a chart.\nOpen the Evals page and check any score down to the claim the judge read."
+              },
+              {
+                "key": "marketplace-analyst-build-lab",
+                "kind": "lab",
+                "title": "Run and read the marketplace analyst",
+                "minutes": 120,
+                "lab": {
+                  "slug": "marketplace-analyst",
+                  "repo_path": "13-marketplace-analyst"
                 },
                 "proof": {
                   "kind": "github-check",

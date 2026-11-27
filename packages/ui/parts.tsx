@@ -13,10 +13,20 @@ function NoImage({ alt }: { alt?: string }) {
   return alt ? <span>{alt}</span> : null;
 }
 
-export function MarkdownText() {
+// A product that rewrites the text first, for example to turn citation markers into links, uses this.
+export function RewrittenText({ preprocess }: { preprocess?: (text: string) => string }) {
   return (
-    <MarkdownTextPrimitive className="markdown" remarkPlugins={[remarkGfm]} components={{ img: NoImage }} />
+    <MarkdownTextPrimitive
+      className="markdown"
+      preprocess={preprocess}
+      remarkPlugins={[remarkGfm]}
+      components={{ img: NoImage }}
+    />
   );
+}
+
+export function MarkdownText() {
+  return <RewrittenText />;
 }
 
 export function StatusChip({ running }: { running: boolean }) {
